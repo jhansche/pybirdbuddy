@@ -40,7 +40,7 @@ class BirdBuddy:
         self._refresh_token = None
         self._me = None
 
-    def _login(self) -> bool:
+    async def _login(self) -> bool:
         assert self._email and self._password
         variables = {
             "emailSignInInput": {
@@ -48,7 +48,7 @@ class BirdBuddy:
                 "password": self._password,
             }
         }
-        data = self.graphql.execute(query=birdbuddy.queries.auth.SignIn, variables=variables)
+        data = await self.graphql.execute_async(query=birdbuddy.queries.auth.SignIn, variables=variables)
         if not data:
             _LOGGER.error("GraphQL had no response: {}", data)
             return False
@@ -59,17 +59,16 @@ class BirdBuddy:
 
         self._access_token = data['data']['authEmailSignIn']['accessToken']
         self._refresh_token = data['data']['authEmailSignIn']['refreshToken']
-        # TODO: check for Problem
         return self._save_me(data['data']['authEmailSignIn']['me'])
 
-    def _refresh_access_token(self) -> bool:
+    async def _refresh_access_token(self) -> bool:
         assert self._refresh_token
         variables = {
             "refreshTokenInput": {
                 "token": self._refresh_token,
             }
         }
-        data = self.graphql.execute(query=birdbuddy.queries.auth.RefreshAuthToken, variables=variables)
+        data = await self.graphql.execute_async(query=birdbuddy.queries.auth.RefreshAuthToken, variables=variables)
         if not data:
             _LOGGER.warning("GraphQL had no response: {}", data)
             return False
@@ -83,13 +82,13 @@ class BirdBuddy:
         _LOGGER.debug("Refreshed access token...")
         return not self._needs_refresh()
 
-    def refresh(self) -> bool:
+    async def refresh(self) -> bool:
         if self._needs_login():
-            return self._login()
+            return await self._login()
         elif self._needs_refresh():
-            return self._refresh_access_token() and self.refresh()
+            return await self._refresh_access_token() and await self.refresh()
         else:
-            data = self.graphql.execute(query=birdbuddy.queries.me.Me, headers=self._headers())
+            data = await self.graphql.execute_async(query=birdbuddy.queries.me.Me, headers=self._headers())
             if not data:
                 # No response?
                 _LOGGER.warning("GraphQL had no response: {}", data)
@@ -100,7 +99,7 @@ class BirdBuddy:
                     # Access token is good for 15 minutes
                     _LOGGER.info("Access token expired -> refreshing now...")
                     self._access_token = None
-                    return self._refresh_access_token() and self.refresh()
+                    return await self._refresh_access_token() and await self.refresh()
                 _LOGGER.warning("Unexpected GraphQL response: {}", data)
                 return False
             _LOGGER.debug("Feeder data refreshed successfully.")
@@ -109,8 +108,6 @@ class BirdBuddy:
     @property
     def feeders(self):
         if self._needs_login():
-            # FIXME: do not block property access
-            _LOGGER.debug("BirdBuddy.feeders access triggering login...")
-            assert self._login()
-        assert self._me is not None
+            _LOGGER.error("BirdBuddy is not logged in. Call refresh() first.")
+            return []
         return self._me.get('feeders', [])

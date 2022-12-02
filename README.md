@@ -6,11 +6,8 @@ import pprint
 from birdbuddy.client import BirdBuddy
 
 bb = BirdBuddy("user@email.com", "Pa$$w0rd")
-
-# BirdBuddy.feeders will initiate login if not already, but will not automatically refresh
+await bb.refresh()
 pprint.pprint(bb.feeders)
-# refresh() will update feeder data, including login if needed and/or refreshing access token if needed.
-bb.refresh()
 ```
 
 Note: only password login is supported currently. Google and other SSOs are not supported. If
