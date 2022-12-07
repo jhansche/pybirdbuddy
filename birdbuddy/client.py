@@ -3,8 +3,7 @@ from datetime import datetime
 
 from python_graphql_client import GraphqlClient
 
-import birdbuddy.queries.auth
-import birdbuddy.queries.me
+import birdbuddy.queries
 from birdbuddy.const import BB_URL
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,6 +38,11 @@ class BirdBuddy:
         self._access_token = None
         self._refresh_token = None
         self._me = None
+
+    async def dump_schema(self) -> dict:
+        """For debugging purposes: dump the entire GraphQL schema"""
+        import birdbuddy.queries.debug
+        return await self.graphql.execute_async(query=birdbuddy.queries.debug.DUMP_SCHEMA)
 
     async def _login(self) -> bool:
         assert self._email and self._password
