@@ -174,5 +174,5 @@ fragment SightingRecognizedMysteryVisitorFields on SightingRecognizedMysteryVisi
   text
   __typename
 }
-"""
+""".strip()
 """This might return error code ``SIGHTING_POSTCARD_ALREADY_CLAIMED``"""

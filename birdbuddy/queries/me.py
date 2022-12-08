@@ -104,7 +104,7 @@ fragment FeederForMemberPendingFields on FeederForMemberPending {
   name
   __typename
 }
-"""
+""".strip()
 
 FEED = """
 query meFeed($first: Int, $last: Int, $after: String, $before: String) {
@@ -354,4 +354,4 @@ fragment NewPostcardFields on FeedItemNewPostcard {
   ...FeedItemFields
   __typename
 }
-"""
+""".strip()

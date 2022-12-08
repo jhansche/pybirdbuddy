@@ -1,15 +1,20 @@
 """Bird Buddy client module"""
 
-import logging
 from datetime import datetime
+from typing import Union
 
 from python_graphql_client import GraphqlClient
 
-import birdbuddy.queries
-from birdbuddy.const import BB_URL
-from birdbuddy.feeder import Feeder
-
-_LOGGER = logging.getLogger(__name__)
+from . import LOGGER, queries
+from .const import BB_URL
+from .exceptions import (
+    AuthenticationFailedError,
+    AuthTokenExpiredError,
+    NoResponseError,
+    GraphqlError,
+    UnexpectedResponseError,
+)
+from .feeder import Feeder
 
 
 class BirdBuddy:
@@ -18,9 +23,9 @@ class BirdBuddy:
     graphql: GraphqlClient
     _email: str
     _password: str
-    _access_token: [str, None]
-    _refresh_token: [str, None]
-    _me: [dict, None]
+    _access_token: Union[str, None]
+    _refresh_token: Union[str, None]
+    _me: Union[dict, None]
     _feeders: dict[str, Feeder]
 
     def __init__(self, email: str, password: str):
@@ -63,14 +68,16 @@ class BirdBuddy:
     async def dump_schema(self) -> dict:
         """For debugging purposes: dump the entire GraphQL schema"""
         # pylint: disable=import-outside-toplevel
-        from birdbuddy.queries.debug import DUMP_SCHEMA
+        from .queries.debug import DUMP_SCHEMA
 
-        return await self.graphql.execute_async(query=DUMP_SCHEMA)
+        return await self._make_request(query=DUMP_SCHEMA, auth=False)
 
     async def _check_auth(self) -> bool:
         if self._needs_login():
+            LOGGER.debug("Login required.")
             return await self._login()
-        elif self._needs_refresh():
+        if self._needs_refresh():
+            LOGGER.debug("Access token needs to be refreshed.")
             await self._refresh_access_token()
         return not self._needs_login()
 
@@ -82,18 +89,17 @@ class BirdBuddy:
                 "password": self._password,
             }
         }
-        data = await self.graphql.execute_async(
-            query=birdbuddy.queries.auth.SIGN_IN, variables=variables
-        )
-        if not data:
-            _LOGGER.error("GraphQL had no response: %s", data)
-            return False
-        elif not data.get("data"):
-            self._clear()
-            _LOGGER.warning("GraphQL Signin failed: %s", data)
-            return False
+        try:
+            data = await self._make_request(
+                query=queries.auth.SIGN_IN,
+                variables=variables,
+                auth=False,
+            )
+        except GraphqlError as err:
+            LOGGER.exception("Error logging in: %s", err)
+            raise AuthenticationFailedError(err) from err
 
-        result = data["data"]["authEmailSignIn"]
+        result = data["authEmailSignIn"]
         self._access_token = result["accessToken"]
         self._refresh_token = result["refreshToken"]
         return self._save_me(result["me"])
@@ -105,65 +111,91 @@ class BirdBuddy:
                 "token": self._refresh_token,
             }
         }
-        data = await self.graphql.execute_async(
-            query=birdbuddy.queries.auth.REFRESH_AUTH_TOKEN, variables=variables
-        )
-        if not data:
-            _LOGGER.warning("GraphQL had no response: %s", data)
-            return False
-        if not data.get("data", {}).get("authRefreshToken"):
-            _LOGGER.warning("Unexpected GraphQL response: %s", data)
+        try:
+            data = await self._make_request(
+                query=queries.auth.REFRESH_AUTH_TOKEN,
+                variables=variables,
+                auth=False,
+            )
+        except GraphqlError as exc:
+            LOGGER.exception("Error refreshing access token: %s", exc)
             self._refresh_token = None
-            return False
-        result = data["data"]["authRefreshToken"]
-        self._access_token = result.get("accessToken")
-        self._refresh_token = result.get("refreshToken")
-        _LOGGER.debug("Refreshed access token...")
+            raise AuthenticationFailedError(exc) from exc
+
+        tokens = data["authRefreshToken"]
+        self._access_token = tokens.get("accessToken")
+        self._refresh_token = tokens.get("refreshToken")
+        LOGGER.info("Access token refreshed.")
         return not self._needs_refresh()
+
+    async def _make_request(
+        self,
+        query: str,
+        variables: dict = None,
+        auth: bool = True,
+        reauth: bool = True,
+    ) -> dict:
+        """Make the request, check for errors, and return the unwrapped data"""
+        if auth:
+            await self._check_auth()
+            headers = self._headers()
+        else:
+            headers = {}
+
+        LOGGER.debug("Making GraphQL request: %s", query.partition("\n")[0])
+        response = await self.graphql.execute_async(
+            query=query,
+            variables=variables,
+            headers=headers,
+        )
+
+        if not response or not isinstance(response, dict):
+            raise NoResponseError
+
+        errors = response.get("errors", [])
+        try:
+            GraphqlError.raise_errors(errors)
+        except AuthTokenExpiredError:
+            self._access_token = None
+            if auth and reauth:
+                # login and try again
+                return await self._make_request(
+                    query=query,
+                    variables=variables,
+                    auth=auth,
+                    reauth=False,
+                )
+            raise
+
+        result = response.get("data")
+        if not isinstance(result, dict):
+            raise UnexpectedResponseError(response)
+
+        return result
 
     async def refresh(self) -> bool:
         """Refreshes the Bird Buddy feeder data"""
-        await self._check_auth()
-        data = await self.graphql.execute_async(
-            query=birdbuddy.queries.me.ME,
-            headers=self._headers(),
-        )
-        if not data:
-            # No response?
-            _LOGGER.warning("GraphQL had no response: %s", data)
-            return False
-        if not data.get("data", {}).get("me"):
-            err = data.get("errors", []).pop()
-            if (
-                err
-                and err.get("extensions", {}).get("code") == "AUTH_TOKEN_EXPIRED_ERROR"
-            ):
-                # Access token is good for 15 minutes
-                _LOGGER.info("Access token expired -> refreshing now...")
-                self._access_token = None
-                return await self._refresh_access_token() and await self.refresh()
-            _LOGGER.warning("Unexpected GraphQL response: %s", data)
-            return False
-        _LOGGER.debug("Feeder data refreshed successfully.")
-        return self._save_me(data["data"]["me"])
+        data = await self._make_request(query=queries.me.ME)
+        LOGGER.debug("Feeder data refreshed successfully: %s", data)
+        return self._save_me(data["me"])
 
     async def feed(self) -> dict:
         """Returns the Bird Buddy Feed"""
-        data = await self.graphql.execute_async(
-            query=birdbuddy.queries.me.FEED,
-            headers=self._headers(),
-        )
+        data = await self._make_request(query=queries.me.FEED)
         return data
 
     async def sighting_from_postcard(self, postcard_id: str) -> dict:
         """Convert a 'postcard' into a 'sighting'."""
         await self._check_auth()
 
-        variables = {"sightingCreateFromPostcardInput": {"feedItemId": postcard_id}}
-        data = await self.graphql.execute_async(
-            query=birdbuddy.queries.birds.POSTCARD_TO_SIGHTING,
+        variables = {
+            "sightingCreateFromPostcardInput": {
+                "feedItemId": postcard_id,
+            }
+        }
+        data = await self._make_request(
+            query=queries.birds.POSTCARD_TO_SIGHTING,
             variables=variables,
-            headers=self._headers(),
         )
         # data[feeder], data[medias], data[sightingReport]
         # sightingReport.reportToken is JSON-string, containing confidence of each match
@@ -174,6 +206,6 @@ class BirdBuddy:
     def feeders(self) -> dict[str, Feeder]:
         """The Feeder devices associated with the account."""
         if self._needs_login():
-            _LOGGER.error("BirdBuddy is not logged in. Call refresh() first.")
+            LOGGER.warning("BirdBuddy is not logged in. Call refresh() first.")
             return {}
         return self._feeders

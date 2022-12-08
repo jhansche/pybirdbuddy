@@ -173,7 +173,7 @@ fragment ProblemFields on Problem {
   }
   __typename
 }
-"""
+""".strip()
 
 REFRESH_AUTH_TOKEN = """
 mutation authRefreshToken($refreshTokenInput: RefreshTokenInput!) {
@@ -187,4 +187,4 @@ fragment AuthFields on Auth {
   refreshToken
   __typename
 }
-"""
+""".strip()

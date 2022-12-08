@@ -87,4 +87,4 @@ query IntrospectionQuery {
     }
   }
 }
-"""
+""".strip()

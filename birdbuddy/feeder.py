@@ -1,11 +1,10 @@
 """Bird Buddy feeder models"""
 
-import logging
 from collections import UserDict
 from enum import Enum
 from typing import Optional
 
-_LOGGER = logging.getLogger(__package__)
+from . import LOGGER
 
 
 class MetricState(Enum):
@@ -109,7 +108,7 @@ class Feeder(UserDict[str, any]):
         Level of bird seed in the feeder.
         @incubating This field appears not to work currently.
         """
-        _LOGGER.info("birdbuddy.Feeder.food is incubating")
+        LOGGER.info("birdbuddy.Feeder.food is incubating")
         return MetricState(self.get("food", {}).get("state", "UNKNOWN"))
 
     @property
@@ -119,5 +118,5 @@ class Feeder(UserDict[str, any]):
         Temperature at the feeder.
         @incubating This field appears not to work currently.
         """
-        _LOGGER.info("birdbuddy.Feeder.temperature is incubating")
+        LOGGER.info("birdbuddy.Feeder.temperature is incubating")
         return self.get("temperature", {}).get("value", 0)
