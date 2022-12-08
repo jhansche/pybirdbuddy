@@ -147,6 +147,29 @@ class BirdBuddy:
         _LOGGER.debug("Feeder data refreshed successfully.")
         return self._save_me(data["data"]["me"])
 
+    async def feed(self) -> dict:
+        """Returns the Bird Buddy Feed"""
+        data = await self.graphql.execute_async(
+            query=birdbuddy.queries.me.FEED,
+            headers=self._headers(),
+        )
+        return data
+
+    async def sighting_from_postcard(self, postcard_id: str) -> dict:
+        """Convert a 'postcard' into a 'sighting'."""
+        await self._check_auth()
+
+        variables = {"sightingCreateFromPostcardInput": {"feedItemId": postcard_id}}
+        data = await self.graphql.execute_async(
+            query=birdbuddy.queries.birds.POSTCARD_TO_SIGHTING,
+            variables=variables,
+            headers=self._headers(),
+        )
+        # data[feeder], data[medias], data[sightingReport]
+        # sightingReport.reportToken is JSON-string, containing confidence of each match
+        # sightingReport.sightings[] might be type `SightingCantDecideWhichBird`
+        return data
+
     @property
     def feeders(self) -> dict[str, Feeder]:
         """The Feeder devices associated with the account."""
