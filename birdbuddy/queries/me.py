@@ -1,4 +1,6 @@
-Me = """
+"""Queries related to the logged in user"""
+
+ME = """
 query me {
   me {
     user {
@@ -104,7 +106,7 @@ fragment FeederForMemberPendingFields on FeederForMemberPending {
 }
 """
 
-Feed = """
+FEED = """
 query meFeed($first: Int, $last: Int, $after: String, $before: String) {
   me {
     feed(first: $first, last: $last, after: $after, before: $before) {

@@ -1,4 +1,6 @@
-SignIn = """
+"""Authentication queries"""
+
+SIGN_IN = """
 mutation emailSignIn($emailSignInInput: EmailSignInInput!) {
   authEmailSignIn(emailSignInInput: $emailSignInInput) {
     ... on Auth {
@@ -173,7 +175,7 @@ fragment ProblemFields on Problem {
 }
 """
 
-RefreshAuthToken = """
+REFRESH_AUTH_TOKEN = """
 mutation authRefreshToken($refreshTokenInput: RefreshTokenInput!) {
   authRefreshToken(refreshTokenInput: $refreshTokenInput) {
     ...AuthFields

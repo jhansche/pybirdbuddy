@@ -1,18 +1,24 @@
+"""Bird Buddy feeder models"""
+
 import logging
 from collections import UserDict
 from enum import Enum
-from typing import Mapping, Optional
+from typing import Optional
 
 _LOGGER = logging.getLogger(__package__)
 
 
 class MetricState(Enum):
+    """Feeder metric states"""
+
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
 
 
 class FeederState(Enum):
+    """Feeder states"""
+
     OFFLINE = "OFFLINE"
     OFF_GRID = "OFF_GRID"
     ONLINE = "ONLINE"
@@ -25,23 +31,19 @@ class FeederState(Enum):
 class Signal(UserDict[str, any]):
     """Wifi signal metrics"""
 
-    def __init__(self, signal: Mapping[str, any]) -> None:
-        super().__init__(signal)
-
     @property
     def rssi(self) -> int:
+        """Signal strength"""
         return self.get("value", -1)
 
     @property
     def state(self) -> MetricState:
+        """Signal strength"""
         return MetricState(self.get("state", "UNKNOWN"))
 
 
 class Battery(UserDict[str, any]):
     """Battery info"""
-
-    def __init__(self, battery: Mapping[str, any]) -> None:
-        super().__init__(battery)
 
     @property
     def percentage(self) -> int:
@@ -62,12 +64,8 @@ class Battery(UserDict[str, any]):
 class Feeder(UserDict[str, any]):
     """Represents one Bird Buddy device"""
 
-    def __init__(self, feeder: Mapping[str, any]) -> None:
-        super().__init__(feeder)
-
     def __str__(self):
-        return (f"<Feeder: {self.name}, {self.state}, "
-                f"{self.battery.percentage}%>")
+        return f"<Feeder: {self.name}, {self.state}, " f"{self.battery.percentage}%>"
 
     @property
     def id(self):
@@ -86,6 +84,7 @@ class Feeder(UserDict[str, any]):
 
     @property
     def owner(self) -> str:
+        """The username who first paired the Feeder"""
         return self.get("ownerName")
 
     @property
@@ -101,8 +100,7 @@ class Feeder(UserDict[str, any]):
     @property
     def location(self) -> tuple[Optional[str], Optional[str]]:
         """Configured location of the Feeder"""
-        return (self.get("locationCity"),
-                self.get("locationCountry"))
+        return (self.get("locationCity"), self.get("locationCountry"))
 
     @property
     # @incubating
