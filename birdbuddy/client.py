@@ -28,7 +28,7 @@ class BirdBuddy:
     _me: Union[dict, None]
     _feeders: dict[str, Feeder]
 
-    def __init__(self, email: str, password: str):
+    def __init__(self, email: str, password: str) -> None:
         self.graphql = GraphqlClient(BB_URL)
         self._email = email
         self._password = password
@@ -74,10 +74,10 @@ class BirdBuddy:
 
     async def _check_auth(self) -> bool:
         if self._needs_login():
-            LOGGER.debug("Login required.")
+            LOGGER.debug("Login required")
             return await self._login()
         if self._needs_refresh():
-            LOGGER.debug("Access token needs to be refreshed.")
+            LOGGER.debug("Access token needs to be refreshed")
             await self._refresh_access_token()
         return not self._needs_login()
 
@@ -125,7 +125,7 @@ class BirdBuddy:
         tokens = data["authRefreshToken"]
         self._access_token = tokens.get("accessToken")
         self._refresh_token = tokens.get("refreshToken")
-        LOGGER.info("Access token refreshed.")
+        LOGGER.info("Access token refreshed")
         return not self._needs_refresh()
 
     async def _make_request(
@@ -236,6 +236,6 @@ class BirdBuddy:
     def feeders(self) -> dict[str, Feeder]:
         """The Feeder devices associated with the account."""
         if self._needs_login():
-            LOGGER.warning("BirdBuddy is not logged in. Call refresh() first.")
+            LOGGER.warning("BirdBuddy is not logged in. Call refresh() first")
             return {}
         return self._feeders
