@@ -355,3 +355,114 @@ fragment NewPostcardFields on FeedItemNewPostcard {
   __typename
 }
 """.strip()
+
+COLLECTIONS = """
+query meCollections {
+  me {
+    collections {
+      ...AnyCollectionMainListFields
+      __typename
+    }
+    __typename
+  }
+}
+fragment AnyCollectionMainListFields on AnyCollection {
+  ... on CollectionBird {
+    ...CollectionMainListBirdFields
+    __typename
+  }
+  ... on CollectionMysteryVisitor {
+    ...CollectionMainListFields
+    __typename
+  }
+  __typename
+}
+fragment CollectionMainListBirdFields on CollectionBird {
+  ...CollectionMainListFields
+  species {
+    ...SpeciesAnyListFields
+    __typename
+  }
+  __typename
+}
+fragment CollectionMainListFields on Collection {
+  id
+  coverCollectionMedia {
+    ...CollectionMediaFields
+    __typename
+  }
+  markedAsNew
+  visitsAllTime
+  visitLastTime
+  previewMedia {
+    ...GalleryPreviewImagesFields
+    __typename
+  }
+  __typename
+}
+fragment CollectionMediaFields on CollectionMedia {
+  id
+  feederName
+  liked
+  likes
+  isShared
+  locationCity
+  locationCountry
+  owning
+  ownerName
+  origin
+  media {
+    ...MediaFullFields
+    __typename
+  }
+  __typename
+}
+fragment MediaFullFields on Media {
+  id
+  createdAt
+  thumbnailUrl
+  ... on MediaImage {
+    contentUrl(size: ORIGINAL)
+    __typename
+  }
+  ... on MediaVideo {
+    contentUrl(size: ORIGINAL)
+    __typename
+  }
+  __typename
+}
+fragment GalleryPreviewImagesFields on CollectionMedia {
+  media {
+    thumbnailUrl
+    __typename
+  }
+  __typename
+}
+fragment SpeciesAnyListFields on AnySpecies {
+  ... on SpeciesBird {
+    ...SpeciesListFields
+    isUnofficialName
+    mapUrl
+    __typename
+  }
+  ... on SpeciesBirdFamily {
+    ...SpeciesListFields
+    __typename
+  }
+  ... on SpeciesBirdGenus {
+    ...SpeciesListFields
+    __typename
+  }
+  ... on SpeciesBirdOrder {
+    ...SpeciesListFields
+    __typename
+  }
+  __typename
+}
+fragment SpeciesListFields on Species {
+  id
+  iconUrl
+  name
+  __typename
+}
+""".strip()

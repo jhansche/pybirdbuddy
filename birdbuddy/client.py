@@ -15,6 +15,7 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feeder import Feeder
+from .media import Collection
 
 
 class BirdBuddy:
@@ -27,6 +28,7 @@ class BirdBuddy:
     _refresh_token: Union[str, None]
     _me: Union[dict, None]
     _feeders: dict[str, Feeder]
+    _collections: dict[str, Collection]
 
     def __init__(self, email: str, password: str) -> None:
         self.graphql = GraphqlClient(BB_URL)
@@ -36,6 +38,7 @@ class BirdBuddy:
         self._refresh_token = None
         self._me = None
         self._feeders = {}
+        self._collections = {}
 
     def _save_me(self, me_data: dict):
         if not me_data:
@@ -231,6 +234,27 @@ class BirdBuddy:
         #  - for each .sightings[]: sightingChooseSpecies()
         #  - sightingReportPostcardFinish()
         return data
+
+    async def refresh_collections(self, of_type: str = "bird") -> dict[str, Collection]:
+        """Returns the remote bird collections"""
+        data = await self._make_request(query=queries.me.COLLECTIONS)
+        collections = {
+            (c := Collection(d)).collection_id: c
+            for d in data["me"]["collections"]
+            # __typename: CollectionBird
+            if d["__typename"] == f"Collection{of_type.capitalize()}"
+        }
+        self._collections.update(collections)
+        return self._collections
+
+    @property
+    def collections(self) -> dict[str, Collection]:
+        if self._needs_login():
+            LOGGER.warning(
+                "BirdBuddy is not logged in. Call refresh_collections() first"
+            )
+            return {}
+        return self._collections
 
     @property
     def feeders(self) -> dict[str, Feeder]:
