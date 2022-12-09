@@ -182,10 +182,31 @@ class BirdBuddy:
     async def feed(self) -> dict:
         """Returns the Bird Buddy Feed"""
         data = await self._make_request(query=queries.me.FEED)
-        return data
+        return data["me"]["feed"]
+
+    async def feed_node_types(self) -> list:
+        """Returns just the node types from the Bird Buddy Feed"""
+        feed = await self.feed()
+        nodes = [edge["node"] for edge in feed["edges"]]
+        return [node["__typename"] for node in nodes]
+
+    async def feed_nodes(self, node_type: str) -> list[dict]:
+        """Returns all feed items of type ``node_type``"""
+        feed = await self.feed()
+        nodes = [edge["node"] for edge in feed["edges"]]
+        return [node for node in nodes if node["__typename"] == node_type]
+
+    async def new_postcards(self) -> list[dict]:
+        """Returns all new 'Postcard' feed items.
+
+        These Postcard node types will be converted into sightings using ``sighting_from_postcard``.
+        """
+        return await self.feed_nodes("FeedItemNewPostcard")
 
     async def sighting_from_postcard(self, postcard_id: str) -> dict:
-        """Convert a 'postcard' into a 'sighting'."""
+        """Convert a 'postcard' into a 'sighting report'.
+        Next step is to choose or confirm species and then finish the sighting.
+        """
         await self._check_auth()
 
         variables = {
@@ -199,7 +220,16 @@ class BirdBuddy:
         )
         # data[feeder], data[medias], data[sightingReport]
         # sightingReport.reportToken is JSON-string, containing confidence of each match
-        # sightingReport.sightings[] might be type `SightingCantDecideWhichBird`
+        # sightingReport.sightings[] might have types:
+        #  'SightingCantDecideWhichBird',
+        #  'SightingNoBird',
+        #  'SightingNoBirdRecognized',
+        #  'SightingRecognizedBird',
+        #  'SightingRecognizedBirdUnlocked',
+        #  'SightingRecognizedMysteryVisitor',
+        # Next steps:
+        #  - for each .sightings[]: sightingChooseSpecies()
+        #  - sightingReportPostcardFinish()
         return data
 
     @property
