@@ -3,6 +3,30 @@
 from collections import UserDict
 
 
+class Media(UserDict):
+    """Represents one ``MediaImage`` type"""
+
+    @property
+    def id(self) -> str:
+        """The media id"""
+        return self["id"]
+
+    @property
+    def created_at(self) -> str:
+        """Creation timestamp"""
+        return self["createdAt"]
+
+    @property
+    def thumbnail_url(self) -> str:
+        """Thumbnail URL"""
+        return self["thumbnailUrl"]
+
+    @property
+    def content_url(self) -> str:
+        """Large content URL"""
+        return self["contentUrl"]
+
+
 class Collection(UserDict):
     """Collection of media for a particular bird species."""
 
@@ -17,6 +41,6 @@ class Collection(UserDict):
         return self["id"]
 
     @property
-    def cover_media(self) -> dict[str, any]:
+    def cover_media(self) -> Media:
         """The cover media"""
-        return self["coverCollectionMedia"]
+        return Media(self["coverCollectionMedia"]["media"])

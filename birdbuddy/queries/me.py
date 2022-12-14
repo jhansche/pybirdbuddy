@@ -466,3 +466,76 @@ fragment SpeciesListFields on Species {
   __typename
 }
 """.strip()
+
+COLLECTIONS_MEDIA = """
+query meCollectionsMedia($collectionId: ID!, $first: Int, $orderBy: MediaOrderByInput, $last: Int, $after: String, $before: String) {
+  collection(collectionId: $collectionId) {
+    ... on CollectionBird {
+      id
+      media(
+        first: $first
+        orderBy: $orderBy
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        ...CollectionMediaConnectionFields
+      }
+    }
+    ... on CollectionMysteryVisitor {
+      id
+      media(
+        first: $first
+        orderBy: $orderBy
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        ...CollectionMediaConnectionFields
+      }
+    }
+  }
+}
+fragment CollectionMediaConnectionFields on CollectionMediaConnection {
+  edges {
+    node {
+      ...CollectionMediaFields
+    }
+  }
+  pageInfo {
+    hasNextPage
+    endCursor
+  }
+}
+fragment CollectionMediaFields on CollectionMedia {
+  id
+  feederName
+  liked
+  likes
+  isShared
+  locationCity
+  locationCountry
+  owning
+  ownerName
+  origin
+  media {
+    ...MediaFullFields
+    __typename
+  }
+  __typename
+}
+fragment MediaFullFields on Media {
+  id
+  createdAt
+  thumbnailUrl
+  ... on MediaImage {
+    contentUrl(size: ORIGINAL)
+    __typename
+  }
+  ... on MediaVideo {
+    contentUrl(size: ORIGINAL)
+    __typename
+  }
+  __typename
+}
+"""

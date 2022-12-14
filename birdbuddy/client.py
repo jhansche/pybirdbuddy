@@ -15,7 +15,7 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feeder import Feeder
-from .media import Collection
+from .media import Collection, Media
 
 
 class BirdBuddy:
@@ -247,6 +247,7 @@ class BirdBuddy:
         self._collections.update(collections)
         return self._collections
 
+    # TODO: does it even  make sense to cache this? If it's going to change
     @property
     def collections(self) -> dict[str, Collection]:
         if self._needs_login():
@@ -255,6 +256,24 @@ class BirdBuddy:
             )
             return {}
         return self._collections
+
+    async def collection(self, collection_id: str) -> dict[str, Media]:
+        """Returns the media in the specified collection.
+
+        The keys will be the ``media_id``, and values
+        """
+        variables = {
+            "collectionId": collection_id,
+            # other inputs: first, orderBy, last, after, before
+        }
+        data = await self._make_request(
+            query=queries.me.COLLECTIONS_MEDIA, variables=variables
+        )
+        # TODO: check [collection][media][pageInfo][hasNextPage]?
+        return {
+            (node := edge["node"]["media"])["id"]: Media(node)
+            for edge in data["collection"]["media"]["edges"]
+        }
 
     @property
     def feeders(self) -> dict[str, Feeder]:
