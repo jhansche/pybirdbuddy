@@ -208,7 +208,10 @@ class BirdBuddy:
 
     async def sighting_from_postcard(self, postcard_id: str) -> dict:
         """Convert a 'postcard' into a 'sighting report'.
+
         Next step is to choose or confirm species and then finish the sighting.
+        If the sighting type is ``SightingRecognized``, we can collect the sighting with
+        ``finish_postcard``.
         """
         await self._check_auth()
 
@@ -234,6 +237,50 @@ class BirdBuddy:
         #  - for each .sightings[]: sightingChooseSpecies()
         #  - sightingReportPostcardFinish()
         return data
+
+    async def finish_postcard(
+        self,
+        feed_item_id: str,
+        sighting_result: dict,
+    ) -> bool:
+        """Finish collecting the postcard in your collections.
+
+        :param feed_item_id the id from ``new_postcards``
+        :param sighting_result from ``sighting_from_postcard``, should contain sightings of type
+        ``SightingRecognizedBird`` or `SightingRecognizedBirdUnlocked``.
+        """
+        if sighting_result.get("__typename") != "SightingCreateFromPostcardResult":
+            # See sighting_from_postcard()["sightingCreateFromPostcard"]
+            LOGGER.warning("Unexpected sighting result: %s", sighting_result)
+            return False
+
+        report = sighting_result["sightingReport"]
+        sighting_types = [x["__typename"] for x in report["sightings"]]
+
+        if not all(t in ["SightingRecognizedBird", "SightingRecognizedBirdUnlocked"] for t in sighting_types):
+            LOGGER.warning("Requires manual selection: %s", report)
+            return False
+
+        variables = {
+            "sightingReportPostcardFinishInput": {
+                "feedItemId": feed_item_id,
+                "defaultCoverMedia": [
+                    {
+                        "speciesId": s["species"]["id"],
+                        "mediaId": s["matchTokens"][0],
+                    }
+                    for s in report["sightings"]
+                    if s["__typename"] == "SightingRecognizedBirdUnlocked"
+                ],
+                "notSelectedMediaIds": [],
+                "reportToken": report["reportToken"],
+            }
+        }
+        data = await self._make_request(
+            query=queries.birds.FINISH_SIGHTING,
+            variables=variables,
+        )
+        return bool(data["sightingReportPostcardFinish"]["success"])
 
     async def refresh_collections(self, of_type: str = "bird") -> dict[str, Collection]:
         """Returns the remote bird collections"""

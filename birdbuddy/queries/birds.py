@@ -176,3 +176,14 @@ fragment SightingRecognizedMysteryVisitorFields on SightingRecognizedMysteryVisi
 }
 """.strip()
 """This might return error code ``SIGHTING_POSTCARD_ALREADY_CLAIMED``"""
+
+FINISH_SIGHTING = """
+mutation sightingReportPostcardFinish($sightingReportPostcardFinishInput: SightingReportPostcardFinishInput!) {
+  sightingReportPostcardFinish(
+    sightingReportPostcardFinishInput: $sightingReportPostcardFinishInput
+  ) {
+    success
+    __typename
+  }
+}
+""".strip()
