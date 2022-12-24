@@ -18,6 +18,8 @@ class MetricState(Enum):
 class FeederState(Enum):
     """Feeder states"""
 
+    DEEP_SLEEP = "DEEP_SLEEP"
+    FIRMWARE_UPDATE = "FIRMWARE_UPDATE"
     OFFLINE = "OFFLINE"
     OFF_GRID = "OFF_GRID"
     ONLINE = "ONLINE"
