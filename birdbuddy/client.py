@@ -1,11 +1,12 @@
 """Bird Buddy client module"""
 
+from __future__ import annotations
 from datetime import datetime
 from typing import Union
 
 from python_graphql_client import GraphqlClient
 
-from . import LOGGER, queries
+from . import LOGGER, VERBOSE, queries
 from .const import BB_URL
 from .exceptions import (
     AuthenticationFailedError,
@@ -16,6 +17,18 @@ from .exceptions import (
 )
 from .feeder import Feeder
 from .media import Collection, Media
+
+_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
+"""The format string of GraphQL timestamps. This is not guaranteed to conform to
+:func:`datetime.fromisoformat()`, so it has to be parsed manually."""
+
+_NO_VALUE = object()
+"""Sentinel value to allow None to override a default value."""
+
+
+def _redact(data, redacted: bool = True):
+    """Returns a redacted string if necessary."""
+    return "**REDACTED**" if redacted else data
 
 
 class BirdBuddy:
@@ -29,6 +42,7 @@ class BirdBuddy:
     _me: Union[dict, None]
     _feeders: dict[str, Feeder]
     _collections: dict[str, Collection]
+    _last_feed_date: datetime
 
     def __init__(self, email: str, password: str) -> None:
         self.graphql = GraphqlClient(BB_URL)
@@ -37,6 +51,7 @@ class BirdBuddy:
         self._access_token = None
         self._refresh_token = None
         self._me = None
+        self._last_feed_date = None
         self._feeders = {}
         self._collections = {}
 
@@ -145,7 +160,12 @@ class BirdBuddy:
         else:
             headers = {}
 
-        LOGGER.debug("Making GraphQL request: %s", query.partition("\n")[0])
+        should_redact = query in [queries.auth.REFRESH_AUTH_TOKEN, queries.auth.SIGN_IN]
+        LOGGER.debug(
+            "> GraphQL %s, vars=%s",
+            query.partition("\n")[0],  # First line of query
+            _redact(variables, should_redact),
+        )
         response = await self.graphql.execute_async(
             query=query,
             variables=variables,
@@ -174,6 +194,8 @@ class BirdBuddy:
         if not isinstance(result, dict):
             raise UnexpectedResponseError(response)
 
+        LOGGER.log(VERBOSE, "< response: %s", _redact(result, should_redact))
+
         return result
 
     async def refresh(self) -> bool:
@@ -182,10 +204,94 @@ class BirdBuddy:
         LOGGER.debug("Feeder data refreshed successfully: %s", data)
         return self._save_me(data["me"])
 
-    async def feed(self) -> dict:
-        """Returns the Bird Buddy Feed"""
-        data = await self._make_request(query=queries.me.FEED)
-        return data["me"]["feed"]
+    async def feed(
+        self,
+        first: int = 20,
+        after: str = None,
+        last: int = None,
+        before: str = None,
+        newer_than: datetime | str = None,
+    ) -> dict:
+        """Returns the Bird Buddy Feed.
+
+        The returned dictionary contains a `"pageInfo"` key for pagination/cursor data; and an
+        `"edges"` key containing a list of FeedEdge nodes, most recent items listed first.
+
+        :param first: Return the first N items older than `after`
+        :param after: The cursor of the oldest item previously seen, to allow pagination of very long feeds
+        :param last: Return the last N items newer than `before`
+        :param before: The cursor of the newest item previously seen, to allow pagination of very long feeds
+        :param newer_than: `datetime` or `str` of the most recent feed item previously seen
+        """
+        variables = {
+            # $first: Int,
+            # $after: String,
+            # $last: Int,
+            # $before: String,
+            "first": first,
+        }
+
+        if after:
+            # $after actually looks for _older_ items
+            variables["after"] = after
+
+        if before:
+            # Not implemented: birdbuddy.exceptions.GraphqlError: 501: 'Not Implemented'
+            #  variables["before"] = before
+            #  variables["last"] = last if last else 20
+            pass
+
+        data = await self._make_request(query=queries.me.FEED, variables=variables)
+        feed = data["me"]["feed"]
+
+        # Convert createdAt to datetime:
+        for edge in feed["edges"]:
+            if created_at := edge["node"].get("createdAt", None):
+                edge["node"]["createdAt"] = datetime.strptime(
+                    created_at, _DATETIME_FORMAT
+                )
+
+        if isinstance(newer_than, str):
+            if len(newer_than) == 24:
+                # The known expected datetime format in the BirdBuddy feed
+                newer_than = datetime.strptime(newer_than, _DATETIME_FORMAT)
+            else:
+                newer_than = datetime.fromisoformat(newer_than)
+        if newer_than:
+            # filter edges by `newer_than` time
+            # This simulates the expected behavior of `before` + `last`, which does not work.
+            feed["edges"] = [
+                edge for edge in feed["edges"] if edge["node"]["createdAt"] > newer_than
+            ]
+
+        # Append a fake "newestDate" to pageInfo
+        if len(feed["edges"]) > 0:
+            feed["pageInfo"]["newestDate"] = max(
+                (x["node"]["createdAt"] for x in feed["edges"])
+            )
+
+        return feed
+
+    async def refresh_feed(self, since: datetime = _NO_VALUE) -> dict:
+        """Get only fresh feed items, new since the last Feed refresh.
+
+        The most recent edge node timestamp will be saved as the last seen feed item,
+        which will become the new default value for `since`. This can be useful to,
+        for example, restore a last-seen timestamp in a new instance.
+
+        :param since: The `datetime` after which to restrict new feed items."""
+        if since == _NO_VALUE:
+            since = self._last_feed_date
+        feed = await self.feed(newer_than=since)
+        newest_date = feed.get("pageInfo", {}).get("newestDate", since)
+        if newest_date and newest_date != self._last_feed_date:
+            LOGGER.debug(
+                "Updating latest seen Feed timestamp: %s -> %s",
+                self._last_feed_date,
+                newest_date,
+            )
+            self._last_feed_date = newest_date
+        return feed
 
     async def feed_node_types(self) -> list:
         """Returns just the node types from the Bird Buddy Feed"""
@@ -257,7 +363,11 @@ class BirdBuddy:
         report = sighting_result["sightingReport"]
         sighting_types = [x["__typename"] for x in report["sightings"]]
 
-        if not all(t in ["SightingRecognizedBird", "SightingRecognizedBirdUnlocked"] for t in sighting_types):
+        if not all(
+            t in ["SightingRecognizedBird", "SightingRecognizedBirdUnlocked"]
+            for t in sighting_types
+        ):
+            # TODO: emit an event and allow an automation to handle it?
             LOGGER.warning("Requires manual selection: %s", report)
             return False
 
@@ -297,6 +407,7 @@ class BirdBuddy:
     # TODO: does it even  make sense to cache this? If it's going to change
     @property
     def collections(self) -> dict[str, Collection]:
+        """Returns the last seen cached Collections. See also :func:`BirdBuddy.refresh_collections()`"""
         if self._needs_login():
             LOGGER.warning(
                 "BirdBuddy is not logged in. Call refresh_collections() first"
