@@ -7,6 +7,7 @@ from typing import Union
 from python_graphql_client import GraphqlClient
 
 from . import LOGGER, VERBOSE, queries
+from .birds import PostcardSighting, SightingFinishStrategy
 from .const import BB_URL
 from .exceptions import (
     AuthenticationFailedError,
@@ -15,12 +16,9 @@ from .exceptions import (
     GraphqlError,
     UnexpectedResponseError,
 )
+from .feed import Feed, FeedNode, FeedNodeType
 from .feeder import Feeder
 from .media import Collection, Media
-
-_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
-"""The format string of GraphQL timestamps. This is not guaranteed to conform to
-:func:`datetime.fromisoformat()`, so it has to be parsed manually."""
 
 _NO_VALUE = object()
 """Sentinel value to allow None to override a default value."""
@@ -210,8 +208,7 @@ class BirdBuddy:
         after: str = None,
         last: int = None,
         before: str = None,
-        newer_than: datetime | str = None,
-    ) -> dict:
+    ) -> Feed:
         """Returns the Bird Buddy Feed.
 
         The returned dictionary contains a `"pageInfo"` key for pagination/cursor data; and an
@@ -242,37 +239,9 @@ class BirdBuddy:
             pass
 
         data = await self._make_request(query=queries.me.FEED, variables=variables)
-        feed = data["me"]["feed"]
+        return Feed(data["me"]["feed"])
 
-        # Convert createdAt to datetime:
-        for edge in feed["edges"]:
-            if created_at := edge["node"].get("createdAt", None):
-                edge["node"]["createdAt"] = datetime.strptime(
-                    created_at, _DATETIME_FORMAT
-                )
-
-        if isinstance(newer_than, str):
-            if len(newer_than) == 24:
-                # The known expected datetime format in the BirdBuddy feed
-                newer_than = datetime.strptime(newer_than, _DATETIME_FORMAT)
-            else:
-                newer_than = datetime.fromisoformat(newer_than)
-        if newer_than:
-            # filter edges by `newer_than` time
-            # This simulates the expected behavior of `before` + `last`, which does not work.
-            feed["edges"] = [
-                edge for edge in feed["edges"] if edge["node"]["createdAt"] > newer_than
-            ]
-
-        # Append a fake "newestDate" to pageInfo
-        if len(feed["edges"]) > 0:
-            feed["pageInfo"]["newestDate"] = max(
-                (x["node"]["createdAt"] for x in feed["edges"])
-            )
-
-        return feed
-
-    async def refresh_feed(self, since: datetime = _NO_VALUE) -> dict:
+    async def refresh_feed(self, since: datetime | str = _NO_VALUE) -> list[FeedNode]:
         """Get only fresh feed items, new since the last Feed refresh.
 
         The most recent edge node timestamp will be saved as the last seen feed item,
@@ -282,72 +251,62 @@ class BirdBuddy:
         :param since: The `datetime` after which to restrict new feed items."""
         if since == _NO_VALUE:
             since = self._last_feed_date
-        feed = await self.feed(newer_than=since)
-        newest_date = feed.get("pageInfo", {}).get("newestDate", since)
-        if newest_date and newest_date != self._last_feed_date:
+        if isinstance(since, str):
+            since = FeedNode.parse_datetime(since)
+        feed = await self.feed()
+        if (newest_date := feed.newest_edge.node.created_at) != self._last_feed_date:
             LOGGER.debug(
                 "Updating latest seen Feed timestamp: %s -> %s",
                 self._last_feed_date,
                 newest_date,
             )
             self._last_feed_date = newest_date
-        return feed
+        return feed.filter(newer_than=since)
 
-    async def feed_node_types(self) -> list:
-        """Returns just the node types from the Bird Buddy Feed"""
-        feed = await self.feed()
-        nodes = [edge["node"] for edge in feed["edges"]]
-        return [node["__typename"] for node in nodes]
-
-    async def feed_nodes(self, node_type: str) -> list[dict]:
+    async def feed_nodes(self, node_type: str) -> list[FeedNode]:
         """Returns all feed items of type ``node_type``"""
         feed = await self.feed()
-        nodes = [edge["node"] for edge in feed["edges"]]
-        return [node for node in nodes if node["__typename"] == node_type]
+        return feed.filter(of_type=node_type)
 
-    async def new_postcards(self) -> list[dict]:
+    async def new_postcards(self) -> list[FeedNode]:
         """Returns all new 'Postcard' feed items.
 
         These Postcard node types will be converted into sightings using ``sighting_from_postcard``.
         """
-        return await self.feed_nodes("FeedItemNewPostcard")
+        return await self.feed_nodes(FeedNodeType.NewPostcard)
 
-    async def sighting_from_postcard(self, postcard_id: str) -> dict:
+    async def sighting_from_postcard(
+        self,
+        postcard: str | FeedNode,
+    ) -> PostcardSighting:
         """Convert a 'postcard' into a 'sighting report'.
 
         Next step is to choose or confirm species and then finish the sighting.
         If the sighting type is ``SightingRecognized``, we can collect the sighting with
         ``finish_postcard``.
         """
-        await self._check_auth()
-
+        postcard_id: str
+        if isinstance(postcard, str):
+            postcard_id = postcard
+        elif isinstance(postcard, FeedNode):
+            assert postcard.node_type == FeedNodeType.NewPostcard
+            postcard_id = postcard.node_id
         variables = {
             "sightingCreateFromPostcardInput": {
                 "feedItemId": postcard_id,
             }
         }
-        data = await self._make_request(
+        result = await self._make_request(
             query=queries.birds.POSTCARD_TO_SIGHTING,
             variables=variables,
         )
-        # data[feeder], data[medias], data[sightingReport]
-        # sightingReport.reportToken is JSON-string, containing confidence of each match
-        # sightingReport.sightings[] might have types:
-        #  'SightingCantDecideWhichBird',
-        #  'SightingNoBird',
-        #  'SightingNoBirdRecognized',
-        #  'SightingRecognizedBird',
-        #  'SightingRecognizedBirdUnlocked',
-        #  'SightingRecognizedMysteryVisitor',
-        # Next steps:
-        #  - for each .sightings[]: sightingChooseSpecies()
-        #  - sightingReportPostcardFinish()
-        return data
+        data = result["sightingCreateFromPostcard"]
+        return PostcardSighting(data).with_postcard(postcard)
 
     async def finish_postcard(
         self,
         feed_item_id: str,
-        sighting_result: dict,
+        sighting_result: PostcardSighting,
     ) -> bool:
         """Finish collecting the postcard in your collections.
 
@@ -355,19 +314,16 @@ class BirdBuddy:
         :param sighting_result from ``sighting_from_postcard``, should contain sightings of type
         ``SightingRecognizedBird`` or `SightingRecognizedBirdUnlocked``.
         """
-        if sighting_result.get("__typename") != "SightingCreateFromPostcardResult":
+        if not isinstance(sighting_result, PostcardSighting):
             # See sighting_from_postcard()["sightingCreateFromPostcard"]
             LOGGER.warning("Unexpected sighting result: %s", sighting_result)
             return False
 
-        report = sighting_result["sightingReport"]
-        sighting_types = [x["__typename"] for x in report["sightings"]]
+        report = sighting_result.report
+        strategy = report.finishing_strategy
 
-        if not all(
-            t in ["SightingRecognizedBird", "SightingRecognizedBirdUnlocked"]
-            for t in sighting_types
-        ):
-            # TODO: emit an event and allow an automation to handle it?
+        if strategy != SightingFinishStrategy.RECOGNIZED:
+            # TODO: support other finish strategies
             LOGGER.warning("Requires manual selection: %s", report)
             return False
 
@@ -375,15 +331,10 @@ class BirdBuddy:
             "sightingReportPostcardFinishInput": {
                 "feedItemId": feed_item_id,
                 "defaultCoverMedia": [
-                    {
-                        "speciesId": s["species"]["id"],
-                        "mediaId": s["matchTokens"][0],
-                    }
-                    for s in report["sightings"]
-                    if s["__typename"] == "SightingRecognizedBirdUnlocked"
+                    s.cover_media for s in report.sightings if s.is_unlocked
                 ],
                 "notSelectedMediaIds": [],
-                "reportToken": report["reportToken"],
+                "reportToken": report.token,
             }
         }
         data = await self._make_request(
@@ -404,7 +355,7 @@ class BirdBuddy:
         self._collections.update(collections)
         return self._collections
 
-    # TODO: does it even  make sense to cache this? If it's going to change
+    # TODO: does it even make sense to cache this? If it's going to change
     @property
     def collections(self) -> dict[str, Collection]:
         """Returns the last seen cached Collections. See also :func:`BirdBuddy.refresh_collections()`"""
