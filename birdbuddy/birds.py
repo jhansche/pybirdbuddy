@@ -91,9 +91,9 @@ class Sighting(UserDict[str, any]):
         return self.sighting_type.is_unlocked
 
     @property
-    def species(self) -> Species:
+    def species(self) -> Species | None:
         """Species"""
-        return Species(self["species"])
+        return Species(self.get("species", {}))
 
     @property
     def suggestions(self) -> list[Species]:
