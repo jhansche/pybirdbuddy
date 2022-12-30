@@ -16,6 +16,15 @@ class SightingFinishStrategy(Enum):
     BEST_GUESS = "best_guess"
     MYSTERY = "mystery"
 
+    def __lt__(self, other):
+        if not self.__class__ is other.__class__:
+            return NotImplemented
+        if self == SightingFinishStrategy.RECOGNIZED:
+            return False
+        if self == SightingFinishStrategy.BEST_GUESS:
+            return other == SightingFinishStrategy.RECOGNIZED
+        return True
+
 
 class Species(UserDict[str, str]):
     """Species"""
@@ -74,6 +83,11 @@ class Sighting(UserDict[str, any]):
 
     def __repr__(self) -> str:
         return f"{__class__.__name__}({super().__repr__()})"
+
+    @property
+    def id(self) -> str:
+        """Sighting ID"""
+        return self["id"]
 
     @property
     def sighting_type(self) -> SightingType:

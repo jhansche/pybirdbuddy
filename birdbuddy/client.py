@@ -7,7 +7,7 @@ from typing import Union
 from python_graphql_client import GraphqlClient
 
 from . import LOGGER, VERBOSE, queries
-from .birds import PostcardSighting, SightingFinishStrategy
+from .birds import PostcardSighting, SightingFinishStrategy, SightingReport
 from .const import BB_URL
 from .exceptions import (
     AuthenticationFailedError,
@@ -307,6 +307,7 @@ class BirdBuddy:
         self,
         feed_item_id: str,
         sighting_result: PostcardSighting,
+        strategy: SightingFinishStrategy = SightingFinishStrategy.RECOGNIZED,
     ) -> bool:
         """Finish collecting the postcard in your collections.
 
@@ -320,12 +321,40 @@ class BirdBuddy:
             return False
 
         report = sighting_result.report
-        strategy = report.finishing_strategy
+        recommended_strategy = report.finishing_strategy
 
-        if strategy != SightingFinishStrategy.RECOGNIZED:
-            # TODO: support other finish strategies
-            LOGGER.warning("Requires manual selection: %s", report)
+        if strategy > recommended_strategy:
+            LOGGER.info(
+                "Requested %s, but best possible strategy is %s",
+                strategy,
+                recommended_strategy,
+            )
             return False
+
+        if strategy == SightingFinishStrategy.MYSTERY:
+            LOGGER.warning("Mystery Visitor strategy is not yet implemented")
+            return False
+
+        if recommended_strategy == SightingFinishStrategy.BEST_GUESS:
+            # $matchToken => {$speciesCode, $confidence}
+            matches = report.highest_confidence_matches
+            for (match, item) in matches.items():
+                if sighting := next(
+                    (s for s in report.sightings if match in s.match_tokens), None
+                ):
+                    LOGGER.debug(
+                        "selecting highest confidence: %s%% for species %s",
+                        item["confidence"],
+                        item["speciesCode"],
+                    )
+                    new_report = await self.sighting_choose_species(
+                        sighting.id,
+                        item["speciesCode"],
+                        report,
+                    )
+                    LOGGER.debug("after manual species assignment: %s", new_report)
+                    # TODO: merge new_report with old report? Might be needed for an unlocked species.
+                    report.sightings.append(new_report.sightings)
 
         variables = {
             "sightingReportPostcardFinishInput": {
@@ -342,6 +371,35 @@ class BirdBuddy:
             variables=variables,
         )
         return bool(data["sightingReportPostcardFinish"]["success"])
+
+    async def sighting_choose_species(
+        self,
+        sighting_id: str,
+        species_id: str,
+        sighting_data: SightingReport | str = None,
+    ) -> SightingReport:
+        """Manually assign a species to a sighting."""
+        token: str
+        if isinstance(sighting_data, SightingReport):
+            token = sighting_data.token
+        elif isinstance(sighting_data, str):
+            token = sighting_data
+        else:
+            raise ValueError(
+                "sighting_data should be the `SightingReport` or `SightingReport.token`"
+            )
+        variables = {
+            "sightingChooseSpeciesInput": {
+                "sightingId": sighting_id,
+                "speciesId": species_id,
+                "reportToken": token,
+            }
+        }
+        data = await self._make_request(
+            query=queries.birds.SIGHTING_CHOOSE_SPECIES,
+            variables=variables,
+        )
+        return SightingReport(data["sightingChooseSpecies"])
 
     async def refresh_collections(self, of_type: str = "bird") -> dict[str, Collection]:
         """Returns the remote bird collections"""
