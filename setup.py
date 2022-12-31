@@ -10,7 +10,7 @@ with open(path.join(this_directory, "README.md"), "r", encoding='utf-8') as fh:
 
 setup(
     name='pybirdbuddy',
-    version='0.0.4',
+    version='0.0.5',
     author="jhansche",
     author_email="madcoder@gmail.com",
     description="A library to query data about a Bird Buddy smart bird feeder",
