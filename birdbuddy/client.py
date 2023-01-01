@@ -202,6 +202,34 @@ class BirdBuddy:
         LOGGER.debug("Feeder data refreshed successfully: %s", data)
         return self._save_me(data["me"])
 
+    async def toggle_off_grid(
+        self,
+        feeder: Feeder | str,
+        is_off_grid: bool,
+    ) -> bool:
+        """Toggle the feeder's off-grid status.
+
+        Available to Owner account only."""
+        if isinstance(feeder, Feeder):
+            feeder_id = feeder.id
+            if not feeder.is_owner:
+                LOGGER.warning("Off-grid is available only to owner accounts")
+                # The request will fail
+        else:
+            # We cannot check the owner status if we only have an id
+            feeder_id = feeder
+        variables = {
+            "feederId": feeder_id,
+            "feederToggleOffGridInput": {
+                "offGrid": is_off_grid,
+            },
+        }
+        result = await self._make_request(
+            query=queries.feeder.TOGGLE_OFF_GRID,
+            variables=variables,
+        )
+        return bool(result["feederToggleOffGrid"]["feeder"]["offGrid"])
+
     async def feed(
         self,
         first: int = 20,

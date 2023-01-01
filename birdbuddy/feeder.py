@@ -79,6 +79,26 @@ class Feeder(UserDict[str, any]):
         return self.get("name", "Bird Buddy")
 
     @property
+    def is_owner(self):
+        """Whether the logged in user is the owner of this feeder."""
+        return self.get("__typename") == "FeederForOwner"
+
+    @property
+    def is_public(self):
+        """Whether this is a public feeder."""
+        return self.get("__typename") == "FeederForPublic"
+
+    @property
+    def version(self) -> str:
+        """Firmware version (owner only)"""
+        return self.get("firmwareVersion")
+
+    @property
+    def version_update_available(self) -> str:
+        """Firmware update version (owner only)"""
+        return self.get("availableFirmwareVersion")
+
+    @property
     def state(self) -> FeederState:
         """State of the Feeder"""
         return FeederState(self.get("state", "UNKNOWN"))
@@ -110,7 +130,7 @@ class Feeder(UserDict[str, any]):
         Level of bird seed in the feeder.
         @incubating This field appears not to work currently.
         """
-        LOGGER.info("birdbuddy.Feeder.food is incubating")
+        LOGGER.debug("birdbuddy.Feeder.food is incubating")
         return MetricState(self.get("food", {}).get("state", "UNKNOWN"))
 
     @property
@@ -120,5 +140,5 @@ class Feeder(UserDict[str, any]):
         Temperature at the feeder.
         @incubating This field appears not to work currently.
         """
-        LOGGER.info("birdbuddy.Feeder.temperature is incubating")
+        LOGGER.debug("birdbuddy.Feeder.temperature is incubating")
         return self.get("temperature", {}).get("value", 0)
