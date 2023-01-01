@@ -207,7 +207,7 @@ class BirdBuddy:
         self,
         feeder: Feeder | str,
         is_off_grid: bool,
-    ) -> bool:
+    ) -> Feeder:
         """Toggle the feeder's off-grid status.
 
         Available to Owner account only."""
@@ -239,7 +239,7 @@ class BirdBuddy:
             await asyncio.sleep(1)
             assert await self.refresh()
             new_off_grid = self.feeders[feeder_id].is_off_grid
-        return True
+        return self.feeders[feeder_id]
 
     async def feed(
         self,
