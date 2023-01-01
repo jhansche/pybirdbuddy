@@ -96,7 +96,7 @@ class Feeder(UserDict[str, any]):
     @property
     def version_update_available(self) -> str:
         """Firmware update version (owner only)"""
-        return self.get("availableFirmwareVersion")
+        return self.get("availableFirmwareVersion", None)
 
     @property
     def state(self) -> FeederState:
@@ -142,3 +142,27 @@ class Feeder(UserDict[str, any]):
         """
         LOGGER.debug("birdbuddy.Feeder.temperature is incubating")
         return self.get("temperature", {}).get("value", 0)
+
+
+class FeederUpdateStatus(UserDict[str, any]):
+    """Feeder update status"""
+
+    @property
+    def feeder(self) -> Feeder:
+        """Returns a partial Feeder result"""
+        return Feeder(self["feeder"])
+
+    @property
+    def is_complete(self) -> bool:
+        """`True` if the firmware update was successfully completed."""
+        return self["__typename"] == "FeederFirmwareUpdateSucceededResult"
+
+    @property
+    def failure_reason(self) -> str:
+        """Failure reason, or `None` if no failure."""
+        return self.get("failedReason", "Unknown failure")
+
+    @property
+    def progress(self) -> int:
+        """Current firmware installation progress."""
+        return self.get("progress", None)

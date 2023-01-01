@@ -17,7 +17,7 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feed import Feed, FeedNode, FeedNodeType
-from .feeder import Feeder
+from .feeder import Feeder, FeederUpdateStatus
 from .media import Collection, Media
 
 _NO_VALUE = object()
@@ -440,6 +440,45 @@ class BirdBuddy:
         }
         self._collections.update(collections)
         return self._collections
+
+    async def update_firmware_start(self, feeder: Feeder | str) -> FeederUpdateStatus:
+        """Start a firmware update."""
+        feeder_id: str
+        if isinstance(feeder, Feeder):
+            if not feeder.is_owner:
+                LOGGER.warning("Firmware update is available only to owner accounts")
+                # The request will fail
+            feeder_id = feeder.id
+        else:
+            feeder_id = feeder
+        variables = {"feederId": feeder_id}
+        data = await self._make_request(
+            query=queries.feeder.UPDATE_FIRMWARE,
+            variables=variables,
+        )
+        result = FeederUpdateStatus(data["feederFirmwareUpdateStart"])
+        if result.is_complete:
+            self.feeders[feeder_id].update(result.get("feeder", {}))
+        return result
+
+    async def update_firmware_check(self, feeder: Feeder | str):
+        """Check on a firmware update."""
+        if isinstance(feeder, Feeder):
+            if not feeder.is_owner:
+                LOGGER.warning("Firmware update is available only to owner accounts")
+                # The request will fail
+            feeder_id = feeder.id
+        else:
+            feeder_id = feeder
+        variables = {"feederId": feeder_id}
+        data = await self._make_request(
+            query=queries.feeder.UPDATE_FIRMWARE_PROGRESS,
+            variables=variables,
+        )
+        result = FeederUpdateStatus(data["feederFirmwareUpdateCheckProgress"])
+        if result.is_complete:
+            self.feeders[feeder_id].update(result.get("feeder", {}))
+        return result
 
     # TODO: does it even make sense to cache this? If it's going to change
     @property
