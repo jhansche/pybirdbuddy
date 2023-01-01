@@ -228,7 +228,9 @@ class BirdBuddy:
             query=queries.feeder.TOGGLE_OFF_GRID,
             variables=variables,
         )
-        return bool(result["feederToggleOffGrid"]["feeder"]["offGrid"])
+        LOGGER.debug("Off-grid result: %s", result)
+        # FIXME: result["feederToggleOffGrid"]["feeder"]["offGrid"] is not updated yet!
+        return True
 
     async def feed(
         self,
