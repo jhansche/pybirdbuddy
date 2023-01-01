@@ -104,6 +104,11 @@ class Feeder(UserDict[str, any]):
         return FeederState(self.get("state", "UNKNOWN"))
 
     @property
+    def is_off_grid(self) -> bool:
+        """Whether `state` is `FeederState.OFF_GRID`."""
+        return self.get("offGrid", None)
+
+    @property
     def owner(self) -> str:
         """The username who first paired the Feeder"""
         return self.get("ownerName")

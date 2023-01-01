@@ -1,6 +1,7 @@
 """Bird Buddy client module"""
 
 from __future__ import annotations
+import asyncio
 from datetime import datetime
 from typing import Union
 
@@ -17,7 +18,7 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feed import Feed, FeedNode, FeedNodeType
-from .feeder import Feeder, FeederUpdateStatus
+from .feeder import Feeder, FeederState, FeederUpdateStatus
 from .media import Collection, Media
 
 _NO_VALUE = object()
@@ -229,7 +230,15 @@ class BirdBuddy:
             variables=variables,
         )
         LOGGER.debug("Off-grid result: %s", result)
-        # FIXME: result["feederToggleOffGrid"]["feeder"]["offGrid"] is not updated yet!
+        # The off-grid status doesn't get updated right away.
+
+        new_off_grid = result["feederToggleOffGrid"]["feeder"]["offGrid"]
+
+        while new_off_grid != is_off_grid:
+            LOGGER.debug("waiting for off-grid to update")
+            await asyncio.sleep(1)
+            assert await self.refresh()
+            new_off_grid = self.feeders[feeder_id].is_off_grid
         return True
 
     async def feed(
