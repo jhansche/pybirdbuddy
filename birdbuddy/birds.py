@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from collections import UserDict
+from dataclasses import dataclass
 from enum import Enum
 import json
 
@@ -16,14 +17,28 @@ class SightingFinishStrategy(Enum):
     BEST_GUESS = "best_guess"
     MYSTERY = "mystery"
 
+    def finish(self, data: dict = None) -> SightingFinishMod:
+        """Wrap the strategy with additional metadata if needed"""
+        if self == SightingFinishStrategy.BEST_GUESS:
+            return SightingFinishMod(self, data)
+        return SightingFinishMod(self)
+
     def __lt__(self, other):
-        if not self.__class__ is other.__class__:
+        if self.__class__ is not other.__class__:
             return NotImplemented
         if self == SightingFinishStrategy.RECOGNIZED:
             return False
         if self == SightingFinishStrategy.BEST_GUESS:
             return other == SightingFinishStrategy.RECOGNIZED
         return True
+
+
+@dataclass
+class SightingFinishMod:
+    """Simple wrapper for SightingFinishStrategy that includes additional data"""
+
+    strategy: SightingFinishStrategy
+    data: dict | None = None
 
 
 class Species(UserDict[str, str]):
@@ -141,8 +156,8 @@ class SightingReport(UserDict[str, any]):
 
     def __str__(self) -> str:
         return (
-            f"SightingReport<sightings={len(self.sightings)}:{str(self.sightings[0])}, "
-            f"recognized={self.all_sightings_recognized}>"
+            f"SightingReport<sightings[{len(self.sightings)}]: "
+            f"modes={ {s.id: f for (s, f) in self.sighting_finishing_strategies().items()} }>"
         )
 
     def __repr__(self) -> str:
@@ -154,11 +169,6 @@ class SightingReport(UserDict[str, any]):
         return [Sighting(s) for s in self.get("sightings", [])]
 
     @property
-    def all_sightings_recognized(self) -> bool:
-        """Returns `True` if all `sightings` are `Sighting.is_recognized`."""
-        return all(s.is_recognized for s in self.sightings)
-
-    @property
     def token(self) -> str:
         """Sighting reportToken, to allow the server to associate the sighting data."""
         return self.get("reportToken", None)
@@ -168,24 +178,34 @@ class SightingReport(UserDict[str, any]):
         """sightingReport.reportToken, parsed from a JSON string."""
         return json.loads(self.token)
 
-    @property
-    def finishing_strategy(self) -> SightingFinishStrategy:
-        """Recommended finishing strategy:
+    def sighting_finishing_strategies(
+        self,
+        confidence_threshold: int = None,
+    ) -> dict[Sighting, SightingFinishMod]:
+        """Determine best finishing strategy for each sighting in this report.
 
-        - `SightingRecognized` can be finished automatically by accepting recognized species.
-        - `CannotDecide` can be finished by choosing the highest-confidence species, as long
-          as they all have a high enough confidence.
-        - Last resort, we can report it as a 'Mystery Visitor'"""
-        if self.all_sightings_recognized:
-            return SightingFinishStrategy.RECOGNIZED
-
-        if all(
-            x["confidence"] >= SightingReport._BEST_GUESS_CONFIDENCE
-            for x in self.highest_confidence_matches.values()
-        ):
-            return SightingFinishStrategy.BEST_GUESS
-
-        return SightingFinishStrategy.MYSTERY
+        Response will be a dictionary with the `Sighting` as the key, and the
+        best `SightingFinishMod` for that `Sighting`.
+        """
+        if confidence_threshold is None:
+            confidence_threshold = SightingReport._BEST_GUESS_CONFIDENCE
+        strategies = {}
+        matches = self.highest_confidence_matches
+        # pylint: disable=invalid-name
+        for s in self.sightings:
+            if s.is_recognized:
+                strategies[s] = SightingFinishStrategy.RECOGNIZED.finish()
+            else:
+                # Match sightings to highest confidence
+                for (m, item) in matches.items():
+                    if (
+                        m in s.match_tokens
+                        and item["confidence"] >= confidence_threshold
+                    ):
+                        strategies[s] = SightingFinishStrategy.BEST_GUESS.finish(item)
+                        break
+            strategies.setdefault(s, SightingFinishStrategy.MYSTERY.finish())
+        return strategies
 
     @property
     def highest_confidence_matches(self) -> dict[str, dict[str, any]]:
