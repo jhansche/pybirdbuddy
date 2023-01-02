@@ -293,7 +293,9 @@ class BirdBuddy:
         if isinstance(since, str):
             since = FeedNode.parse_datetime(since)
         feed = await self.feed()
-        if (newest_date := feed.newest_edge.node.created_at) != self._last_feed_date:
+        if (newest_edge := feed.newest_edge) and (
+            newest_date := newest_edge.node.created_at
+        ) != self._last_feed_date:
             LOGGER.debug(
                 "Updating latest seen Feed timestamp: %s -> %s",
                 self._last_feed_date,

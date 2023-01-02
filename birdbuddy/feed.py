@@ -97,9 +97,9 @@ class Feed(UserDict[str, any]):
         return self.get("pageInfo", {}).get("endCursor", None)
 
     @cached_property
-    def newest_edge(self) -> FeedEdge:
+    def newest_edge(self) -> FeedEdge | None:
         """Returns the newest `FeedEdge`, by `FeedNode.created_at`"""
-        return max(self.edges, key=lambda edge: edge.node.created_at)
+        return max(self.edges, key=lambda edge: edge.node.created_at, default=None)
 
     def filter(
         self,
