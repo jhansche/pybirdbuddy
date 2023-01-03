@@ -19,14 +19,24 @@ class FeederState(Enum):
     """Feeder states"""
 
     DEEP_SLEEP = "DEEP_SLEEP"
+    FACTORY_RESET = "FACTORY_RESET"
     FIRMWARE_UPDATE = "FIRMWARE_UPDATE"
     OFFLINE = "OFFLINE"
     OFF_GRID = "OFF_GRID"
     ONLINE = "ONLINE"
     OUT_OF_FEEDER = "OUT_OF_FEEDER"
+    PENDING_FACTORY_RESET = "PENDING_FACTORY_RESET"
+    PENDING_REMOVAL = "PENDING_REMOVAL"
     READY_TO_STREAM = "READY_TO_STREAM"
     STREAMING = "STREAMING"
     TAKING_POSTCARDS = "TAKING_POSTCARDS"
+
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def _missing_(cls, value: str):
+        LOGGER.warning("Unexpected feeder.state: %s", value)
+        return FeederState.UNKNOWN
 
 
 class Signal(UserDict[str, any]):
