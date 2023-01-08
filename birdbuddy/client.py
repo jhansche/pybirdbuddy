@@ -8,7 +8,13 @@ from typing import Union
 from python_graphql_client import GraphqlClient
 
 from . import LOGGER, VERBOSE, queries
-from .birds import PostcardSighting, SightingFinishStrategy, SightingReport
+from .birds import (
+    PostcardSighting,
+    Sighting,
+    SightingFinishMod,
+    SightingFinishStrategy,
+    SightingReport,
+)
 from .const import BB_URL
 from .exceptions import (
     AuthenticationFailedError,
@@ -349,6 +355,7 @@ class BirdBuddy:
         feed_item_id: str,
         sighting_result: PostcardSighting,
         strategy: SightingFinishStrategy = SightingFinishStrategy.RECOGNIZED,
+        confidence_threshold: int = None,
     ) -> bool:
         """Finish collecting the postcard in your collections.
 
@@ -362,40 +369,53 @@ class BirdBuddy:
             return False
 
         report = sighting_result.report
-        recommended_strategy = report.finishing_strategy
 
-        if strategy > recommended_strategy:
-            LOGGER.info(
-                "Requested %s, but best possible strategy is %s",
-                strategy,
-                recommended_strategy,
-            )
-            return False
-
-        if strategy == SightingFinishStrategy.MYSTERY:
-            LOGGER.warning("Mystery Visitor strategy is not yet implemented")
-            return False
-
-        if recommended_strategy == SightingFinishStrategy.BEST_GUESS:
-            # $matchToken => {$speciesCode, $confidence}
-            matches = report.highest_confidence_matches
-            for (match, item) in matches.items():
-                if sighting := next(
-                    (s for s in report.sightings if match in s.match_tokens), None
-                ):
-                    LOGGER.debug(
-                        "selecting highest confidence: %s%% for species %s",
-                        item["confidence"],
-                        item["speciesCode"],
-                    )
-                    new_report = await self.sighting_choose_species(
-                        sighting.id,
-                        item["speciesCode"],
-                        report,
-                    )
-                    LOGGER.debug("after manual species assignment: %s", new_report)
-                    # TODO: merge new_report with old report? Might be needed for an unlocked species.
-                    report.sightings.append(new_report.sightings)
+        sighting: Sighting = None
+        mod: SightingFinishMod = None
+        for (sighting, mod) in report.sighting_finishing_strategies(
+            confidence_threshold
+        ).items():
+            # if we need extra work, do it now and update `report`
+            if mod.strategy == SightingFinishStrategy.RECOGNIZED:
+                # Nothing to do, this will pass through as-is
+                pass
+            elif strategy > mod.strategy:
+                # Caller chose not to allow this.
+                # We will try to finish the postcard anyway.
+                LOGGER.info(
+                    "Requested %s, but recommended strategy is %s",
+                    strategy,
+                    mod,
+                )
+            elif mod.strategy == SightingFinishStrategy.BEST_GUESS:
+                # Choose the highest recommended species
+                LOGGER.debug(
+                    "selecting highest confidence: %s%% for species %s",
+                    mod.data["confidence"],
+                    mod.data["speciesCode"],
+                )
+                new_report = await self.sighting_choose_species(
+                    sighting.id,
+                    mod.data["speciesCode"],
+                    report,
+                )
+                LOGGER.debug(
+                    "replacing report after choosing species:\nold=%s\nnew=%s",
+                    report,
+                    new_report,
+                )
+                report = new_report
+            elif mod.strategy == SightingFinishStrategy.MYSTERY:
+                new_report = await self.sighting_choose_mystery(
+                    sighting.id,
+                    report,
+                )
+                LOGGER.debug(
+                    "replacing report after converting to mystery:\nold=%s\nnew=%s",
+                    report,
+                    new_report,
+                )
+                report = new_report
 
         variables = {
             "sightingReportPostcardFinishInput": {
@@ -441,6 +461,33 @@ class BirdBuddy:
             variables=variables,
         )
         return SightingReport(data["sightingChooseSpecies"])
+
+    async def sighting_choose_mystery(
+        self,
+        sighting_id: str,
+        sighting_data: SightingReport | str = None,
+    ) -> SightingReport:
+        """Convert the sighting into a mystery visitor."""
+        token: str
+        if isinstance(sighting_data, SightingReport):
+            token = sighting_data.token
+        elif isinstance(sighting_data, str):
+            token = sighting_data
+        else:
+            raise ValueError(
+                "sighting_data should be the `SightingReport` or `SightingReport.token`"
+            )
+        variables = {
+            "sightingConvertToMysteryVisitorInput": {
+                "sightingId": sighting_id,
+                "reportToken": token,
+            }
+        }
+        data = await self._make_request(
+            query=queries.birds.SIGHTING_CHOOSE_MYSTERY,
+            variables=variables,
+        )
+        return SightingReport(data["sightingConvertToMysteryVisitor"])
 
     async def refresh_collections(self, of_type: str = "bird") -> dict[str, Collection]:
         """Returns the remote bird collections"""
