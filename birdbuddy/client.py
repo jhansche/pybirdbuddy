@@ -554,9 +554,9 @@ class BirdBuddy:
             )
             return {}
 
-        for cid, collection in self._collections.items():
+        for collection in list(self._collections.values()):
             if collection.cover_media.is_expired:
-                del self._collections[cid]
+                del self._collections[collection.collection_id]
         return self._collections
 
     async def collection(self, collection_id: str) -> dict[str, Media]:
