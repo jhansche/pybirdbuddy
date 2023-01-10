@@ -78,7 +78,6 @@ class SightingType(Enum):
         return self in [
             SightingType.SPECIES_RECOGNIZED,
             SightingType.SPECIES_UNLOCKED,
-            SightingType.MYSTERY_VISITOR,
         ]
 
     @property

@@ -540,15 +540,22 @@ class BirdBuddy:
             self.feeders[feeder_id].update(result.get("feeder", {}))
         return result
 
-    # TODO: does it even make sense to cache this? If it's going to change
     @property
     def collections(self) -> dict[str, Collection]:
-        """Returns the last seen cached Collections. See also :func:`BirdBuddy.refresh_collections()`"""
+        """Returns the last seen cached Collections.
+
+        Note that this may be outdated.
+
+        See also :func:`BirdBuddy.refresh_collections()`"""
         if self._needs_login():
             LOGGER.warning(
                 "BirdBuddy is not logged in. Call refresh_collections() first"
             )
             return {}
+
+        for cid, collection in self._collections.items():
+            if collection.cover_media.is_expired:
+                del self._collections[cid]
         return self._collections
 
     async def collection(self, collection_id: str) -> dict[str, Media]:
