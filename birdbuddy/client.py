@@ -382,6 +382,7 @@ class BirdBuddy:
             elif strategy > mod.strategy:
                 # Caller chose not to allow this.
                 # We will try to finish the postcard anyway.
+                # This may result in losing the sighting data.
                 LOGGER.info(
                     "Requested %s, but recommended strategy is %s",
                     strategy,

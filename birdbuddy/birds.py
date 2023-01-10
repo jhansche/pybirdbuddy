@@ -200,6 +200,7 @@ class SightingReport(UserDict[str, any]):
                     if (
                         m in s.match_tokens
                         and item["confidence"] >= confidence_threshold
+                        and item["type"] == "BIRD"
                     ):
                         strategies[s] = SightingFinishStrategy.BEST_GUESS.finish(item)
                         break
@@ -214,8 +215,11 @@ class SightingReport(UserDict[str, any]):
         This can be used to select the highest confidence species match for each match token.
         These match tokens will correspond to 'CannotDecide' sighting types."""
         matches = {
-            # items should already be sorted by confidence
-            i["matchToken"]: max(i["items"], key=lambda x: x["confidence"])
+            # items should already be sorted by confidence, but make sure we only return BIRD items
+            i["matchToken"]: max(
+                [ii for ii in i["items"] if ii["type"] == "BIRD"],
+                key=lambda x: x["confidence"],
+            )
             for i in self.token_json["reportItems"]
         }
         return matches
