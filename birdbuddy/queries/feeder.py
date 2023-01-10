@@ -20,6 +20,60 @@ mutation feederToggleOffGrid($feederId: ID!, $feederToggleOffGridInput: FeederTo
 }
 """
 
+SET_OPTIONS = """
+mutation feederUpdate($feederId: ID!, $feederUpdateInput: FeederUpdateInput!) {
+  feederUpdate(feederId: $feederId, feederUpdateInput: $feederUpdateInput) {
+    ... on FeederForOwner {
+      ...ListOwnerFeederFields
+      ...SingleOwnerFeederAdditionalFields
+    }
+  }
+}
+fragment ListOwnerFeederFields on FeederForOwner {
+  ...ListFeederFields
+  availableFirmwareVersion
+  firmwareVersion
+  offGrid
+}
+fragment ListFeederFields on FeederForPrivate {
+  battery {
+    charging
+    percentage
+    state
+    __typename
+  }
+  food {
+    state
+    __typename
+  }
+  id
+  name
+  signal {
+    state
+    value
+    __typename
+  }
+  state
+  temperature {
+    value
+    __typename
+  }
+  __typename
+}
+fragment SingleOwnerFeederAdditionalFields on FeederForOwner {
+  frequency
+  lowBatteryNotification
+  lowFoodNotification
+  offGrid
+  serialNumber
+  temperature {
+    value
+    __typename
+  }
+  __typename
+}
+"""
+
 UPDATE_FIRMWARE = """
 mutation feederFirmwareUpdateStart($feederId: ID!) {
   feederFirmwareUpdateStart(feederId: $feederId) {

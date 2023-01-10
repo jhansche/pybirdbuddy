@@ -14,6 +14,13 @@ class MetricState(Enum):
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
 
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def _missing_(cls, value: str):
+        LOGGER.warning("Unexpected metric state: %s", value)
+        return MetricState.UNKNOWN
+
 
 class FeederState(Enum):
     """Feeder states"""
@@ -137,6 +144,12 @@ class Feeder(UserDict[str, any]):
     def location(self) -> tuple[Optional[str], Optional[str]]:
         """Configured location of the Feeder"""
         return (self.get("locationCity"), self.get("locationCountry"))
+
+    @property
+    def frequency(self) -> MetricState:
+        """Configured frequency of the Feeder."""
+        # Presumably this is a setting for preferred frequency of postcards?
+        return MetricState(self.get("frequency", "UNKNOWN"))
 
     @property
     # @incubating

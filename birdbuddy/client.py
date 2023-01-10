@@ -24,7 +24,7 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feed import Feed, FeedNode, FeedNodeType
-from .feeder import Feeder, FeederState, FeederUpdateStatus
+from .feeder import Feeder, FeederState, FeederUpdateStatus, MetricState
 from .media import Collection, Media
 
 _NO_VALUE = object()
@@ -501,6 +501,28 @@ class BirdBuddy:
         }
         self._collections.update(collections)
         return self._collections
+
+    async def set_frequency(self, feeder: Feeder | str, frequency: MetricState) -> dict:
+        """Update Feeder frequency state"""
+        if isinstance(feeder, Feeder):
+            feeder_id = feeder.id
+            if not feeder.is_owner:
+                LOGGER.warning("Frequency setting is available only to owner accounts")
+        else:
+            feeder_id = feeder
+        variables = {
+            "feederId": feeder_id,
+            "feederUpdateInput": {
+                "frequency": frequency.value,
+            },
+        }
+        result = await self._make_request(
+            query=queries.feeder.SET_OPTIONS,
+            variables=variables,
+        )
+        updated = {"frequency": result["feederUpdate"].get("frequency", None)}
+        self.feeders[feeder_id].update(updated)
+        return updated
 
     async def update_firmware_start(self, feeder: Feeder | str) -> FeederUpdateStatus:
         """Start a firmware update."""
