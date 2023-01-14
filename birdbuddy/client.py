@@ -3,7 +3,6 @@
 from __future__ import annotations
 import asyncio
 from datetime import datetime
-from typing import Union
 
 from python_graphql_client import GraphqlClient
 
@@ -24,8 +23,9 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feed import Feed, FeedNode, FeedNodeType
-from .feeder import Feeder, FeederState, FeederUpdateStatus, MetricState
+from .feeder import Feeder, FeederUpdateStatus, MetricState
 from .media import Collection, Media
+from .user import BirdBuddyUser
 
 _NO_VALUE = object()
 """Sentinel value to allow None to override a default value."""
@@ -42,9 +42,9 @@ class BirdBuddy:
     graphql: GraphqlClient
     _email: str
     _password: str
-    _access_token: Union[str, None]
-    _refresh_token: Union[str, None]
-    _me: Union[dict, None]
+    _access_token: str | None
+    _refresh_token: str | None
+    _me: BirdBuddyUser | None
     _feeders: dict[str, Feeder]
     _collections: dict[str, Collection]
     _last_feed_date: datetime
@@ -64,7 +64,7 @@ class BirdBuddy:
         if not me_data:
             return False
         me_data["__last_updated"] = datetime.now()
-        self._me = me_data
+        self._me = BirdBuddyUser(me_data["user"])
         # pylint: disable=invalid-name
         for f in me_data.get("feeders", []):
             if f["id"] in self._feeders:
@@ -202,6 +202,11 @@ class BirdBuddy:
         LOGGER.log(VERBOSE, "< response: %s", _redact(result, should_redact))
 
         return result
+
+    @property
+    def user(self) -> None | BirdBuddyUser:
+        """The logged in user data"""
+        return self._me
 
     async def refresh(self) -> bool:
         """Refreshes the Bird Buddy feeder data"""

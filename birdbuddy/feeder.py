@@ -91,6 +91,11 @@ class Feeder(UserDict[str, any]):
         return self["id"]
 
     @property
+    def serial(self):
+        """Feeder SN"""
+        return self["serialNumber"]
+
+    @property
     def name(self):
         """Feeder name, as set in the app"""
         return self.get("name", "Bird Buddy")
