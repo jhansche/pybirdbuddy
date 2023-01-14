@@ -39,15 +39,18 @@ class Media(UserDict):
     @property
     def is_expired(self) -> bool:
         """`True` if the media URL is expired"""
-        if not self.thumbnail_url:
-            return None
-        expiry = int(
-            parse_qs(urlparse(self.thumbnail_url).query).get("Expires", None).pop()
-        )
-        if not expiry:
-            return None
-        now = time.time()
-        return expiry < now
+        return is_media_expired(self.thumbnail_url)
+
+
+def is_media_expired(media_url: str) -> bool:
+    """`True` if the media URL is expired"""
+    if not media_url:
+        return None
+    expiry = int(parse_qs(urlparse(media_url).query).get("Expires", None).pop())
+    if not expiry:
+        return None
+    now = time.time()
+    return expiry < now
 
 
 class Collection(UserDict):
