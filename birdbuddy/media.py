@@ -22,9 +22,9 @@ class Media(UserDict):
         return self["__typename"] == "MediaVideo"
 
     @property
-    def created_at(self) -> str:
+    def created_at(self) -> datetime:
         """Creation timestamp"""
-        return self["createdAt"]
+        return FeedNode.parse_datetime(self["createdAt"])
 
     @property
     def thumbnail_url(self) -> str:
