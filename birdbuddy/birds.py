@@ -175,7 +175,11 @@ class SightingReport(UserDict[str, any]):
     @property
     def token_json(self) -> dict:
         """sightingReport.reportToken, parsed from a JSON string."""
-        return json.loads(self.token)
+        try:
+            return json.loads(token) if (token := self.token) else {}
+        except (ValueError, TypeError) as err:
+            LOGGER.error("Error parsing sighting report token: %s", err, exc_info=err)
+            return {}
 
     def sighting_finishing_strategies(
         self,
@@ -217,10 +221,10 @@ class SightingReport(UserDict[str, any]):
         matches = {
             # items should already be sorted by confidence, but make sure we only return BIRD items
             i["matchToken"]: max(
-                [ii for ii in i["items"] if ii["type"] == "BIRD"],
+                (ii for ii in i["items"] if ii["type"] == "BIRD"),
                 key=lambda x: x["confidence"],
             )
-            for i in self.token_json["reportItems"]
+            for i in self.token_json.get("reportItems", [])
         }
         return matches
 
