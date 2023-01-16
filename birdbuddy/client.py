@@ -40,8 +40,8 @@ class BirdBuddy:
     """Bird Buddy api client"""
 
     graphql: GraphqlClient
-    _email: str
-    _password: str
+    _email: str | None
+    _password: str | None
     _access_token: str | None
     _refresh_token: str | None
     _me: BirdBuddyUser | None
@@ -49,12 +49,18 @@ class BirdBuddy:
     _collections: dict[str, Collection]
     _last_feed_date: datetime
 
-    def __init__(self, email: str, password: str) -> None:
+    def __init__(self, emailOrToken: str, password: str | None = None) -> None:
         self.graphql = GraphqlClient(BB_URL)
-        self._email = email
+        
         self._password = password
+        if password is not None:
+            self._email = emailOrToken
+            self._refresh_token = None
+        else:
+            self._email = None
+            self._refresh_token = emailOrToken
+        
         self._access_token = None
-        self._refresh_token = None
         self._me = None
         self._last_feed_date = None
         self._feeders = {}
