@@ -467,3 +467,11 @@ fragment SightingRecognizedMysteryVisitorFields on SightingRecognizedMysteryVisi
   __typename
 }
 """
+
+SHARE_MEDIAS = """
+mutation mediaShareToggle($mediaShareToggleInput: MediaShareToggleInput!) {
+  mediaShareToggle(mediaShareToggleInput: $mediaShareToggleInput) {
+    success
+  }
+}
+"""

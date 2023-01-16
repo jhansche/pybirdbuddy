@@ -361,12 +361,18 @@ class BirdBuddy:
         sighting_result: PostcardSighting,
         strategy: SightingFinishStrategy = SightingFinishStrategy.RECOGNIZED,
         confidence_threshold: int = None,
+        share_media: bool = False,
     ) -> bool:
         """Finish collecting the postcard in your collections.
 
         :param feed_item_id the id from ``new_postcards``
         :param sighting_result from ``sighting_from_postcard``, should contain sightings of type
         ``SightingRecognizedBird`` or `SightingRecognizedBirdUnlocked``.
+        :param strategy Finishing strategy, one of `RECOGNIZED`, `BEST_GUESS`, or `MYSTERY`
+        :param confidence_threshold Threshold for `BEST_GUESS` strategy to accept the highest
+        confidence suggestion above this threshold. Defaults to 10 (%).
+        :param share_media ``True`` to automatically share finished media to the community.
+        Defaults to ``False``.
         """
         if not isinstance(sighting_result, PostcardSighting):
             # See sighting_from_postcard()["sightingCreateFromPostcard"]
@@ -437,7 +443,35 @@ class BirdBuddy:
             query=queries.birds.FINISH_SIGHTING,
             variables=variables,
         )
-        return bool(data["sightingReportPostcardFinish"]["success"])
+        result = bool(data["sightingReportPostcardFinish"]["success"])
+        if share_media:
+            media_ids = [m.id for m in sighting_result.medias]
+            try:
+                share_result = await self.share_medias(media_ids, share=True)
+                LOGGER.info("Sharing %d medias: %s", len(media_ids), share_result)
+            except Exception as err:  # pylint: disable=broad-except
+                LOGGER.error(
+                    "Error sharing %d medias: %s",
+                    len(media_ids),
+                    err,
+                    exc_info=err,
+                )
+                share_result = False
+        return result
+
+    async def share_medias(self, media_ids: list[str], share: bool = True) -> bool:
+        """Toggle media sharing"""
+        variables = {
+            "mediaShareToggleInput": {
+                "mediaIds": media_ids,
+                "share": share,
+            }
+        }
+        result = await self._make_request(
+            query=queries.birds.SHARE_MEDIAS,
+            variables=variables,
+        )
+        return bool(result["mediaShareToggle"]["success"])
 
     async def sighting_choose_species(
         self,
