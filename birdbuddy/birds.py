@@ -6,6 +6,7 @@ from collections import UserDict
 from dataclasses import dataclass
 from enum import Enum
 import json
+import logging
 
 from . import LOGGER
 from .media import Media
@@ -173,25 +174,35 @@ class SightingReport(UserDict[str, any]):
         """Sighting reportToken, to allow the server to associate the sighting data."""
         return self.get("reportToken", None)
 
+    def _decode_signed_token(self, signed: str) -> str:
+        # This is a signed payload. The string is made up of:
+        # "<base64-encoded signing header>.<base64-encoded json payload>.<base64-encoded signature bytes>"
+        # We ignore the header and signature, and decode payload as JSON.
+        (header, b64payload, _sig) = signed.split(".")
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            header = base64.b64decode(header + "==", validate=False)
+            LOGGER.debug("Got signed reportToken: %s", header)
+        # Decode the payload section to a json string
+        payload_json = base64.b64decode(b64payload + "==", validate=False).decode(
+            "utf-8", "ignore"
+        )
+        # Then decode the JSON string so we can extract the nested reportToken
+        payload = json.loads(payload_json)
+        if not (token := payload.get("reportToken", None)):
+            return {}
+        return token
+
     @property
     def token_json(self) -> dict:
         """sightingReport.reportToken, parsed from a JSON string."""
-        # FIXME: this field may be encoded; if so we'll have to get the ordered suggestions
-        #  {"alg":"HS256","typ":"JWT"},
-        #  {reportToken, iat, exp}
-        #  ...
+        if not (token := self.token):
+            return {}
+        if token.count(".") == 2:
+            token = self._decode_signed_token(token)
         try:
-            return json.loads(token) if (token := self.token) else {}
+            return json.loads(token)
         except (ValueError, TypeError) as err:
-            b64token = base64.b64decode(token + "==", validate=False)
-            LOGGER.debug(
-                "Error parsing sighting report token: %s, decoded=%s",
-                err,
-                b64token,
-            )
-            # TODO: extract the token
-            # b64json = json.loads(b64token)
-            # LOGGER.debug("Decoded b64 json: %s", b64json)
+            LOGGER.warning("Unable to decode report token: %s", err)
             return {}
 
     def sighting_finishing_strategies(
