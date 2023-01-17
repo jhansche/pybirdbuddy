@@ -1,5 +1,6 @@
 """Bird Buddy collections and media"""
 
+from __future__ import annotations
 from collections import UserDict
 from datetime import datetime
 import time
@@ -75,6 +76,11 @@ class Collection(UserDict):
     def last_visit(self) -> datetime:
         """Most recent visit time"""
         return FeedNode.parse_datetime(self["visitLastTime"])
+
+    @property
+    def feeder_name(self) -> str | None:
+        """The feeder that captured this cover"""
+        return self["coverCollectionMedia"].get("feederName")
 
     @property
     def cover_media(self) -> Media:

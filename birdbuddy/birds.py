@@ -1,10 +1,12 @@
 """Data models relating to Species, Sightings, etc"""
 
 from __future__ import annotations
+import base64
 from collections import UserDict
 from dataclasses import dataclass
 from enum import Enum
 import json
+import logging
 
 from . import LOGGER
 from .media import Media
@@ -156,7 +158,7 @@ class SightingReport(UserDict[str, any]):
     def __str__(self) -> str:
         return (
             f"SightingReport<sightings[{len(self.sightings)}]: "
-            f"modes={ {s.id: f for (s, f) in self.sighting_finishing_strategies().items()} }>"
+            f"modes={ {s.id: f for (s, f) in self.sighting_finishing_strategies().values()} }>"
         )
 
     def __repr__(self) -> str:
@@ -172,15 +174,41 @@ class SightingReport(UserDict[str, any]):
         """Sighting reportToken, to allow the server to associate the sighting data."""
         return self.get("reportToken", None)
 
+    def _decode_signed_token(self, signed: str) -> str:
+        # This is a signed payload. The string is made up of:
+        # "<base64-encoded signing header>.<base64-encoded json payload>.<base64-encoded signature bytes>"
+        # We ignore the header and signature, and decode payload as JSON.
+        (header, b64payload, _sig) = signed.split(".")
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            header = base64.b64decode(header + "==", validate=False)
+            LOGGER.debug("Got signed reportToken: %s", header)
+        # Decode the payload section to a json string
+        payload_json = base64.b64decode(b64payload + "==", validate=False).decode(
+            "utf-8", "ignore"
+        )
+        # Then decode the JSON string so we can extract the nested reportToken
+        payload = json.loads(payload_json)
+        if not (token := payload.get("reportToken", None)):
+            return {}
+        return token
+
     @property
     def token_json(self) -> dict:
         """sightingReport.reportToken, parsed from a JSON string."""
-        return json.loads(self.token)
+        if not (token := self.token):
+            return {}
+        if token.count(".") == 2:
+            token = self._decode_signed_token(token)
+        try:
+            return json.loads(token)
+        except (ValueError, TypeError) as err:
+            LOGGER.warning("Unable to decode report token: %s", err)
+            return {}
 
     def sighting_finishing_strategies(
         self,
         confidence_threshold: int = None,
-    ) -> dict[Sighting, SightingFinishMod]:
+    ) -> dict[str, tuple[Sighting, SightingFinishMod]]:
         """Determine best finishing strategy for each sighting in this report.
 
         Response will be a dictionary with the `Sighting` as the key, and the
@@ -193,7 +221,7 @@ class SightingReport(UserDict[str, any]):
         # pylint: disable=invalid-name
         for s in self.sightings:
             if s.is_recognized:
-                strategies[s] = SightingFinishStrategy.RECOGNIZED.finish()
+                strategies[s.id] = (s, SightingFinishStrategy.RECOGNIZED.finish())
             else:
                 # Match sightings to highest confidence
                 for (m, item) in matches.items():
@@ -202,9 +230,12 @@ class SightingReport(UserDict[str, any]):
                         and item["confidence"] >= confidence_threshold
                         and item["type"] == "BIRD"
                     ):
-                        strategies[s] = SightingFinishStrategy.BEST_GUESS.finish(item)
+                        strategies[s.id] = (
+                            s,
+                            SightingFinishStrategy.BEST_GUESS.finish(item),
+                        )
                         break
-            strategies.setdefault(s, SightingFinishStrategy.MYSTERY.finish())
+            strategies.setdefault(s.id, (s, SightingFinishStrategy.MYSTERY.finish()))
         return strategies
 
     @property
@@ -214,13 +245,28 @@ class SightingReport(UserDict[str, any]):
 
         This can be used to select the highest confidence species match for each match token.
         These match tokens will correspond to 'CannotDecide' sighting types."""
+        token = self.token_json
+        if not token:
+            LOGGER.warning("Cannot decode reportToken, falling back on .suggestions")
+            return {
+                match_token: {
+                    "confidence": SightingReport._BEST_GUESS_CONFIDENCE,
+                    "speciesCode": species.id,
+                    "type": "BIRD",  # XXX
+                }
+                for s in self.sightings
+                if (match_token := next(iter(s.match_tokens), None))
+                and (species := next(iter(s.suggestions), None))
+                and species.get("__typename") == "SpeciesBird"
+            }
+
         matches = {
             # items should already be sorted by confidence, but make sure we only return BIRD items
             i["matchToken"]: max(
-                [ii for ii in i["items"] if ii["type"] == "BIRD"],
+                (ii for ii in i["items"] if ii["type"] == "BIRD"),
                 key=lambda x: x["confidence"],
             )
-            for i in self.token_json["reportItems"]
+            for i in token.get("reportItems", [])
         }
         return matches
 

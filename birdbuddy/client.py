@@ -394,12 +394,12 @@ class BirdBuddy:
         mod: SightingFinishMod = None
         for (sighting, mod) in report.sighting_finishing_strategies(
             confidence_threshold
-        ).items():
+        ).values():
             # if we need extra work, do it now and update `report`
             if mod.strategy == SightingFinishStrategy.RECOGNIZED:
                 # Nothing to do, this will pass through as-is
                 pass
-            elif strategy > mod.strategy:
+            elif mod.strategy < strategy:
                 # Caller chose not to allow this.
                 # We will try to finish the postcard anyway.
                 # This may result in losing the sighting data.
@@ -574,6 +574,12 @@ class BirdBuddy:
 
     async def update_firmware_start(self, feeder: Feeder | str) -> FeederUpdateStatus:
         """Start a firmware update."""
+        current_status = await self.update_firmware_check(feeder)
+
+        if current_status.is_in_progress:
+            # There's already an update in progress
+            return current_status
+
         feeder_id: str
         if isinstance(feeder, Feeder):
             if not feeder.is_owner:
@@ -583,12 +589,20 @@ class BirdBuddy:
         else:
             feeder_id = feeder
         variables = {"feederId": feeder_id}
-        data = await self._make_request(
-            query=queries.feeder.UPDATE_FIRMWARE,
-            variables=variables,
-        )
+        try:
+            data = await self._make_request(
+                query=queries.feeder.UPDATE_FIRMWARE,
+                variables=variables,
+            )
+        except GraphqlError as err:
+            if err.error_code == "FEEDER_FIRMWARE_UPGRADE_ALREADY_IN_PROGRESS":
+                # Should have been handled above.
+                return current_status
+            raise
+        LOGGER.debug("start firmware update response: %s", data)
         result = FeederUpdateStatus(data["feederFirmwareUpdateStart"])
         if result.is_complete:
+            # After completion, update the Feeder state
             self.feeders[feeder_id].update(result.get("feeder", {}))
         return result
 

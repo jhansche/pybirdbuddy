@@ -106,6 +106,11 @@ class Feeder(UserDict[str, any]):
         return self.get("__typename") == "FeederForOwner"
 
     @property
+    def is_pending(self):
+        """``True`` if waiting for the owner account to approve access to the Feeder."""
+        return self.get("__typename") == "FeederForMemberPending"
+
+    @property
     def is_public(self):
         """Whether this is a public feeder."""
         return self.get("__typename") == "FeederForPublic"
@@ -191,9 +196,22 @@ class FeederUpdateStatus(UserDict[str, any]):
         return self["__typename"] == "FeederFirmwareUpdateSucceededResult"
 
     @property
+    def is_in_progress(self) -> bool:
+        """`True` if the firmware update is in progress."""
+        return (
+            self["__typename"] == "FeederFirmwareUpdateProgressResult"
+            and self.get("progress", None) is not None
+        )
+
+    @property
+    def is_failed(self) -> bool:
+        """`True` if the firmware update has failed."""
+        return self["__typename"] == "FeederFirmwareUpdateFailedResult"
+
+    @property
     def failure_reason(self) -> str:
         """Failure reason, or `None` if no failure."""
-        return self.get("failedReason", "Unknown failure")
+        return self.get("failedReason", None)
 
     @property
     def progress(self) -> int:

@@ -325,7 +325,7 @@ fragment SightingRecognizedMysteryVisitorFields on SightingRecognizedMysteryVisi
   text
   __typename
 }
-"""
+""".strip()
 
 SIGHTING_CHOOSE_MYSTERY = """
 mutation sightingConvertToMysteryVisitor($sightingConvertToMysteryVisitorInput: SightingConvertToMysteryVisitorInput!) {
@@ -466,7 +466,7 @@ fragment SightingRecognizedMysteryVisitorFields on SightingRecognizedMysteryVisi
   text
   __typename
 }
-"""
+""".strip()
 
 SHARE_MEDIAS = """
 mutation mediaShareToggle($mediaShareToggleInput: MediaShareToggleInput!) {
@@ -474,4 +474,4 @@ mutation mediaShareToggle($mediaShareToggleInput: MediaShareToggleInput!) {
     success
   }
 }
-"""
+""".strip()

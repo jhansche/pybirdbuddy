@@ -18,7 +18,7 @@ mutation feederToggleOffGrid($feederId: ID!, $feederToggleOffGridInput: FeederTo
     }
   }
 }
-"""
+""".strip()
 
 SET_OPTIONS = """
 mutation feederUpdate($feederId: ID!, $feederUpdateInput: FeederUpdateInput!) {
@@ -72,18 +72,21 @@ fragment SingleOwnerFeederAdditionalFields on FeederForOwner {
   }
   __typename
 }
-"""
+""".strip()
 
 UPDATE_FIRMWARE = """
 mutation feederFirmwareUpdateStart($feederId: ID!) {
   feederFirmwareUpdateStart(feederId: $feederId) {
     ... on FeederFirmwareUpdateFailedResult {
       failedReason
+      __typename
     }
     ... on FeederFirmwareUpdateProgressResult {
       progress
+      __typename
     }
     ... on FeederFirmwareUpdateSucceededResult {
+      __typename
       feeder {
         availableFirmwareVersion
         firmwareVersion
@@ -91,21 +94,24 @@ mutation feederFirmwareUpdateStart($feederId: ID!) {
     }
   }
 }
-"""
+""".strip()
 
 UPDATE_FIRMWARE_PROGRESS = """
 mutation feederFirmwareUpdateCheckProgress($feederId: ID!) {
   feederFirmwareUpdateCheckProgress(feederId: $feederId) {
     ... on FeederFirmwareUpdateFailedResult {
       failedReason
+      __typename
     }
     ... on FeederFirmwareUpdateProgressResult {
       feeder {
         state
       }
       progress
+      __typename
     }
     ... on FeederFirmwareUpdateSucceededResult {
+      __typename
       feeder {
         availableFirmwareVersion
         firmwareVersion
@@ -113,4 +119,4 @@ mutation feederFirmwareUpdateCheckProgress($feederId: ID!) {
     }
   }
 }
-"""
+""".strip()
