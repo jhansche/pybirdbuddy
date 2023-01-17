@@ -390,7 +390,7 @@ class BirdBuddy:
             if mod.strategy == SightingFinishStrategy.RECOGNIZED:
                 # Nothing to do, this will pass through as-is
                 pass
-            elif strategy > mod.strategy:
+            elif mod.strategy < strategy:
                 # Caller chose not to allow this.
                 # We will try to finish the postcard anyway.
                 # This may result in losing the sighting data.
