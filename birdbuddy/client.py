@@ -1,6 +1,7 @@
 """Bird Buddy client module"""
 
 from __future__ import annotations
+
 import asyncio
 from datetime import datetime
 
@@ -49,18 +50,20 @@ class BirdBuddy:
     _collections: dict[str, Collection]
     _last_feed_date: datetime
 
-    def __init__(self, emailOrToken: str, password: str | None = None) -> None:
-        self.graphql = GraphqlClient(BB_URL)
-        
+    def __init__(
+        self,
+        email: str | None = None,
+        password: str | None = None,
+        /,
+        refresh_token: str | None = None,
+        access_token: str | None = None,
+    ) -> None:
+        self._email = email
         self._password = password
-        if password is not None:
-            self._email = emailOrToken
-            self._refresh_token = None
-        else:
-            self._email = None
-            self._refresh_token = emailOrToken
-        
-        self._access_token = None
+        self._refresh_token = refresh_token
+        self._access_token = access_token
+
+        self.graphql = GraphqlClient(BB_URL)
         self._me = None
         self._last_feed_date = None
         self._feeders = {}
