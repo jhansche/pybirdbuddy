@@ -106,6 +106,11 @@ class Feeder(UserDict[str, any]):
         return self.get("__typename") == "FeederForOwner"
 
     @property
+    def is_pending(self):
+        """``True`` if waiting for the owner account to approve access to the Feeder."""
+        return self.get("__typename") == "FeederForMemberPending"
+
+    @property
     def is_public(self):
         """Whether this is a public feeder."""
         return self.get("__typename") == "FeederForPublic"
