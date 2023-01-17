@@ -538,4 +538,4 @@ fragment MediaFullFields on Media {
   }
   __typename
 }
-"""
+""".strip()
