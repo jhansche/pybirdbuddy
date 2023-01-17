@@ -1,6 +1,7 @@
 """Data models relating to Species, Sightings, etc"""
 
 from __future__ import annotations
+import base64
 from collections import UserDict
 from dataclasses import dataclass
 from enum import Enum
@@ -156,7 +157,7 @@ class SightingReport(UserDict[str, any]):
     def __str__(self) -> str:
         return (
             f"SightingReport<sightings[{len(self.sightings)}]: "
-            f"modes={ {s.id: f for (s, f) in self.sighting_finishing_strategies().items()} }>"
+            f"modes={ {s.id: f for (s, f) in self.sighting_finishing_strategies().values()} }>"
         )
 
     def __repr__(self) -> str:
@@ -175,16 +176,28 @@ class SightingReport(UserDict[str, any]):
     @property
     def token_json(self) -> dict:
         """sightingReport.reportToken, parsed from a JSON string."""
+        # FIXME: this field may be encoded; if so we'll have to get the ordered suggestions
+        #  {"alg":"HS256","typ":"JWT"},
+        #  {reportToken, iat, exp}
+        #  ...
         try:
             return json.loads(token) if (token := self.token) else {}
         except (ValueError, TypeError) as err:
-            LOGGER.error("Error parsing sighting report token: %s", err, exc_info=err)
+            b64token = base64.b64decode(token + "==", validate=False)
+            LOGGER.debug(
+                "Error parsing sighting report token: %s, decoded=%s",
+                err,
+                b64token,
+            )
+            # TODO: extract the token
+            # b64json = json.loads(b64token)
+            # LOGGER.debug("Decoded b64 json: %s", b64json)
             return {}
 
     def sighting_finishing_strategies(
         self,
         confidence_threshold: int = None,
-    ) -> dict[Sighting, SightingFinishMod]:
+    ) -> dict[str, tuple[Sighting, SightingFinishMod]]:
         """Determine best finishing strategy for each sighting in this report.
 
         Response will be a dictionary with the `Sighting` as the key, and the
@@ -197,7 +210,7 @@ class SightingReport(UserDict[str, any]):
         # pylint: disable=invalid-name
         for s in self.sightings:
             if s.is_recognized:
-                strategies[s] = SightingFinishStrategy.RECOGNIZED.finish()
+                strategies[s.id] = (s, SightingFinishStrategy.RECOGNIZED.finish())
             else:
                 # Match sightings to highest confidence
                 for (m, item) in matches.items():
@@ -206,9 +219,12 @@ class SightingReport(UserDict[str, any]):
                         and item["confidence"] >= confidence_threshold
                         and item["type"] == "BIRD"
                     ):
-                        strategies[s] = SightingFinishStrategy.BEST_GUESS.finish(item)
+                        strategies[s.id] = (
+                            s,
+                            SightingFinishStrategy.BEST_GUESS.finish(item),
+                        )
                         break
-            strategies.setdefault(s, SightingFinishStrategy.MYSTERY.finish())
+            strategies.setdefault(s.id, (s, SightingFinishStrategy.MYSTERY.finish()))
         return strategies
 
     @property
@@ -218,13 +234,28 @@ class SightingReport(UserDict[str, any]):
 
         This can be used to select the highest confidence species match for each match token.
         These match tokens will correspond to 'CannotDecide' sighting types."""
+        token = self.token_json
+        if not token:
+            LOGGER.warning("Cannot decode reportToken, falling back on .suggestions")
+            return {
+                match_token: {
+                    "confidence": SightingReport._BEST_GUESS_CONFIDENCE,
+                    "speciesCode": species.id,
+                    "type": "BIRD",  # XXX
+                }
+                for s in self.sightings
+                if (match_token := next(iter(s.match_tokens), None))
+                and (species := next(iter(s.suggestions), None))
+                and species.get("__typename") == "SpeciesBird"
+            }
+
         matches = {
             # items should already be sorted by confidence, but make sure we only return BIRD items
             i["matchToken"]: max(
                 (ii for ii in i["items"] if ii["type"] == "BIRD"),
                 key=lambda x: x["confidence"],
             )
-            for i in self.token_json.get("reportItems", [])
+            for i in token.get("reportItems", [])
         }
         return matches
 

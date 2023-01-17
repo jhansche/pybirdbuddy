@@ -385,7 +385,7 @@ class BirdBuddy:
         mod: SightingFinishMod = None
         for (sighting, mod) in report.sighting_finishing_strategies(
             confidence_threshold
-        ).items():
+        ).values():
             # if we need extra work, do it now and update `report`
             if mod.strategy == SightingFinishStrategy.RECOGNIZED:
                 # Nothing to do, this will pass through as-is
