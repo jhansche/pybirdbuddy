@@ -1,0 +1,210 @@
+postcard:
+  id: ea7c32bb-e95b-4fe6-a8ef-64134c1ae97e
+  createdAt: '2023-01-23T19:13:13.490Z'
+  __typename: FeedItemNewPostcard
+sighting:
+  feeder:
+    id: 06e8cbcb-cc13-456d-a457-d468a644ad82
+    name: Elm Bird Buddy
+    state: READY_TO_STREAM
+    __typename: FeederForOwner
+  medias:
+    - id: e579818d-cb68-40d2-876c-fcfdf3483eb6
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+    - id: 85dcdea5-920d-4349-ad6c-58ffab31c6be
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+    - id: 0f70dda5-6916-4529-80e8-6f52095917e4
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg?
+      __typename: MediaImage
+    - id: 15cd2b59-427b-45e7-9185-963c912d211a
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+    - id: bc7343d1-3597-48e9-939b-d3524ffd6d0c
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+    - id: 40277c96-0c06-40c1-9d86-c1fcc7e69c74
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+    - id: b794852b-537e-446a-880f-cf34f7976b27
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+    - id: 4f304761-ba4c-4421-ba76-e58e39cb7fb3
+      createdAt: '2023-01-23T19:12:58.779Z'
+      thumbnailUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg
+      contentUrl: >-
+        https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../CONTENT.jpg
+      __typename: MediaImage
+  sightingReport:
+    decoded_reportToken: >-
+      {"reportToken":"{\"manuallyChangedMatchTokens\":[],\"feederId\":\"06e8cbcb-cc13-456d-a457-d468a644ad82\",\"reportItems\":[{\"matchToken\":\"e579818d-cb68-40d2-876c-fcfdf3483eb6\",\"items\":[{\"confidence\":100,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"911b33e2-fe83-4efd-8031-1d22936cf354\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":0,\"speciesCode\":\"88999787-62b3-4142-985a-216ba54a5b02\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"e054c253-0c88-4144-82eb-46c7f9ed5d37\",\"type\":\"BIRD\"}]},{\"matchToken\":\"85dcdea5-920d-4349-ad6c-58ffab31c6be\",\"items\":[{\"confidence\":100,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":0,\"speciesCode\":\"47a530e1-cce9-4ff6-ab04-f98280cc3fa7\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"f77fe68a-e910-4e47-8fee-9fbebd8db2be\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"88999787-62b3-4142-985a-216ba54a5b02\",\"type\":\"BIRD\"}]},{\"matchToken\":\"0f70dda5-6916-4529-80e8-6f52095917e4\",\"items\":[{\"confidence\":100,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"911b33e2-fe83-4efd-8031-1d22936cf354\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":0,\"speciesCode\":\"47a530e1-cce9-4ff6-ab04-f98280cc3fa7\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"e130d12e-f9da-4c73-841c-946330fd1c46\",\"type\":\"BIRD\"}]},{\"matchToken\":\"15cd2b59-427b-45e7-9185-963c912d211a\",\"items\":[{\"confidence\":47,\"speciesCode\":\"47a7f641-0787-41ff-8110-df9061cd2b5f\",\"type\":\"BIRD\"},{\"confidence\":10,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":8,\"speciesCode\":\"81a13484-a311-477d-8011-8873bd3c053c\",\"type\":\"BIRD\"},{\"confidence\":3,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":3,\"speciesCode\":\"411ed3ff-bca4-4000-ba13-b14272aad38c\",\"type\":\"BIRD\"}]},{\"matchToken\":\"bc7343d1-3597-48e9-939b-d3524ffd6d0c\",\"items\":[{\"confidence\":22,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":17,\"speciesCode\":\"47a7f641-0787-41ff-8110-df9061cd2b5f\",\"type\":\"BIRD\"},{\"confidence\":14,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":8,\"speciesCode\":\"f77fe68a-e910-4e47-8fee-9fbebd8db2be\",\"type\":\"BIRD\"},{\"confidence\":5,\"speciesCode\":\"75935825-ffd5-4a01-ae39-a6fe12852e71\",\"type\":\"BIRD\"}]},{\"matchToken\":\"40277c96-0c06-40c1-9d86-c1fcc7e69c74\",\"items\":[{\"confidence\":100,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"911b33e2-fe83-4efd-8031-1d22936cf354\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":0,\"speciesCode\":\"74e2b98f-5c27-47ae-974a-368d76b8c196\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"47a530e1-cce9-4ff6-ab04-f98280cc3fa7\",\"type\":\"BIRD\"}]},{\"matchToken\":\"b794852b-537e-446a-880f-cf34f7976b27\",\"items\":[{\"confidence\":100,\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"911b33e2-fe83-4efd-8031-1d22936cf354\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"background\",\"type\":\"UNKNOWN\"},{\"confidence\":0,\"speciesCode\":\"47a530e1-cce9-4ff6-ab04-f98280cc3fa7\",\"type\":\"BIRD\"},{\"confidence\":0,\"speciesCode\":\"e130d12e-f9da-4c73-841c-946330fd1c46\",\"type\":\"BIRD\"}]},{\"matchToken\":\"4f304761-ba4c-4421-ba76-e58e39cb7fb3\",\"items\":[{\"confidence\":17,\"speciesCode\":\"81a13484-a311-477d-8011-8873bd3c053c\",\"type\":\"BIRD\"},{\"confidence\":8,\"speciesCode\":\"411ed3ff-bca4-4000-ba13-b14272aad38c\",\"type\":\"BIRD\"},{\"confidence\":7,\"speciesCode\":\"31909c50-93f9-447d-a1b8-65c939c9ff71\",\"type\":\"BIRD\"},{\"confidence\":6,\"speciesCode\":\"fbc390ca-dd72-48dd-8c6b-86277119ef23\",\"type\":\"BIRD\"},{\"confidence\":5,\"speciesCode\":\"f77fe68a-e910-4e47-8fee-9fbebd8db2be\",\"type\":\"BIRD\"}]}],\"sightings\":[{\"id\":\"58d02330-9e89-4189-93b7-e7d341182bd5\",\"matchTokens\":[\"e579818d-cb68-40d2-876c-fcfdf3483eb6\",\"85dcdea5-920d-4349-ad6c-58ffab31c6be\",\"0f70dda5-6916-4529-80e8-6f52095917e4\",\"40277c96-0c06-40c1-9d86-c1fcc7e69c74\",\"b794852b-537e-446a-880f-cf34f7976b27\",\"15cd2b59-427b-45e7-9185-963c912d211a\",\"bc7343d1-3597-48e9-939b-d3524ffd6d0c\"],\"speciesCode\":\"35379866-a4c6-4991-a2af-e6da93eaec4f\",\"__type\":\"sightingUnlocked\"},{\"id\":\"233000f8-ecbe-430c-9227-2c826866323f\",\"matchTokens\":[\"4f304761-ba4c-4421-ba76-e58e39cb7fb3\"],\"suggestionSpeciesCodes\":[\"81a13484-a311-477d-8011-8873bd3c053c\",\"411ed3ff-bca4-4000-ba13-b14272aad38c\",\"31909c50-93f9-447d-a1b8-65c939c9ff71\",\"fbc390ca-dd72-48dd-8c6b-86277119ef23\",\"f77fe68a-e910-4e47-8fee-9fbebd8db2be\"],\"__type\":\"sightingCannotDecide\"}],\"userId\":\"fed92c44-ebde-4c70-bf70-d7e37adfad2b\"}"}
+    reportToken: >-
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXBvcnRUb2tlbiI6IntcIm1hbnVhbGx5Q2hhbmdlZE1hdGNoVG9rZW5zXCI6W10sXCJmZWVkZXJJZFwiOlwiMDZlOGNiY2ItY2MxMy00NTZkLWE0NTctZDQ2OGE2NDRhZDgyXCIsXCJyZXBvcnRJdGVtc1wiOlt7XCJtYXRjaFRva2VuXCI6XCJlNTc5ODE4ZC1jYjY4LTQwZDItODc2Yy1mY2ZkZjM0ODNlYjZcIixcIml0ZW1zXCI6W3tcImNvbmZpZGVuY2VcIjoxMDAsXCJzcGVjaWVzQ29kZVwiOlwiMzUzNzk4NjYtYTRjNi00OTkxLWEyYWYtZTZkYTkzZWFlYzRmXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjowLFwic3BlY2llc0NvZGVcIjpcIjkxMWIzM2UyLWZlODMtNGVmZC04MDMxLTFkMjI5MzZjZjM1NFwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCJiYWNrZ3JvdW5kXCIsXCJ0eXBlXCI6XCJVTktOT1dOXCJ9LHtcImNvbmZpZGVuY2VcIjowLFwic3BlY2llc0NvZGVcIjpcIjg4OTk5Nzg3LTYyYjMtNDE0Mi05ODVhLTIxNmJhNTRhNWIwMlwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCJlMDU0YzI1My0wYzg4LTQxNDQtODJlYi00NmM3ZjllZDVkMzdcIixcInR5cGVcIjpcIkJJUkRcIn1dfSx7XCJtYXRjaFRva2VuXCI6XCI4NWRjZGVhNS05MjBkLTQzNDktYWQ2Yy01OGZmYWIzMWM2YmVcIixcIml0ZW1zXCI6W3tcImNvbmZpZGVuY2VcIjoxMDAsXCJzcGVjaWVzQ29kZVwiOlwiMzUzNzk4NjYtYTRjNi00OTkxLWEyYWYtZTZkYTkzZWFlYzRmXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjowLFwic3BlY2llc0NvZGVcIjpcImJhY2tncm91bmRcIixcInR5cGVcIjpcIlVOS05PV05cIn0se1wiY29uZmlkZW5jZVwiOjAsXCJzcGVjaWVzQ29kZVwiOlwiNDdhNTMwZTEtY2NlOS00ZmY2LWFiMDQtZjk4MjgwY2MzZmE3XCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjowLFwic3BlY2llc0NvZGVcIjpcImY3N2ZlNjhhLWU5MTAtNGU0Ny04ZmVlLTlmYmViZDhkYjJiZVwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCI4ODk5OTc4Ny02MmIzLTQxNDItOTg1YS0yMTZiYTU0YTViMDJcIixcInR5cGVcIjpcIkJJUkRcIn1dfSx7XCJtYXRjaFRva2VuXCI6XCIwZjcwZGRhNS02OTE2LTQ1MjktODBlOC02ZjUyMDk1OTE3ZTRcIixcIml0ZW1zXCI6W3tcImNvbmZpZGVuY2VcIjoxMDAsXCJzcGVjaWVzQ29kZVwiOlwiMzUzNzk4NjYtYTRjNi00OTkxLWEyYWYtZTZkYTkzZWFlYzRmXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjowLFwic3BlY2llc0NvZGVcIjpcIjkxMWIzM2UyLWZlODMtNGVmZC04MDMxLTFkMjI5MzZjZjM1NFwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCJiYWNrZ3JvdW5kXCIsXCJ0eXBlXCI6XCJVTktOT1dOXCJ9LHtcImNvbmZpZGVuY2VcIjowLFwic3BlY2llc0NvZGVcIjpcIjQ3YTUzMGUxLWNjZTktNGZmNi1hYjA0LWY5ODI4MGNjM2ZhN1wiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCJlMTMwZDEyZS1mOWRhLTRjNzMtODQxYy05NDYzMzBmZDFjNDZcIixcInR5cGVcIjpcIkJJUkRcIn1dfSx7XCJtYXRjaFRva2VuXCI6XCIxNWNkMmI1OS00MjdiLTQ1ZTctOTE4NS05NjNjOTEyZDIxMWFcIixcIml0ZW1zXCI6W3tcImNvbmZpZGVuY2VcIjo0NyxcInNwZWNpZXNDb2RlXCI6XCI0N2E3ZjY0MS0wNzg3LTQxZmYtODExMC1kZjkwNjFjZDJiNWZcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjEwLFwic3BlY2llc0NvZGVcIjpcImJhY2tncm91bmRcIixcInR5cGVcIjpcIlVOS05PV05cIn0se1wiY29uZmlkZW5jZVwiOjgsXCJzcGVjaWVzQ29kZVwiOlwiODFhMTM0ODQtYTMxMS00NzdkLTgwMTEtODg3M2JkM2MwNTNjXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjozLFwic3BlY2llc0NvZGVcIjpcIjM1Mzc5ODY2LWE0YzYtNDk5MS1hMmFmLWU2ZGE5M2VhZWM0ZlwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MyxcInNwZWNpZXNDb2RlXCI6XCI0MTFlZDNmZi1iY2E0LTQwMDAtYmExMy1iMTQyNzJhYWQzOGNcIixcInR5cGVcIjpcIkJJUkRcIn1dfSx7XCJtYXRjaFRva2VuXCI6XCJiYzczNDNkMS0zNTk3LTQ4ZTktOTM5Yi1kMzUyNGZmZDZkMGNcIixcIml0ZW1zXCI6W3tcImNvbmZpZGVuY2VcIjoyMixcInNwZWNpZXNDb2RlXCI6XCIzNTM3OTg2Ni1hNGM2LTQ5OTEtYTJhZi1lNmRhOTNlYWVjNGZcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjE3LFwic3BlY2llc0NvZGVcIjpcIjQ3YTdmNjQxLTA3ODctNDFmZi04MTEwLWRmOTA2MWNkMmI1ZlwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MTQsXCJzcGVjaWVzQ29kZVwiOlwiYmFja2dyb3VuZFwiLFwidHlwZVwiOlwiVU5LTk9XTlwifSx7XCJjb25maWRlbmNlXCI6OCxcInNwZWNpZXNDb2RlXCI6XCJmNzdmZTY4YS1lOTEwLTRlNDctOGZlZS05ZmJlYmQ4ZGIyYmVcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjUsXCJzcGVjaWVzQ29kZVwiOlwiNzU5MzU4MjUtZmZkNS00YTAxLWFlMzktYTZmZTEyODUyZTcxXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9XX0se1wibWF0Y2hUb2tlblwiOlwiNDAyNzdjOTYtMGMwNi00MGMxLTlkODYtYzFmY2M3ZTY5Yzc0XCIsXCJpdGVtc1wiOlt7XCJjb25maWRlbmNlXCI6MTAwLFwic3BlY2llc0NvZGVcIjpcIjM1Mzc5ODY2LWE0YzYtNDk5MS1hMmFmLWU2ZGE5M2VhZWM0ZlwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCI5MTFiMzNlMi1mZTgzLTRlZmQtODAzMS0xZDIyOTM2Y2YzNTRcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjAsXCJzcGVjaWVzQ29kZVwiOlwiYmFja2dyb3VuZFwiLFwidHlwZVwiOlwiVU5LTk9XTlwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCI3NGUyYjk4Zi01YzI3LTQ3YWUtOTc0YS0zNjhkNzZiOGMxOTZcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjAsXCJzcGVjaWVzQ29kZVwiOlwiNDdhNTMwZTEtY2NlOS00ZmY2LWFiMDQtZjk4MjgwY2MzZmE3XCIsXCJ0eXBlXCI6XCJCSVJEXCJ9XX0se1wibWF0Y2hUb2tlblwiOlwiYjc5NDg1MmItNTM3ZS00NDZhLTg4MGYtY2YzNGY3OTc2YjI3XCIsXCJpdGVtc1wiOlt7XCJjb25maWRlbmNlXCI6MTAwLFwic3BlY2llc0NvZGVcIjpcIjM1Mzc5ODY2LWE0YzYtNDk5MS1hMmFmLWU2ZGE5M2VhZWM0ZlwiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCI5MTFiMzNlMi1mZTgzLTRlZmQtODAzMS0xZDIyOTM2Y2YzNTRcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjAsXCJzcGVjaWVzQ29kZVwiOlwiYmFja2dyb3VuZFwiLFwidHlwZVwiOlwiVU5LTk9XTlwifSx7XCJjb25maWRlbmNlXCI6MCxcInNwZWNpZXNDb2RlXCI6XCI0N2E1MzBlMS1jY2U5LTRmZjYtYWIwNC1mOTgyODBjYzNmYTdcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjAsXCJzcGVjaWVzQ29kZVwiOlwiZTEzMGQxMmUtZjlkYS00YzczLTg0MWMtOTQ2MzMwZmQxYzQ2XCIsXCJ0eXBlXCI6XCJCSVJEXCJ9XX0se1wibWF0Y2hUb2tlblwiOlwiNGYzMDQ3NjEtYmE0Yy00NDIxLWJhNzYtZTU4ZTM5Y2I3ZmIzXCIsXCJpdGVtc1wiOlt7XCJjb25maWRlbmNlXCI6MTcsXCJzcGVjaWVzQ29kZVwiOlwiODFhMTM0ODQtYTMxMS00NzdkLTgwMTEtODg3M2JkM2MwNTNjXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjo4LFwic3BlY2llc0NvZGVcIjpcIjQxMWVkM2ZmLWJjYTQtNDAwMC1iYTEzLWIxNDI3MmFhZDM4Y1wiLFwidHlwZVwiOlwiQklSRFwifSx7XCJjb25maWRlbmNlXCI6NyxcInNwZWNpZXNDb2RlXCI6XCIzMTkwOWM1MC05M2Y5LTQ0N2QtYTFiOC02NWM5MzljOWZmNzFcIixcInR5cGVcIjpcIkJJUkRcIn0se1wiY29uZmlkZW5jZVwiOjYsXCJzcGVjaWVzQ29kZVwiOlwiZmJjMzkwY2EtZGQ3Mi00OGRkLThjNmItODYyNzcxMTllZjIzXCIsXCJ0eXBlXCI6XCJCSVJEXCJ9LHtcImNvbmZpZGVuY2VcIjo1LFwic3BlY2llc0NvZGVcIjpcImY3N2ZlNjhhLWU5MTAtNGU0Ny04ZmVlLTlmYmViZDhkYjJiZVwiLFwidHlwZVwiOlwiQklSRFwifV19XSxcInNpZ2h0aW5nc1wiOlt7XCJpZFwiOlwiNThkMDIzMzAtOWU4OS00MTg5LTkzYjctZTdkMzQxMTgyYmQ1XCIsXCJtYXRjaFRva2Vuc1wiOltcImU1Nzk4MThkLWNiNjgtNDBkMi04NzZjLWZjZmRmMzQ4M2ViNlwiLFwiODVkY2RlYTUtOTIwZC00MzQ5LWFkNmMtNThmZmFiMzFjNmJlXCIsXCIwZjcwZGRhNS02OTE2LTQ1MjktODBlOC02ZjUyMDk1OTE3ZTRcIixcIjQwMjc3Yzk2LTBjMDYtNDBjMS05ZDg2LWMxZmNjN2U2OWM3NFwiLFwiYjc5NDg1MmItNTM3ZS00NDZhLTg4MGYtY2YzNGY3OTc2YjI3XCIsXCIxNWNkMmI1OS00MjdiLTQ1ZTctOTE4NS05NjNjOTEyZDIxMWFcIixcImJjNzM0M2QxLTM1OTctNDhlOS05MzliLWQzNTI0ZmZkNmQwY1wiXSxcInNwZWNpZXNDb2RlXCI6XCIzNTM3OTg2Ni1hNGM2LTQ5OTEtYTJhZi1lNmRhOTNlYWVjNGZcIixcIl9fdHlwZVwiOlwic2lnaHRpbmdVbmxvY2tlZFwifSx7XCJpZFwiOlwiMjMzMDAwZjgtZWNiZS00MzBjLTkyMjctMmM4MjY4NjYzMjNmXCIsXCJtYXRjaFRva2Vuc1wiOltcIjRmMzA0NzYxLWJhNGMtNDQyMS1iYTc2LWU1OGUzOWNiN2ZiM1wiXSxcInN1Z2dlc3Rpb25TcGVjaWVzQ29kZXNcIjpbXCI4MWExMzQ4NC1hMzExLTQ3N2QtODAxMS04ODczYmQzYzA1M2NcIixcIjQxMWVkM2ZmLWJjYTQtNDAwMC1iYTEzLWIxNDI3MmFhZDM4Y1wiLFwiMzE5MDljNTAtOTNmOS00NDdkLWExYjgtNjVjOTM5YzlmZjcxXCIsXCJmYmMzOTBjYS1kZDcyLTQ4ZGQtOGM2Yi04NjI3NzExOWVmMjNcIixcImY3N2ZlNjhhLWU5MTAtNGU0Ny04ZmVlLTlmYmViZDhkYjJiZVwiXSxcIl9fdHlwZVwiOlwic2lnaHRpbmdDYW5ub3REZWNpZGVcIn1dLFwidXNlcklkXCI6XCJmZWQ5MmM0NC1lYmRlLTRjNzAtYmY3MC1kN2UzN2FkZmFkMmJcIn0iLCJpYXQiOjE2NzQ1MDEyOTcsImV4cCI6MTY3NzA5MzI5N30.oYjSy-X3Fo5J_KseuvmT5ny5uwhBRY8MWeOpWrdVvns
+    sightings:
+      - id: 58d02330-9e89-4189-93b7-e7d341182bd5
+        matchTokens:
+          - e579818d-cb68-40d2-876c-fcfdf3483eb6
+          - 85dcdea5-920d-4349-ad6c-58ffab31c6be
+          - 0f70dda5-6916-4529-80e8-6f52095917e4
+          - 40277c96-0c06-40c1-9d86-c1fcc7e69c74
+          - b794852b-537e-446a-880f-cf34f7976b27
+          - 15cd2b59-427b-45e7-9185-963c912d211a
+          - bc7343d1-3597-48e9-939b-d3524ffd6d0c
+        __typename: SightingRecognizedBirdUnlocked
+        color: PINK
+        text: Knock, knock! Looks like you've got a new first-time visitor!
+        shareableMatchTokens:
+          - e579818d-cb68-40d2-876c-fcfdf3483eb6
+          - 85dcdea5-920d-4349-ad6c-58ffab31c6be
+          - 0f70dda5-6916-4529-80e8-6f52095917e4
+          - 40277c96-0c06-40c1-9d86-c1fcc7e69c74
+          - b794852b-537e-446a-880f-cf34f7976b27
+          - 15cd2b59-427b-45e7-9185-963c912d211a
+          - bc7343d1-3597-48e9-939b-d3524ffd6d0c
+        species:
+          id: 35379866-a4c6-4991-a2af-e6da93eaec4f
+          iconUrl: >-
+            https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/icon/bird/92598614-c91d-4e87-b606-f3f707271466_carolina%20wren.svg
+          name: Carolina Wren
+          __typename: SpeciesBird
+          isUnofficialName: false
+          mapUrl: >-
+            https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/092641a1-8f5d-4c9a-9866-860f34b97680_Carolina%20Wren.svg
+      - id: 233000f8-ecbe-430c-9227-2c826866323f
+        matchTokens:
+          - 4f304761-ba4c-4421-ba76-e58e39cb7fb3
+        __typename: SightingCantDecideWhichBird
+        suggestions:
+          - isCollected: false
+            media: null
+            species:
+              id: 81a13484-a311-477d-8011-8873bd3c053c
+              description: >-
+                When it comes to food, fish crows are not picky and will
+                eat just about anything. If there is anything left over,
+                they will cache the surplus for later and use it to feed
+                their young. Pairs are affectionate and often preen the
+                back of each other's heads, but they can be quite the
+                troublemakers when dealing with other birds. They have
+                been known to harass them and steal food, as well as raid
+                nests.
+              name: Fish Crow
+              iconUrl: >-
+                https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/icon/bird/b0a7b955-60fb-44f2-914d-ac5fa633d3dc_Fish%20Crow.svg
+              __typename: SpeciesBird
+            __typename: CollectionSpecies
+          - isCollected: false
+            media: null
+            species:
+              id: 411ed3ff-bca4-4000-ba13-b14272aad38c
+              description: >-
+                When the cows come home, so do brown-headed cowbirds; they
+                get their name from following around grazing livestock
+                that bring a lot of insects for them to eat. Work smart,
+                not hard, right? That seems to apply to their parenting
+                style as well or lack thereof. They are notorious nest
+                parasites, laying eggs in the nests of other birds. When
+                the baby cowbird hatches, it will roll the other eggs out
+                of the nest!
+              name: Brown-Headed Cowbird
+              iconUrl: >-
+                https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/icon/bird/05b22f92-60b2-442f-aef4-bb8506c50a20_brown%20headed%20cowbird.svg
+              __typename: SpeciesBird
+            __typename: CollectionSpecies
+          - isCollected: false
+            media: null
+            species:
+              id: 31909c50-93f9-447d-a1b8-65c939c9ff71
+              description: >-
+                There's no family like a crow family! A crow family is
+                composed of around 15 crows and up to five different
+                generations of young. Young crows help out with family
+                duties before they start breeding between the ages of two
+                and four. They are also very smart! They know how to make
+                and use tools and know to follow other animals to find and
+                steal their food.
+              name: American Crow
+              iconUrl: >-
+                https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/icon/bird/54b8db66-fda1-4567-9f92-5ac50b154571_d138f3b3-8b1f-41c5-a8e2-0d7baec9d42c_American%20Crow.svg
+              __typename: SpeciesBird
+            __typename: CollectionSpecies
+          - isCollected: false
+            media: null
+            species:
+              id: fbc390ca-dd72-48dd-8c6b-86277119ef23
+              description: >-
+                These noisy birds will come to your feeders but usually
+                eat from the ground and sometimes maybe even steal food
+                right from under other birds' beaks! They engage in a
+                practice called anting – this means they allow ants to
+                walk all over their body and secrete formic acid, which is
+                thought to kill parasites. Ants aren't their only means of
+                pest control, though, they also use walnut juice,
+                mothballs, lemons, limes and chokecherries.
+              name: Common Grackle
+              iconUrl: >-
+                https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/icon/bird/d0fd93f1-c94b-4adf-9ed4-5eea09dece54_common%20grackle.svg
+              __typename: SpeciesBird
+            __typename: CollectionSpecies
+          - isCollected: true
+            media:
+              id: ae8d1f9a-2020-4266-b340-332f4a4a1db3
+              createdAt: '2023-01-22T13:19:58.580Z'
+              thumbnailUrl: >-
+                https://media.app-api-graphql.app-api.prod.aws.mybirdbuddy.com/media/feeder/.../THUMBNAIL.jpg?
+              __typename: MediaImage
+            species:
+              id: f77fe68a-e910-4e47-8fee-9fbebd8db2be
+              description: >-
+                House sparrows have long been our companions, living
+                alongside us since the Stone Age and are still found in
+                places where humans live. They are social birds that roost
+                in groups and engage in social singing, meaning multiple
+                birds will call together from bushes, like a little
+                sparrow choir. Cleanliness is important and you will
+                frequently see them taking dust baths!
+              name: House Sparrow
+              iconUrl: >-
+                https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/icon/bird/fac12e03-b825-446b-8aaa-c834c0582cab_house%20sparrow.svg
+              __typename: SpeciesBird
+            __typename: CollectionSpecies
+    __typename: SightingReport
+  __typename: SightingCreateFromPostcardResult
+origin: REMOTE
+time_fired: '2023-01-23T19:14:57.427495+00:00'
+context:
+  id: 01GQG0W58KZ4XDSAF9RBHSY587
+  parent_id: null
+  user_id: null
+description: event 'birdbuddy_new_postcard_sighting'
+
