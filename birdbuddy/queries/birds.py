@@ -22,6 +22,10 @@ fragment SightingCreateFromPostcardFields on SightingCreateFromPostcardResult {
     ...SightingsReportFields
     __typename
   }
+  videoMedia {
+    ...MediaFullFields
+    __typename
+  }
   __typename
 }
 fragment FeederFields on Feeder {

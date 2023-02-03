@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 from urllib.parse import urlparse, parse_qs
 
-from birdbuddy.feed import FeedNode
+from .feed import FeedNode
 
 
 class Media(UserDict):
