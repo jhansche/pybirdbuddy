@@ -103,13 +103,15 @@ class Feed(UserDict[str, any]):
 
     def filter(
         self,
-        of_type: FeedNodeType = None,
+        of_type: FeedNodeType | list[FeedNodeType] = None,
         newer_than: datetime = None,
     ) -> list[FeedNode]:
         """Filter the feed by type or time"""
+        if isinstance(of_type, FeedNodeType):
+            of_type = [of_type]
         return list(
             node
             for node in self.nodes
-            if (of_type is None or node.node_type == of_type)
+            if (of_type is None or node.node_type in of_type)
             and (newer_than is None or node.created_at > newer_than)
         )
