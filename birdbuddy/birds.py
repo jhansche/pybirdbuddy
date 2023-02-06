@@ -297,7 +297,7 @@ class PostcardSighting(UserDict[str, any]):
     @property
     def video_media(self) -> list[Media]:
         """List of Video media for the sighting"""
-        return [Media(v) for v in (self.get("videoMedia")) if v]
+        return [Media(v)] if (v := self.get("videoMedia")) else []
 
     @property
     def report(self) -> SightingReport:
