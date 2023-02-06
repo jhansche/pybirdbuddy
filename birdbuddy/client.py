@@ -448,6 +448,8 @@ class BirdBuddy:
                 "reportToken": report.token,
             }
         }
+        if video := next(iter(sighting_result.video_media), None):
+            variables["sightingReportPostcardFinishInput"]["videoMediaId"] = video
         data = await self._make_request(
             query=queries.birds.FINISH_SIGHTING,
             variables=variables,
