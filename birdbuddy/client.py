@@ -449,7 +449,7 @@ class BirdBuddy:
             }
         }
         if video := next(iter(sighting_result.video_media), None):
-            variables["sightingReportPostcardFinishInput"]["videoMediaId"] = video
+            variables["sightingReportPostcardFinishInput"]["videoMediaId"] = video.id
         data = await self._make_request(
             query=queries.birds.FINISH_SIGHTING,
             variables=variables,
