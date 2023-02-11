@@ -8,13 +8,6 @@ from datetime import datetime
 from python_graphql_client import GraphqlClient
 
 from . import LOGGER, VERBOSE, queries
-from .birds import (
-    PostcardSighting,
-    Sighting,
-    SightingFinishMod,
-    SightingFinishStrategy,
-    SightingReport,
-)
 from .const import BB_URL
 from .exceptions import (
     AuthenticationFailedError,
@@ -26,6 +19,13 @@ from .exceptions import (
 from .feed import Feed, FeedNode, FeedNodeType
 from .feeder import Feeder, FeederUpdateStatus, MetricState
 from .media import Collection, Media
+from .sightings import (
+    PostcardSighting,
+    Sighting,
+    SightingFinishMod,
+    SightingFinishStrategy,
+    SightingReport,
+)
 from .user import BirdBuddyUser
 
 _NO_VALUE = object()
@@ -392,7 +392,7 @@ class BirdBuddy:
 
         sighting: Sighting = None
         mod: SightingFinishMod = None
-        for (sighting, mod) in report.sighting_finishing_strategies(
+        for sighting, mod in report.sighting_finishing_strategies(
             confidence_threshold
         ).values():
             # if we need extra work, do it now and update `report`
