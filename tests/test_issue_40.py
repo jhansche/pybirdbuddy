@@ -2,8 +2,8 @@ from unittest.mock import AsyncMock, ANY, call
 
 import pytest
 
-from birdbuddy.birds import PostcardSighting, SightingFinishStrategy
 from birdbuddy.client import BirdBuddy
+from birdbuddy.sightings import PostcardSighting, SightingFinishStrategy
 
 
 @pytest.mark.asyncio
@@ -26,9 +26,12 @@ async def test_sighting_recognized_single(
         query=ANY,
         variables={
             "sightingReportPostcardFinishInput": {
-                "defaultCoverMedia":
-                    [{'mediaId': 'e579818d-cb68-40d2-876c-fcfdf3483eb6',
-                      'speciesId': '35379866-a4c6-4991-a2af-e6da93eaec4f'}],
+                "defaultCoverMedia": [
+                    {
+                        "mediaId": "e579818d-cb68-40d2-876c-fcfdf3483eb6",
+                        "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
+                    }
+                ],
                 "notSelectedMediaIds": [],
                 # postcard.id
                 "feedItemId": "ea7c32bb-e95b-4fe6-a8ef-64134c1ae97e",
@@ -52,10 +55,12 @@ async def test_sighting_best_guess(
     # with BEST_GUESS strategy, we will attempt to choose the best species match
     graphql_mock.side_effect = [
         # sightingChooseSpecies
-        {"data": {
-            # new report data
-            "sightingChooseSpecies": modified_report
-        }},
+        {
+            "data": {
+                # new report data
+                "sightingChooseSpecies": modified_report
+            }
+        },
         # sightingReportPostcardFinish
         {"data": {"sightingReportPostcardFinish": {"success": True}}},
     ]
@@ -66,26 +71,30 @@ async def test_sighting_best_guess(
     )
     graphql_mock.assert_has_calls(
         calls=[
-            call(query=ANY,  # sightingChooseSpecies
-                 variables={
-                     "sightingChooseSpeciesInput": {
-                         "reportToken": ANY,
-                         # FIXME: This is a bad selection!
-                         #  Add a way to make this species selection more intelligent.
-                         #  Target species=35379866-a4c6-4991-a2af-e6da93eaec4f
-                         "speciesId": "81a13484-a311-477d-8011-8873bd3c053c",
-                         "sightingId": "233000f8-ecbe-430c-9227-2c826866323f",
-                     },
-                 },
-                 headers=ANY,
-                 ),
+            call(
+                query=ANY,  # sightingChooseSpecies
+                variables={
+                    "sightingChooseSpeciesInput": {
+                        "reportToken": ANY,
+                        # FIXME: This is a bad selection!
+                        #  Add a way to make this species selection more intelligent.
+                        #  Target species=35379866-a4c6-4991-a2af-e6da93eaec4f
+                        "speciesId": "81a13484-a311-477d-8011-8873bd3c053c",
+                        "sightingId": "233000f8-ecbe-430c-9227-2c826866323f",
+                    },
+                },
+                headers=ANY,
+            ),
             call(
                 query=ANY,  # sightingReportPostcardFinish
                 variables={
                     "sightingReportPostcardFinishInput": {
-                        "defaultCoverMedia":
-                            [{'mediaId': 'e579818d-cb68-40d2-876c-fcfdf3483eb6',
-                              'speciesId': '35379866-a4c6-4991-a2af-e6da93eaec4f'}],
+                        "defaultCoverMedia": [
+                            {
+                                "mediaId": "e579818d-cb68-40d2-876c-fcfdf3483eb6",
+                                "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
+                            }
+                        ],
                         "notSelectedMediaIds": [],
                         # postcard.id
                         "feedItemId": "ea7c32bb-e95b-4fe6-a8ef-64134c1ae97e",
@@ -93,7 +102,7 @@ async def test_sighting_best_guess(
                     }
                 },
                 headers=ANY,
-            )
+            ),
         ],
         any_order=False,
     )
@@ -124,25 +133,29 @@ async def test_sighting_anomaly_correction(
     )
     graphql_mock.assert_has_calls(
         calls=[
-            call(query=ANY,  # sightingChooseSpecies
-                 variables={
-                     "sightingChooseSpeciesInput": {
-                         "reportToken": ANY,
-                         # anomaly correction replaces the anomaly (Fish Crow)
-                         # with expected (Carolina Wren)
-                         "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
-                         "sightingId": "233000f8-ecbe-430c-9227-2c826866323f",
-                     },
-                 },
-                 headers=ANY,
-                 ),
+            call(
+                query=ANY,  # sightingChooseSpecies
+                variables={
+                    "sightingChooseSpeciesInput": {
+                        "reportToken": ANY,
+                        # anomaly correction replaces the anomaly (Fish Crow)
+                        # with expected (Carolina Wren)
+                        "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
+                        "sightingId": "233000f8-ecbe-430c-9227-2c826866323f",
+                    },
+                },
+                headers=ANY,
+            ),
             call(
                 query=ANY,  # sightingReportPostcardFinish
                 variables={
                     "sightingReportPostcardFinishInput": {
-                        "defaultCoverMedia":
-                            [{'mediaId': 'e579818d-cb68-40d2-876c-fcfdf3483eb6',
-                              'speciesId': '35379866-a4c6-4991-a2af-e6da93eaec4f'}],
+                        "defaultCoverMedia": [
+                            {
+                                "mediaId": "e579818d-cb68-40d2-876c-fcfdf3483eb6",
+                                "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
+                            }
+                        ],
                         "notSelectedMediaIds": [],
                         # postcard.id
                         "feedItemId": "ea7c32bb-e95b-4fe6-a8ef-64134c1ae97e",
@@ -150,7 +163,7 @@ async def test_sighting_anomaly_correction(
                     }
                 },
                 headers=ANY,
-            )
+            ),
         ],
         any_order=False,
     )
