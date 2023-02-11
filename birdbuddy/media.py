@@ -6,6 +6,7 @@ from datetime import datetime
 import time
 from urllib.parse import urlparse, parse_qs
 
+from .birds import Species
 from .feed import FeedNode
 
 
@@ -61,6 +62,13 @@ class Collection(UserDict):
     def bird_name(self) -> str:
         """The bird species in this collection"""
         return self.get("species", {}).get("name", None)
+
+    @property
+    def species(self) -> Species | None:
+        """The bird species of this collection"""
+        if s := self.get("species", None):
+            return Species(s)
+        return None
 
     @property
     def collection_id(self) -> str:

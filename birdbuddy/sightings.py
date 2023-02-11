@@ -10,7 +10,7 @@ import logging
 
 from . import LOGGER
 from .birds import Species
-from .media import Media
+from .media import Collection, Media
 
 
 class SightingFinishStrategy(Enum):
@@ -113,10 +113,10 @@ class Sighting(UserDict[str, any]):
         return Species(self.get("species", {}))
 
     @property
-    def suggestions(self) -> list[Species]:
+    def suggestions(self) -> list[Collection]:
         """Suggested species"""
         return [
-            Species(s["species"])
+            Collection(s)
             for s in self.get("suggestions", [])
             if s["__typename"] == "CollectionSpecies"
             and s["species"]["__typename"] == "SpeciesBird"
@@ -238,13 +238,12 @@ class SightingReport(UserDict[str, any]):
             return {
                 match_token: {
                     "confidence": SightingReport._BEST_GUESS_CONFIDENCE,
-                    "speciesCode": species.id,
+                    "speciesCode": collection.species.id,
                     "type": "BIRD",
                 }
                 for s in self.sightings
                 if (match_token := next(iter(s.match_tokens), None))
-                and (species := next(iter(s.suggestions), None))
-                and species.get("__typename") == "SpeciesBird"
+                and (collection := next(iter(s.suggestions), None))
             }
 
         matches = {
