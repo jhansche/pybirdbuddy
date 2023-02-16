@@ -1,12 +1,21 @@
 # pybirdbuddy
 
 ```python
+import asyncio
 import pprint
 
 from birdbuddy.client import BirdBuddy
 
 bb = BirdBuddy("user@email.com", "Pa$$w0rd")
-await bb.refresh()
+
+# Using coroutines with async/await:
+async def async_test():
+    await bb.refresh()
+    pprint.pprint(bb.feeders)
+
+# Without async/await, including from a top-level module:
+result = asyncio.run(bb.refresh())
+pprint.pprint(result)
 pprint.pprint(bb.feeders)
 ```
 
