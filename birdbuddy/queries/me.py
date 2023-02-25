@@ -206,7 +206,7 @@ fragment MediaLikedFields on FeedItemMediaLiked {
     __typename
   }
   media {
-    thumbnailUrl
+    ...MediaFullFields
     __typename
   }
   __typename
@@ -317,7 +317,7 @@ fragment SpeciesSightingFields on FeedItemSpeciesSighting {
     __typename
   }
   media {
-    thumbnailUrl
+    ...MediaFullFields
     __typename
   }
   __typename
@@ -329,7 +329,7 @@ fragment SpeciesUnlockedFields on FeedItemSpeciesUnlocked {
     __typename
   }
   media {
-    thumbnailUrl
+    ...MediaFullFields
     __typename
   }
   __typename
@@ -337,7 +337,7 @@ fragment SpeciesUnlockedFields on FeedItemSpeciesUnlocked {
 fragment MysteryVisitorNotRecognizedFields on FeedItemMysteryVisitorNotRecognized {
   ...FeedItemFields
   media {
-    thumbnailUrl
+    ...MediaFullFields
     __typename
   }
   __typename
