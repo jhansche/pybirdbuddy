@@ -1,8 +1,9 @@
 import asyncio
-import pprint
+import json
 
 from birdbuddy.client import BirdBuddy
 
 bb = BirdBuddy()
 # Redirect output to schema.txt file
-pprint.pprint({"data": asyncio.run(bb.dump_schema())})
+with open('schema.json', 'w') as f:
+    json.dump(asyncio.run(bb.dump_schema()), f, indent=2)
