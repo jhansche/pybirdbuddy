@@ -48,3 +48,20 @@ fragment ListFeederFields on FeederForPrivate {
   }
 }
 ```
+
+## Translations
+
+API responses can return translated strings by setting the client's `language_code` property.
+Language codes are parsed using [`langcodes`](https://pypi.org/project/langcodes/)
+
+```python
+from birdbuddy import BirdBuddy
+
+async def main():
+    bb = BirdBuddy
+    bb.language_code = "de"
+    
+    collections = await bb.refresh_collections
+    birds = [c.species.name for c in collections.values()]
+    print(birds)
+```
