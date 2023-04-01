@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime
 
+import langcodes
 from python_graphql_client import GraphqlClient
 
 from . import LOGGER, VERBOSE, queries
@@ -45,6 +46,7 @@ class BirdBuddy:
     _password: str | None
     _access_token: str | None
     _refresh_token: str | None
+    _language_code: str
     _me: BirdBuddyUser | None
     _feeders: dict[str, Feeder]
     _collections: dict[str, Collection]
@@ -68,6 +70,7 @@ class BirdBuddy:
         self._last_feed_date = None
         self._feeders = {}
         self._collections = {}
+        self.language_code = "en"
 
     def _save_me(self, me_data: dict):
         if not me_data:
@@ -90,7 +93,10 @@ class BirdBuddy:
         return self._access_token is None
 
     def _headers(self) -> dict:
-        return {"Authorization": f"Bearer {self._access_token}"}
+        return {
+            "Authorization": f"Bearer {self._access_token}",
+            "Accept-Language": self._language_code,
+        }
 
     def _clear(self):
         self._access_token = None
@@ -216,6 +222,20 @@ class BirdBuddy:
     def user(self) -> None | BirdBuddyUser:
         """The logged in user data"""
         return self._me
+
+    @property
+    def language_code(self) -> str:
+        """The current language code"""
+        return self._language_code
+
+    @language_code.setter
+    def language_code(self, language_code: str):
+        """Override the language used in API requests.
+
+        This is useful to get localized responses, including translated
+        bird species names.
+        """
+        self._language_code = langcodes.standardize_tag(language_code)
 
     async def refresh(self) -> bool:
         """Refreshes the Bird Buddy feeder data"""
