@@ -18,6 +18,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/jhansche/pybirdbuddy",
     packages=setuptools.find_packages(),
+    python_requires='>=3.9',
     install_requires=[
         "python-graphql-client",
         "langcodes",
