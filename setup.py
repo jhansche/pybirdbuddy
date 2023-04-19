@@ -1,14 +1,14 @@
 #!/bin/python
 from os import path
 
-from setuptools import setup
+import setuptools
 
 this_directory = path.abspath(path.dirname(__file__))
 
 with open(path.join(this_directory, "README.md"), "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-setup(
+setuptools.setup(
     name="pybirdbuddy",
     version="0.0.15",
     author="jhansche",
