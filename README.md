@@ -61,7 +61,7 @@ async def main():
     bb = BirdBuddy
     bb.language_code = "de"
     
-    collections = await bb.refresh_collections
+    collections = await bb.refresh_collections()
     birds = [c.species.name for c in collections.values()]
     print(birds)
 ```
