@@ -20,6 +20,26 @@ mutation feederToggleOffGrid($feederId: ID!, $feederToggleOffGridInput: FeederTo
 }
 """.strip()
 
+TOGGLE_AUDIO_ENABLED = """
+mutation feederToggleAudio($feederId: ID!, $feederToggleAudioInput: FeederToggleAudioInput!) {
+  feederToggleAudio(
+    feederId: $feederId
+    feederToggleAudioInput: $feederToggleAudioInput
+  ) {
+    ... on FeederToggleAudioFinishedResult {
+      feeder {
+        audioEnabled
+      }
+    }
+    ... on FeederToggleAudioInProgressResult {
+      feeder {
+        audioEnabled
+      }
+    }
+  }
+}
+""".strip()
+
 SET_OPTIONS = """
 mutation feederUpdate($feederId: ID!, $feederUpdateInput: FeederUpdateInput!) {
   feederUpdate(feederId: $feederId, feederUpdateInput: $feederUpdateInput) {
@@ -31,9 +51,12 @@ mutation feederUpdate($feederId: ID!, $feederUpdateInput: FeederUpdateInput!) {
 }
 fragment ListOwnerFeederFields on FeederForOwner {
   ...ListFeederFields
+  audioEnabled
   availableFirmwareVersion
   firmwareVersion
   offGrid
+  presenceUpdatedAt
+  serialNumber
 }
 fragment ListFeederFields on FeederForPrivate {
   battery {

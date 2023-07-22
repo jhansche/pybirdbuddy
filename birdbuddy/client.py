@@ -281,6 +281,45 @@ class BirdBuddy:
             new_off_grid = self.feeders[feeder_id].is_off_grid
         return self.feeders[feeder_id]
 
+
+    async def toggle_audio_enabled(
+        self,
+        feeder: Feeder | str,
+        is_audio_enabled: bool,
+    ) -> Feeder:
+        """Toggle the feeder's audio-enabled setting.
+
+        Available to Owner account only."""
+        if isinstance(feeder, Feeder):
+            feeder_id = feeder.id
+            if not feeder.is_owner:
+                LOGGER.warning("Audio setting is available only to owner accounts")
+                # The request will fail
+        else:
+            # We cannot check the owner status if we only have an id
+            feeder_id = feeder
+        variables = {
+            "feederId": feeder_id,
+            "feederToggleAudioInput": {
+                "audioEnabled": is_audio_enabled,
+            },
+        }
+        result = await self._make_request(
+            query=queries.feeder.TOGGLE_AUDIO_ENABLED,
+            variables=variables,
+        )
+        LOGGER.debug("Audio toggle result: %s", result)
+        # The status doesn't get updated right away.
+
+        new_setting = result["feederToggleAudio"]["feeder"]["audioEnabled"]
+
+        while new_setting != is_audio_enabled:
+            LOGGER.debug("waiting for audio setting to update")
+            await asyncio.sleep(1)
+            assert await self.refresh()
+            new_setting = self.feeders[feeder_id].is_audio_enabled
+        return self.feeders[feeder_id]
+
     async def feed(
         self,
         first: int = 20,
@@ -584,6 +623,11 @@ class BirdBuddy:
             "feederId": feeder_id,
             "feederUpdateInput": {
                 "frequency": frequency.value,
+                # "lowBatteryNotification"
+                # "lowFoodNotification"
+                # "name"
+                # "offGrid"
+                # "offlineMode"
             },
         }
         result = await self._make_request(

@@ -77,8 +77,11 @@ fragment ListOwnerFeederFields on FeederForOwner {
   ...ListFeederFields
   availableFirmwareVersion
   firmwareVersion
+  serialNumber
   invitationsAvailable
   offGrid
+  audioEnabled
+  presenceUpdatedAt
   members {
     ...FeederMemberFields
     __typename

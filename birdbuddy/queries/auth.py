@@ -109,6 +109,9 @@ fragment ListOwnerFeederFields on FeederForOwner {
   firmwareVersion
   invitationsAvailable
   offGrid
+  audioEnabled
+  presenceUpdatedAt
+  serialNumber
   members {
     ...FeederMemberFields
     __typename
