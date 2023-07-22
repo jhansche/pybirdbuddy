@@ -136,6 +136,11 @@ class Feeder(UserDict[str, any]):
         return self.get("offGrid", None)
 
     @property
+    def is_audio_enabled(self) -> bool:
+        """Whether videos will contain audio."""
+        return self.get("audioEnabled", None)
+
+    @property
     def owner(self) -> str:
         """The username who first paired the Feeder"""
         return self.get("ownerName")
