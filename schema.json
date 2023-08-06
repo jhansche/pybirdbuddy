@@ -4020,6 +4020,16 @@
             "kind": "OBJECT",
             "name": "FeederToggleAudioFailedResult",
             "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoFailedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileFailedResult",
+            "ofType": null
           }
         ]
       },
@@ -4051,6 +4061,16 @@
             "kind": "OBJECT",
             "name": "FeederToggleAudioFinishedResult",
             "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoFinishedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileFinishedResult",
+            "ofType": null
           }
         ]
       },
@@ -4081,6 +4101,16 @@
           {
             "kind": "OBJECT",
             "name": "FeederToggleAudioInProgressResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoInProgressResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileInProgressResult",
             "ofType": null
           }
         ]
@@ -4937,6 +4967,21 @@
             "deprecationReason": "Renamed to offGrid"
           },
           {
+            "name": "powerProfile",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "FeederPowerProfile",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "presenceUpdatedAt",
             "args": [],
             "type": {
@@ -4999,6 +5044,21 @@
               "kind": "OBJECT",
               "name": "FeederMetricTemperature",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "videoHighQualityEnabled",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -6101,6 +6161,31 @@
       },
       {
         "kind": "ENUM",
+        "name": "FeederPowerProfile",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "FRENZY_MODE",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "POWER_SAVER_MODE",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "STANDARD_MODE",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
         "name": "FeederState",
         "fields": null,
         "inputFields": null,
@@ -6347,6 +6432,182 @@
       },
       {
         "kind": "UNION",
+        "name": "FeederToggleHighQualityVideoCheckResult",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoFailedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoFinishedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoInProgressResult",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederToggleHighQualityVideoFailedResult",
+        "fields": [
+          {
+            "name": "failedReason",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "FeederChangeDeviceSettingFailedReason",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeederChangeDeviceSettingFailedResult",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederToggleHighQualityVideoFinishedResult",
+        "fields": [
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeederChangeDeviceSettingFinishedResult",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederToggleHighQualityVideoInProgressResult",
+        "fields": [
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeederChangeDeviceSettingInProgressResult",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "FeederToggleHighQualityVideoInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "videoHighQualityEnabled",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "FeederToggleHighQualityVideoResult",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoFinishedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederToggleHighQualityVideoInProgressResult",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
         "name": "FeederToggleOffGridCheckResult",
         "fields": null,
         "inputFields": null,
@@ -6524,15 +6785,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "frequency",
-            "type": {
-              "kind": "ENUM",
-              "name": "FeederFrequency",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
             "name": "lowBatteryNotification",
             "type": {
               "kind": "SCALAR",
@@ -6581,6 +6833,182 @@
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "FeederUpdatePowerProfileCheckResult",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileFailedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileFinishedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileInProgressResult",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederUpdatePowerProfileFailedResult",
+        "fields": [
+          {
+            "name": "failedReason",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "FeederChangeDeviceSettingFailedReason",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeederChangeDeviceSettingFailedResult",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederUpdatePowerProfileFinishedResult",
+        "fields": [
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeederChangeDeviceSettingFinishedResult",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederUpdatePowerProfileInProgressResult",
+        "fields": [
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeederChangeDeviceSettingInProgressResult",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "FeederUpdatePowerProfileInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "powerProfile",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "FeederPowerProfile",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "FeederUpdatePowerProfileResult",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileFinishedResult",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederUpdatePowerProfileInProgressResult",
+            "ofType": null
+          }
+        ]
       },
       {
         "kind": "OBJECT",
@@ -10020,6 +10448,48 @@
             "deprecationReason": null
           },
           {
+            "name": "feederToggleHighQualityVideo",
+            "args": [
+              {
+                "name": "feederId",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "feederToggleHighQualityVideoInput",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "FeederToggleHighQualityVideoInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "FeederToggleHighQualityVideoResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "feederToggleOffGrid",
             "args": [
               {
@@ -10126,6 +10596,48 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feederUpdatePowerProfile",
+            "args": [
+              {
+                "name": "feederId",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "feederUpdatePowerProfileInput",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "FeederUpdatePowerProfileInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "FeederUpdatePowerProfileResult",
                 "ofType": null
               }
             },
@@ -12594,6 +13106,64 @@
             "deprecationReason": null
           },
           {
+            "name": "feederToggleHighQualityVideoCheck",
+            "args": [
+              {
+                "name": "feederId",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "FeederToggleHighQualityVideoCheckResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feederUpdatePowerProfileCheck",
+            "args": [
+              {
+                "name": "feederId",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "FeederUpdatePowerProfileCheckResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "locationGeoIp",
             "args": [],
             "type": {
@@ -13242,6 +13812,21 @@
             "deprecationReason": null
           },
           {
+            "name": "info",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "RemoteFeederInfoResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "isUserConnected",
             "args": [],
             "type": {
@@ -13550,6 +14135,15 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "createTutorialPostcard",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": "false"
+          },
+          {
             "name": "feederId",
             "type": {
               "kind": "NON_NULL",
@@ -13557,6 +14151,19 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slotNumber",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -13646,7 +14253,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "feederId",
+            "name": "remoteFeederConnectionId",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -13792,6 +14399,129 @@
           }
         ],
         "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "RemoteFeederInfoResult",
+        "fields": [
+          {
+            "name": "areaSize",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "coverPhotoUrl",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "description",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "establishedIn",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "landscapeReelUrls",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "mapPhotoUrl",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "speciesCount",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
