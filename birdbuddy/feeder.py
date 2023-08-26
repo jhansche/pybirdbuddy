@@ -22,6 +22,19 @@ class MetricState(Enum):
         return MetricState.UNKNOWN
 
 
+class PowerProfile(Enum):
+    FRENZY = "FRENZY_MODE"
+    POWER_SAVE = "POWER_SAVER_MODE"
+    STANDARD = "STANDARD_MODE"
+
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def _missing_(cls, value: str):
+        LOGGER.warning("Unexpected power profile: %s", value)
+        return PowerProfile.UNKNOWN
+
+
 class FeederState(Enum):
     """Feeder states"""
 
@@ -163,8 +176,13 @@ class Feeder(UserDict[str, any]):
     @property
     def frequency(self) -> MetricState:
         """Configured frequency of the Feeder."""
-        # Presumably this is a setting for preferred frequency of postcards?
+        LOGGER.warning("Feeder.frequency is deprecated. Use power_profile instead")
         return MetricState(self.get("frequency", "UNKNOWN"))
+
+    @property
+    def power_profile(self) -> PowerProfile:
+        """Configured power profile of the Feeder."""
+        return PowerProfile(self.get("powerProfile", "STANDARD"))
 
     @property
     # @incubating
