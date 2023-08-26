@@ -10,7 +10,7 @@ with open(path.join(this_directory, "README.md"), "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pybirdbuddy",
-    version="0.0.16",
+    version="0.0.17",
     author="jhansche",
     author_email="madcoder@gmail.com",
     description="A library to query data about a Bird Buddy smart bird feeder",
@@ -18,7 +18,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/jhansche/pybirdbuddy",
     packages=setuptools.find_packages(),
-    python_requires='>=3.9',
+    python_requires='>=3.10',
     install_requires=[
         "python-graphql-client",
         "langcodes",
