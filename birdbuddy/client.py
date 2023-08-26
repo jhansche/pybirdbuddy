@@ -18,7 +18,7 @@ from .exceptions import (
     UnexpectedResponseError,
 )
 from .feed import Feed, FeedNode, FeedNodeType
-from .feeder import Feeder, FeederUpdateStatus, MetricState
+from .feeder import Feeder, FeederUpdateStatus, PowerProfile
 from .media import Collection, Media
 from .sightings import (
     PostcardSighting,
@@ -172,6 +172,7 @@ class BirdBuddy:
         variables: dict = None,
         auth: bool = True,
         reauth: bool = True,
+        subscript: str | None = None,
     ) -> dict:
         """Make the request, check for errors, and return the unwrapped data"""
         if auth:
@@ -215,7 +216,8 @@ class BirdBuddy:
             raise UnexpectedResponseError(response)
 
         LOGGER.log(VERBOSE, "< response: %s", _redact(result, should_redact))
-
+        if subscript:
+            return result[subscript]
         return result
 
     @property
@@ -611,8 +613,42 @@ class BirdBuddy:
         self._collections.update(collections)
         return self._collections
 
-    async def set_frequency(self, feeder: Feeder | str, frequency: MetricState) -> dict:
-        """Update Feeder frequency state"""
+    async def set_feeder_options(self, feeder: Feeder | str, **kwargs) -> dict:
+        """Update Feeder options. Options can be specified as `kwargs`:
+        * `lowBatteryNotification: bool`
+        * `lowFoodNotification: bool`
+        * `name: str`
+        * `offGrid: bool`
+        * `offlineMode: bool`
+        """
+        if isinstance(feeder, Feeder):
+            feeder_id = feeder.id
+            if not feeder.is_owner:
+                LOGGER.warning("Setting Feeder options is available only to owner accounts")
+        else:
+            feeder_id = feeder
+        variables = {
+            "feederId": feeder_id,
+            "feederUpdateInput": {
+                k: v for (k, v) in kwargs.items() if k in [
+                    "lowBatteryNotification",
+                    "lowFoodNotification",
+                    "name",
+                    "offGrid",
+                    "offlineMode",
+                ]
+            },
+        }
+        updated = await self._make_request(
+            query=queries.feeder.SET_OPTIONS,
+            variables=variables,
+            subscript="feederUpdate",
+        )
+        self.feeders[feeder_id].update(updated)
+        return updated
+
+    async def set_power_profile(self, feeder: Feeder | str, profile: PowerProfile) -> dict:
+        """Update the power profile."""
         if isinstance(feeder, Feeder):
             feeder_id = feeder.id
             if not feeder.is_owner:
@@ -621,21 +657,28 @@ class BirdBuddy:
             feeder_id = feeder
         variables = {
             "feederId": feeder_id,
-            "feederUpdateInput": {
-                "frequency": frequency.value,
-                # "lowBatteryNotification"
-                # "lowFoodNotification"
-                # "name"
-                # "offGrid"
-                # "offlineMode"
+            "feederUpdatePowerProfileInput": {
+                "powerProfile": profile.value,
             },
         }
         result = await self._make_request(
-            query=queries.feeder.SET_OPTIONS,
+            query=queries.feeder.UPDATE_POWER_PROFILE,
             variables=variables,
+            subscript="feederUpdatePowerProfile",
         )
-        updated = {"frequency": result["feederUpdate"].get("frequency", None)}
-        self.feeders[feeder_id].update(updated)
+        # This may raise GraphqlError code `PAYMENTS_SUBSCRIPTION_IS_NOT_ACTIVE`,
+        # implying that `FRENZY_MODE` is a paid feature.
+        updated = {"powerProfile": result.get("feeder", {}).get("powerProfile", None)}
+
+        if result["__typename"] == "FeederUpdatePowerProfileInProgressResult":
+            # Refresh after a short delay
+            # We could also poll `feederUpdatePowerProfileCheck`
+            LOGGER.debug("PowerProfile update is in progress")
+            await asyncio.sleep(0.25)
+            await self.refresh()
+            updated["powerProfile"] = self.feeders[feeder_id].power_profile.value
+        else:
+            self.feeders[feeder_id].update(updated)
         return updated
 
     async def update_firmware_start(self, feeder: Feeder | str) -> FeederUpdateStatus:

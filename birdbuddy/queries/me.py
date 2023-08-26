@@ -81,6 +81,7 @@ fragment ListOwnerFeederFields on FeederForOwner {
   invitationsAvailable
   offGrid
   audioEnabled
+  powerProfile
   presenceUpdatedAt
   members {
     ...FeederMemberFields

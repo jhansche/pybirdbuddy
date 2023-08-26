@@ -27,11 +27,13 @@ mutation feederToggleAudio($feederId: ID!, $feederToggleAudioInput: FeederToggle
     feederToggleAudioInput: $feederToggleAudioInput
   ) {
     ... on FeederToggleAudioFinishedResult {
+      __typename
       feeder {
         audioEnabled
       }
     }
     ... on FeederToggleAudioInProgressResult {
+      __typename
       feeder {
         audioEnabled
       }
@@ -39,6 +41,25 @@ mutation feederToggleAudio($feederId: ID!, $feederToggleAudioInput: FeederToggle
   }
 }
 """.strip()
+
+UPDATE_POWER_PROFILE = """
+mutation feederUpdatePowerProfile($feederId: ID!, $feederUpdatePowerProfileInput: FeederUpdatePowerProfileInput!) {
+  feederUpdatePowerProfile(feederId: $feederId, feederUpdatePowerProfileInput: $feederUpdatePowerProfileInput) {
+    ... on FeederUpdatePowerProfileFinishedResult {
+      __typename
+      feeder {
+        powerProfile
+      }
+    }
+    ... on FeederUpdatePowerProfileInProgressResult {
+      __typename
+      feeder {
+        powerProfile
+      }
+    }
+  }
+}
+"""
 
 SET_OPTIONS = """
 mutation feederUpdate($feederId: ID!, $feederUpdateInput: FeederUpdateInput!) {
@@ -55,6 +76,7 @@ fragment ListOwnerFeederFields on FeederForOwner {
   availableFirmwareVersion
   firmwareVersion
   offGrid
+  powerProfile
   presenceUpdatedAt
   serialNumber
 }
@@ -88,6 +110,7 @@ fragment SingleOwnerFeederAdditionalFields on FeederForOwner {
   lowBatteryNotification
   lowFoodNotification
   offGrid
+  powerProfile
   serialNumber
   temperature {
     value
