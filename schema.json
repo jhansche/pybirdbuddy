@@ -143,6 +143,21 @@
           },
           {
             "kind": "OBJECT",
+            "name": "FeedItemReferralCodeUsed",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemRemoteFeederConnectionExpired",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemRemoteFeederUnlocked",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "FeedItemSpeciesSighting",
             "ofType": null
           },
@@ -2556,7 +2571,22 @@
             "deprecationReason": null
           },
           {
+            "name": "REFERRAL_CODE_USED",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "REGULAR",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REMOTE_FEEDER_CONNECTION_EXPIRED",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REMOTE_FEEDER_UNLOCKED",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -2978,6 +3008,21 @@
           {
             "kind": "OBJECT",
             "name": "FeedItemNewPostcard",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemReferralCodeUsed",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemRemoteFeederConnectionExpired",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemRemoteFeederUnlocked",
             "ofType": null
           },
           {
@@ -3651,6 +3696,219 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "SightingReportPreview",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeedItem",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeedItemReferralCodeUsed",
+        "fields": [
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "usedByUsername",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeedItem",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeedItemRemoteFeederConnectionExpired",
+        "fields": [
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feederName",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slotNumber",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeedItem",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeedItemRemoteFeederUnlocked",
+        "fields": [
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feederName",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               }
             },
@@ -11022,6 +11280,50 @@
             "deprecationReason": null
           },
           {
+            "name": "paymentsProductPurchased",
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "PaymentsProductPurchasedInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PaymentsProductPurchasedResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "paymentsProductsRestored",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PaymentsProductsRestoredResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "postcardIgnoreForFeederMembersUpdate",
             "args": [
               {
@@ -11073,6 +11375,35 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "PostcardSettingsIgnoreMysteryVisitorsResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "premiumCancelled",
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "PremiumCancelledInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PremiumCancelledResult",
                 "ofType": null
               }
             },
@@ -11189,6 +11520,35 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "RemoteFeederDisconnectResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "remoteFeederSwitch",
+            "args": [
+              {
+                "name": "remoteFeederSwitchInput",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "RemoteFeederSwitchInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "RemoteFeederSwitchResult",
                 "ofType": null
               }
             },
@@ -11936,6 +12296,21 @@
           },
           {
             "kind": "OBJECT",
+            "name": "FeedItemReferralCodeUsed",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemRemoteFeederConnectionExpired",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeedItemRemoteFeederUnlocked",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "FeedItemSpeciesSighting",
             "ofType": null
           },
@@ -12355,6 +12730,79 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "PaymentsProductPurchasedInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "productId",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PaymentsProductPurchasedResult",
+        "fields": [
+          {
+            "name": "success",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PaymentsProductsRestoredResult",
+        "fields": [
+          {
+            "name": "success",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "PlaceDetailsInput",
         "fields": null,
         "inputFields": [
@@ -12536,6 +12984,78 @@
         "possibleTypes": null
       },
       {
+        "kind": "ENUM",
+        "name": "PremiumCancellationReason",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "OTHER",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "PremiumCancelledInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "cancellationReason",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "PremiumCancellationReason",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "cancellationReasonText",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PremiumCancelledResult",
+        "fields": [
+          {
+            "name": "success",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "Problem",
         "fields": [
@@ -12704,7 +13224,27 @@
             "deprecationReason": null
           },
           {
+            "name": "REMOTE_FEEDER_CONNECTION_EXPIRED",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REMOTE_FEEDER_POSTCARD_RECEIVED",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REMOTE_FEEDER_REFERRAL_FEEDER_UNLOCKED",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "SIGHTING_POSTCARD_RECEIVED",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USER_REFERRAL_REDEEM",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -13782,7 +14322,7 @@
             "deprecationReason": null
           },
           {
-            "name": "habitat",
+            "name": "flagUrl",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -13795,6 +14335,21 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "habitat",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Design changes. Moved to info block."
           },
           {
             "name": "id",
@@ -13906,8 +14461,8 @@
                 }
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Design changes. Not used anymore."
           },
           {
             "name": "tier",
@@ -13966,8 +14521,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Design changes. Not used anymore."
           },
           {
             "name": "type",
@@ -14407,7 +14962,52 @@
         "name": "RemoteFeederInfoResult",
         "fields": [
           {
+            "name": "altitude",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "areaSize",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Design changes. Not used anymore."
+          },
+          {
+            "name": "climate",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "continent",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -14463,6 +15063,21 @@
                 "ofType": null
               }
             },
+            "isDeprecated": true,
+            "deprecationReason": "Design changes. Not used anymore."
+          },
+          {
+            "name": "habitat",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -14506,6 +15121,21 @@
           },
           {
             "name": "speciesCount",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Design changes. Not used anymore."
+          },
+          {
+            "name": "websiteUrl",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -14606,6 +15236,67 @@
         "possibleTypes": null
       },
       {
+        "kind": "INPUT_OBJECT",
+        "name": "RemoteFeederSwitchInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "newFeederId",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "slotNumber",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "RemoteFeederSwitchResult",
+        "fields": [
+          {
+            "name": "success",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "ENUM",
         "name": "RemoteFeederTier",
         "fields": null,
@@ -14644,6 +15335,11 @@
         "enumValues": [
           {
             "name": "BIRD_BATH",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CLASSIC",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -14728,6 +15424,21 @@
               "kind": "OBJECT",
               "name": "RemoteFeeder",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "slotNumber",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -14880,6 +15591,21 @@
               "kind": "SCALAR",
               "name": "DateTime",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "remoteFeederConnectionExpirationInMinutes",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
