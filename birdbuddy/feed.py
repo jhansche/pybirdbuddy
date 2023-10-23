@@ -44,6 +44,8 @@ class FeedNode(UserDict[str, any]):
     @staticmethod
     def parse_datetime(timestr: str) -> datetime:
         """Convert a time string into `datetime`."""
+        if timestr is None:
+            return None
         if len(timestr) == 24:
             # The known expected datetime format in the BirdBuddy feed
             return datetime.strptime(timestr, FeedNode._DATETIME_FORMAT)
