@@ -12,6 +12,7 @@ from . import LOGGER
 class FeedNodeType(Enum):
     """Known Feed node types"""
 
+    CollectedPostcard = "FeedItemCollectedPostcard"
     GlobalImportant = "FeedGlobalImportantItem"
     GlobalRegular = "FeedGlobalRegularItem"
     InvitationConfirmed = "FeedItemFeederInvitationConfirmed"
@@ -43,6 +44,8 @@ class FeedNode(UserDict[str, any]):
     @staticmethod
     def parse_datetime(timestr: str) -> datetime:
         """Convert a time string into `datetime`."""
+        if timestr is None:
+            return None
         if len(timestr) == 24:
             # The known expected datetime format in the BirdBuddy feed
             return datetime.strptime(timestr, FeedNode._DATETIME_FORMAT)
@@ -99,7 +102,11 @@ class Feed(UserDict[str, any]):
     @cached_property
     def newest_edge(self) -> FeedEdge | None:
         """Returns the newest `FeedEdge`, by `FeedNode.created_at`"""
-        return max(self.edges, key=lambda edge: edge.node.created_at, default=None)
+        return max(
+            (e for e in self.edges if e.node.created_at),
+            key=lambda edge: edge.node.created_at,
+            default=None
+        )
 
     def filter(
         self,
