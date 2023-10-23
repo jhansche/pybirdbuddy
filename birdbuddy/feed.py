@@ -12,6 +12,7 @@ from . import LOGGER
 class FeedNodeType(Enum):
     """Known Feed node types"""
 
+    CollectedPostcard = "FeedItemCollectedPostcard"
     GlobalImportant = "FeedGlobalImportantItem"
     GlobalRegular = "FeedGlobalRegularItem"
     InvitationConfirmed = "FeedItemFeederInvitationConfirmed"
