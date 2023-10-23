@@ -169,8 +169,27 @@ fragment AnyFeedItemFields on AnyFeedItem {
     ...MysteryVisitorResolvedFields
     __typename
   }
+  ... on FeedItemCollectedPostcard {
+    ...CollectedPostcardFields
+    __typename
+  }
   ... on FeedItemNewPostcard {
     ...NewPostcardFields
+    __typename
+  }
+  __typename
+}
+fragment CollectedPostcardFields on FeedItemCollectedPostcard {
+  ...FeedItemFields
+  expiresAt
+  hasNewSpecies
+  hasMysteryVisitor
+  medias {
+    ...MediaFullFields
+    __typename
+  }
+  species {
+    ...SpeciesAnyListFields
     __typename
   }
   __typename
