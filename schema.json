@@ -103,6 +103,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "FeedItemCollectedPostcard",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "FeedItemEditorsChoice",
             "ofType": null
           },
@@ -189,6 +194,11 @@
           {
             "kind": "OBJECT",
             "name": "FeederForPublic",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederForRemoteGuest",
             "ofType": null
           }
         ]
@@ -2512,6 +2522,15 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "referralCode",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -2525,6 +2544,11 @@
         "inputFields": null,
         "interfaces": null,
         "enumValues": [
+          {
+            "name": "COLLECTED_POSTCARD",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "EDITORS_CHOICE",
             "isDeprecated": false,
@@ -2972,6 +2996,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "FeedItemCollectedPostcard",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "FeedItemEditorsChoice",
             "ofType": null
           },
@@ -3036,6 +3065,155 @@
             "ofType": null
           }
         ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeedItemCollectedPostcard",
+        "fields": [
+          {
+            "name": "createdAt",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "expiresAt",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "UNION",
+              "name": "AnyFeeder",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hasMysteryVisitor",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hasNewSpecies",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "medias",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "Media",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "species",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "Species",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "FeedItem",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
       },
       {
         "kind": "OBJECT",
@@ -3606,6 +3784,21 @@
         "name": "FeedItemNewPostcard",
         "fields": [
           {
+            "name": "canBeShared",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "createdAt",
             "args": [],
             "type": {
@@ -3688,6 +3881,29 @@
             "deprecationReason": null
           },
           {
+            "name": "medias",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "Media",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "sightingReportPreview",
             "args": [],
             "type": {
@@ -3754,6 +3970,17 @@
             "deprecationReason": null
           },
           {
+            "name": "usedByUser",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "UserForPublic",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "usedByUsername",
             "args": [],
             "type": {
@@ -3800,6 +4027,17 @@
                 "name": "DateTime",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "FeederForRemoteGuest",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -3886,6 +4124,17 @@
             "deprecationReason": null
           },
           {
+            "name": "feeder",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "FeederForRemoteGuest",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "feederName",
             "args": [],
             "type": {
@@ -3909,6 +4158,32 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "referralCodeUsedByUser",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "UserForPublic",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "referralCodeUsedByUsername",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },
@@ -4176,6 +4451,11 @@
           {
             "kind": "OBJECT",
             "name": "FeederForPublic",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "FeederForRemoteGuest",
             "ofType": null
           }
         ]
@@ -5507,6 +5787,72 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "state",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "FeederState",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Feeder",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "FeederForRemoteGuest",
+        "fields": [
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               }
             },
@@ -8290,6 +8636,36 @@
             "deprecationReason": null
           },
           {
+            "name": "referralCode",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ReferralCode",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "referralCodeRedeemedCount",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "remoteFeederConnections",
             "args": [],
             "type": {
@@ -8304,6 +8680,29 @@
                   "ofType": {
                     "kind": "OBJECT",
                     "name": "RemoteFeederUserConnection",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "remoteFeederReferralProgress",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "RemoteFeederReferralProgress",
                     "ofType": null
                   }
                 }
@@ -11280,6 +11679,35 @@
             "deprecationReason": null
           },
           {
+            "name": "paymentPromotionalCodeRedeem",
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "PaymentPromotionalCodeRedeemInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PaymentPromotionalCodeRedeemResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "paymentsProductPurchased",
             "args": [
               {
@@ -11317,6 +11745,44 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "PaymentsProductsRestoredResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "postcardCollect",
+            "args": [
+              {
+                "name": "feedItemId",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "input",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "PostcardCollectInput",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "PostcardCollectResult",
                 "ofType": null
               }
             },
@@ -11520,6 +11986,35 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "RemoteFeederDisconnectResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "remoteFeederQRCodeScanned",
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "RemoteFeederQRCodeScannedInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "RemoteFeederQRCodeScannedResult",
                 "ofType": null
               }
             },
@@ -12256,6 +12751,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "FeedItemCollectedPostcard",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "FeedItemEditorsChoice",
             "ofType": null
           },
@@ -12341,6 +12841,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "FeederForRemoteGuest",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "FeederInvitation",
             "ofType": null
           },
@@ -12377,6 +12882,11 @@
           {
             "kind": "OBJECT",
             "name": "RemoteFeeder",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "RemoteFeederReferralProgress",
             "ofType": null
           },
           {
@@ -12437,6 +12947,11 @@
           {
             "kind": "OBJECT",
             "name": "User",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "UserForPublic",
             "ofType": null
           },
           {
@@ -12730,6 +13245,54 @@
       },
       {
         "kind": "INPUT_OBJECT",
+        "name": "PaymentPromotionalCodeRedeemInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "paymentPromotionalCode",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PaymentPromotionalCodeRedeemResult",
+        "fields": [
+          {
+            "name": "success",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
         "name": "PaymentsProductPurchasedInput",
         "fields": null,
         "inputFields": [
@@ -12821,6 +13384,46 @@
           }
         ],
         "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "PostcardCollectInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "share",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PostcardCollectResult",
+        "fields": [
+          {
+            "name": "collectedPostcard",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "FeedItemCollectedPostcard",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -12991,7 +13594,37 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "DID_NOT_MEET_MY_EXPECTATIONS",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DID_NOT_USE_THE_FEATURES_THAT_MUCH",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "JUST_TAKING_A_BREAK",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "OTHER",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RECEIVING_TOO_MANY_NOTIFICATIONS",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TOO_EXPENSIVE",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USING_A_DIFFERENT_APP",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -13986,6 +14619,35 @@
             "deprecationReason": null
           },
           {
+            "name": "referralCodeExists",
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ReferralCodeExistsInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ReferralCodeExistsResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "remoteFeeders",
             "args": [
               {
@@ -14250,6 +14912,79 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "ReferralCode",
+        "fields": [
+          {
+            "name": "code",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ReferralCodeExistsInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "referralCode",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ReferralCodeExistsResult",
+        "fields": [
+          {
+            "name": "exists",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "INPUT_OBJECT",
         "name": "RefreshTokenInput",
         "fields": null,
@@ -14337,21 +15072,6 @@
             "deprecationReason": null
           },
           {
-            "name": "habitat",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Design changes. Moved to info block."
-          },
-          {
             "name": "id",
             "args": [],
             "type": {
@@ -14375,6 +15095,21 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "RemoteFeederInfoResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isUnlocked",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
                 "ofType": null
               }
             },
@@ -14425,44 +15160,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "shortTitle",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "species",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "Species",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Design changes. Not used anymore."
           },
           {
             "name": "tier",
@@ -14977,21 +15674,6 @@
             "deprecationReason": null
           },
           {
-            "name": "areaSize",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Design changes. Not used anymore."
-          },
-          {
             "name": "climate",
             "args": [],
             "type": {
@@ -15052,21 +15734,6 @@
             "deprecationReason": null
           },
           {
-            "name": "establishedIn",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Design changes. Not used anymore."
-          },
-          {
             "name": "habitat",
             "args": [],
             "type": {
@@ -15120,21 +15787,6 @@
             "deprecationReason": null
           },
           {
-            "name": "speciesCount",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": true,
-            "deprecationReason": "Design changes. Not used anymore."
-          },
-          {
             "name": "websiteUrl",
             "args": [],
             "type": {
@@ -15152,6 +15804,126 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "RemoteFeederQRCodeScannedInput",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "feederId",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "RemoteFeederQRCodeScannedResult",
+        "fields": [
+          {
+            "name": "success",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "RemoteFeederReferralProgress",
+        "fields": [
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "isUnlocked",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "redeemCountForUnlock",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "remoteFeeder",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "RemoteFeeder",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -15349,7 +16121,7 @@
             "deprecationReason": null
           },
           {
-            "name": "NORMAL",
+            "name": "PLATFORM",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -17817,6 +18589,15 @@
             "defaultValue": null
           },
           {
+            "name": "referralCode",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "token",
             "type": {
               "kind": "NON_NULL",
@@ -19291,6 +20072,67 @@
               "ofType": {
                 "kind": "ENUM",
                 "name": "SignInType",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "UserForPublic",
+        "fields": [
+          {
+            "name": "avatarUrl",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },
