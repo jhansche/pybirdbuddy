@@ -213,7 +213,7 @@ class SightingReport(UserDict[str, any]):
                 # Match sightings to highest confidence
                 for m, item in matches.items():
                     if (
-                        m in s.match_tokens
+                        item and m in s.match_tokens
                         and item["confidence"] >= confidence_threshold
                         and item["type"] == "BIRD"
                     ):
@@ -251,6 +251,7 @@ class SightingReport(UserDict[str, any]):
             i["matchToken"]: max(
                 (ii for ii in i["items"] if ii["type"] == "BIRD"),
                 key=lambda x: x["confidence"],
+                default=None,
             )
             for i in token.get("reportItems", [])
         }
