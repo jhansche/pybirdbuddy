@@ -44,7 +44,7 @@ class FeedNode(UserDict[str, any]):
     :func:`datetime.fromisoformat()`, so it has to be parsed manually."""
 
     @staticmethod
-    def parse_datetime(timestr: str) -> datetime:
+    def parse_datetime(timestr: str | None) -> datetime | None:
         """Convert a time string into `datetime`."""
         if timestr is None:
             return None
@@ -64,7 +64,7 @@ class FeedNode(UserDict[str, any]):
         return FeedNodeType(self.get("__typename"))
 
     @property
-    def created_at(self) -> datetime:
+    def created_at(self) -> datetime | None:
         """The `datetime` when the FeedNode item was created."""
         return FeedNode.parse_datetime(self.get("createdAt"))
 
@@ -122,5 +122,7 @@ class Feed(UserDict[str, any]):
             node
             for node in self.nodes
             if (of_type is None or node.node_type in of_type)
-            and (newer_than is None or node.created_at > newer_than)
+            and (
+                newer_than is None or (node.created_at and node.created_at > newer_than)
+            )
         ]
