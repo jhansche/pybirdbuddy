@@ -1,5 +1,7 @@
 -r requirements.txt
 
+setuptools
+
 # for tests
 coverage==7.0.5
 pytest==7.2.1
