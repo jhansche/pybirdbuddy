@@ -1,16 +1,18 @@
-"""Bird Buddy Feed models"""
+"""Bird Buddy Feed models."""
 
 from __future__ import annotations
+
 from collections import UserDict
 from datetime import datetime
 from enum import Enum
-from functools import cached_property
+
+from propcache import cached_property
 
 from . import LOGGER
 
 
 class FeedNodeType(Enum):
-    """Known Feed node types"""
+    """Known Feed node types."""
 
     CollectedPostcard = "FeedItemCollectedPostcard"
     GlobalImportant = "FeedGlobalImportantItem"
@@ -53,12 +55,12 @@ class FeedNode(UserDict[str, any]):
 
     @property
     def node_id(self) -> str:
-        """The Feed node id"""
+        """The Feed node id."""
         return self["id"]
 
     @property
     def node_type(self) -> FeedNodeType:
-        """The feed node type"""
+        """The feed node type."""
         return FeedNodeType(self.get("__typename"))
 
     @property
@@ -68,30 +70,30 @@ class FeedNode(UserDict[str, any]):
 
 
 class FeedEdge(UserDict[str, any]):
-    """A single Feed edge"""
+    """A single Feed edge."""
 
     @property
     def cursor(self) -> str:
-        """Feed edge cursor"""
+        """Feed edge cursor."""
         return self.get("cursor")
 
     @property
     def node(self) -> FeedNode:
-        """Feed edge node"""
+        """Feed edge node."""
         return FeedNode(self.get("node"))
 
 
 class Feed(UserDict[str, any]):
-    """Representation of the Bird Buddy Feed items"""
+    """Representation of the Bird Buddy Feed items."""
 
     @property
     def edges(self) -> list[FeedEdge]:
-        """Returns all edges of the Feed"""
+        """Returns all edges of the Feed."""
         return (FeedEdge(edge) for edge in self.get("edges", []))
 
     @property
     def nodes(self) -> list[FeedNode]:
-        """Returns all nodes of the Feed edges"""
+        """Returns all nodes of the Feed edges."""
         return (edge.node for edge in self.edges)
 
     @property
@@ -101,24 +103,24 @@ class Feed(UserDict[str, any]):
 
     @cached_property
     def newest_edge(self) -> FeedEdge | None:
-        """Returns the newest `FeedEdge`, by `FeedNode.created_at`"""
+        """Returns the newest `FeedEdge`, by `FeedNode.created_at`."""
         return max(
             (e for e in self.edges if e.node.created_at),
             key=lambda edge: edge.node.created_at,
-            default=None
+            default=None,
         )
 
     def filter(
         self,
         of_type: FeedNodeType | list[FeedNodeType] = None,
-        newer_than: datetime = None,
+        newer_than: datetime | None = None,
     ) -> list[FeedNode]:
-        """Filter the feed by type or time"""
+        """Filter the feed by type or time."""
         if isinstance(of_type, FeedNodeType):
             of_type = [of_type]
-        return list(
+        return [
             node
             for node in self.nodes
             if (of_type is None or node.node_type in of_type)
             and (newer_than is None or node.created_at > newer_than)
-        )
+        ]
