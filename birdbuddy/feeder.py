@@ -1,14 +1,13 @@
-"""Bird Buddy feeder models"""
+"""Bird Buddy feeder models."""
 
 from collections import UserDict
 from enum import Enum
-from typing import Optional
 
 from . import LOGGER
 
 
 class MetricState(Enum):
-    """Feeder metric states"""
+    """Feeder metric states."""
 
     LOW = "LOW"
     MEDIUM = "MEDIUM"
@@ -23,6 +22,8 @@ class MetricState(Enum):
 
 
 class PowerProfile(Enum):
+    """Feeder power profiles."""
+
     FRENZY = "FRENZY_MODE"
     POWER_SAVE = "POWER_SAVER_MODE"
     STANDARD = "STANDARD_MODE"
@@ -36,7 +37,7 @@ class PowerProfile(Enum):
 
 
 class FeederState(Enum):
-    """Feeder states"""
+    """Feeder states."""
 
     DEEP_SLEEP = "DEEP_SLEEP"
     FACTORY_RESET = "FACTORY_RESET"
@@ -60,57 +61,58 @@ class FeederState(Enum):
 
 
 class Signal(UserDict[str, any]):
-    """Wifi signal metrics"""
+    """Wifi signal metrics."""
 
     @property
     def rssi(self) -> int:
-        """Signal strength"""
+        """Signal strength."""
         return self.get("value", -1)
 
     @property
     def state(self) -> MetricState:
-        """Signal strength"""
+        """Signal strength."""
         return MetricState(self.get("state", "UNKNOWN"))
 
 
 class Battery(UserDict[str, any]):
-    """Battery info"""
+    """Battery info."""
 
     @property
     def percentage(self) -> int:
-        """Percentage of battery remaining"""
+        """Percentage of battery remaining."""
         return self.get("percentage", 0)
 
     @property
     def is_charging(self) -> bool:
-        """Whether the battery is charging"""
+        """Whether the battery is charging."""
         return self.get("charging", False)
 
     @property
     def state(self) -> MetricState:
-        """The state (low, medium, high) of the battery"""
+        """The state (low, medium, high) of the battery."""
         return MetricState(self.get("state", "UNKNOWN"))
 
 
 class Feeder(UserDict[str, any]):
-    """Represents one Bird Buddy device"""
+    """Represents one Bird Buddy device."""
 
     def __str__(self):
+        """Return a string representation of the Feeder."""
         return f"<Feeder: {self.name}, {self.state}, " f"{self.battery.percentage}%>"
 
     @property
     def id(self):
-        """UUID"""
+        """UUID."""
         return self["id"]
 
     @property
     def serial(self):
-        """Feeder SN"""
+        """Feeder SN."""
         return self["serialNumber"]
 
     @property
     def name(self):
-        """Feeder name, as set in the app"""
+        """Feeder name, as set in the app."""
         return self.get("name", "Bird Buddy")
 
     @property
@@ -130,17 +132,17 @@ class Feeder(UserDict[str, any]):
 
     @property
     def version(self) -> str:
-        """Firmware version (owner only)"""
+        """Firmware version (owner only)."""
         return self.get("firmwareVersion")
 
     @property
     def version_update_available(self) -> str:
-        """Firmware update version (owner only)"""
+        """Firmware update version (owner only)."""
         return self.get("availableFirmwareVersion", None)
 
     @property
     def state(self) -> FeederState:
-        """State of the Feeder"""
+        """State of the Feeder."""
         return FeederState(self.get("state", "UNKNOWN"))
 
     @property
@@ -155,22 +157,22 @@ class Feeder(UserDict[str, any]):
 
     @property
     def owner(self) -> str:
-        """The username who first paired the Feeder"""
+        """The username who first paired the Feeder."""
         return self.get("ownerName")
 
     @property
     def battery(self) -> Battery:
-        """battery metrics"""
+        """Battery metrics."""
         return Battery(self.get("battery", {}))
 
     @property
     def signal(self) -> Signal:
-        """(wifi) signal metrics"""
+        """(wifi) signal metrics."""
         return Signal(self.get("signal", {}))
 
     @property
-    def location(self) -> tuple[Optional[str], Optional[str]]:
-        """Configured location of the Feeder"""
+    def location(self) -> tuple[str | None, str | None]:
+        """Configured location of the Feeder."""
         return (self.get("locationCity"), self.get("locationCountry"))
 
     @property
@@ -187,8 +189,8 @@ class Feeder(UserDict[str, any]):
     @property
     # @incubating
     def food(self) -> MetricState:
-        """
-        Level of bird seed in the feeder.
+        """Level of bird seed in the feeder.
+
         @incubating This field appears not to work currently.
         """
         LOGGER.debug("birdbuddy.Feeder.food is incubating")
@@ -197,8 +199,8 @@ class Feeder(UserDict[str, any]):
     @property
     # @incubating
     def temperature(self) -> int:
-        """
-        Temperature at the feeder.
+        """Temperature at the feeder.
+
         @incubating This field appears not to work currently.
         """
         LOGGER.debug("birdbuddy.Feeder.temperature is incubating")
@@ -206,11 +208,11 @@ class Feeder(UserDict[str, any]):
 
 
 class FeederUpdateStatus(UserDict[str, any]):
-    """Feeder update status"""
+    """Feeder update status."""
 
     @property
     def feeder(self) -> Feeder:
-        """Returns a partial Feeder result"""
+        """Returns a partial Feeder result."""
         return Feeder(self["feeder"])
 
     @property
