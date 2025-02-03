@@ -246,6 +246,77 @@ class BirdBuddy:
         LOGGER.debug("Feeder data refreshed successfully: %s", data)
         return self._save_me(data["me"])
 
+    async def watching_start(self, feeder: Feeder) -> dict:
+        if isinstance(feeder, Feeder):
+            feeder_id = feeder.id
+            if not feeder.is_owner:
+                LOGGER.warning("Watching is only available to owner accounts (technically to premium accounts too but not supporting that now.)")
+        else:
+            feeder_id = feeder
+
+        variables = {
+            "feederId": feeder_id,
+            "startWatchingInput": {
+                "feederId": feeder_id,
+            },
+        }
+
+        result = await self._make_request(
+            query=queries.feeder.WATCHING_START,
+            variables=variables,
+            subscript="watchingStartV2"
+        )
+
+        LOGGER.debug(result)
+
+        while (result["__typename"] == "WatchingStartInProgressResult"):
+            await asyncio.sleep(5)
+
+            result = await self._make_request(
+                query=queries.feeder.WATCHING_START_CHECK,
+                variables=variables,
+                subscript="watchingStartCheck"
+            )
+
+            LOGGER.debug(result)
+
+        return result
+    
+    async def watching_start_check(self, feeder: Feeder) -> dict:
+        if isinstance(feeder, Feeder):
+            feeder_id = feeder.id
+            if not feeder.is_owner:
+                LOGGER.warning("Watching is only available to owner accounts (technically to premium accounts too but not supporting that now.)")
+        else:
+            feeder_id = feeder
+
+        variables = {
+            "feederId": feeder_id,
+            "startWatchingInput": {
+                "feederId": feeder_id,
+            },
+        }
+
+        result = await self._make_request(
+            query=queries.feeder.WATCHING_START_CHECK,
+            variables=variables,
+            subscript="watchingStartCheck"
+        )
+
+        LOGGER.debug(result)
+
+        return result
+
+    async def watching_active_keep(self) -> dict:
+        result = await self._make_request(
+            query=queries.feeder.WATCHING_ACTIVE_KEEP,
+            subscript="watchingActiveKeep"
+        )
+
+        LOGGER.debug(result)
+
+        return result
+
     async def toggle_off_grid(
         self,
         feeder: Feeder | str,
