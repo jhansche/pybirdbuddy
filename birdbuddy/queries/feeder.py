@@ -1,5 +1,96 @@
 """Feeder queries"""
 
+WATCHING_START = """
+mutation watchingStartV2($startWatchingInput: StartWatchingInput!) {
+  watchingStartV2(startWatchingInput: $startWatchingInput) {
+    ... on WatchingActiveResult {
+      __typename
+      watching {
+        createdByDifferentSession
+        id
+        imageUrls
+        state
+        streamUrl
+      }
+    }
+    ... on WatchingFailedResult {
+      __typename
+      failedReason
+      watching {
+        createdByDifferentSession
+        id
+        imageUrls
+        state
+        streamUrl
+      }
+    }
+    ... on WatchingStartInProgressResult {
+      __typename
+      watching {
+        createdByDifferentSession
+        id
+        imageUrls
+        state
+        streamUrl
+      }
+    }
+  }
+}
+"""
+
+WATCHING_START_CHECK = """
+mutation watchingStartCheck($startWatchingInput: StartWatchingInput!) {
+  watchingStartCheck(startWatchingInput: $startWatchingInput) {
+    ... on WatchingActiveResult {
+      __typename
+      watching {
+        createdByDifferentSession
+        id
+        imageUrls
+        state
+        streamUrl
+      }
+    }
+    ... on WatchingFailedResult {
+      __typename
+      failedReason
+      watching {
+        createdByDifferentSession
+        id
+        imageUrls
+        state
+        streamUrl
+      }
+    }
+    ... on WatchingStartInProgressResult {
+      __typename
+      watching {
+        createdByDifferentSession
+        id
+        imageUrls
+        state
+        streamUrl
+      }
+    }
+  }
+}
+"""
+
+WATCHING_ACTIVE_KEEP = """
+mutation watchingActiveKeep {
+  watchingActiveKeep {
+    ... on Watching {
+      __typename
+      createdByDifferentSession
+      id
+      imageUrls
+      state
+      streamUrl
+    }
+  }
+}
+"""
+
 TOGGLE_OFF_GRID = """
 mutation feederToggleOffGrid($feederId: ID!, $feederToggleOffGridInput: FeederToggleOffGridInput!) {
   feederToggleOffGrid(

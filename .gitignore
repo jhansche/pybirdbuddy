@@ -132,3 +132,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# macOS junk
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+.fseventsd
