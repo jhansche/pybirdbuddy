@@ -23,6 +23,7 @@ from .media import Collection, Media
 from .sightings import (
     PostcardSighting,
     Sighting,
+    SightingCreateProgress,
     SightingFinishMod,
     SightingFinishStrategy,
     SightingReport,
@@ -400,6 +401,29 @@ class BirdBuddy:
         """
         return await self.feed_nodes(FeedNodeType.NewPostcard)
 
+    async def reanalyze_postcard(
+        self,
+        postcard: str | FeedNode,
+    ) -> dict:
+        """Trigger the AI identification (reanalysis) for a postcard.
+
+        This changes the inference execution mode from MANUAL_NOT_STARTED to MANUAL_COMPLETED
+        and populates the sighting report preview.
+        """
+        postcard_id: str
+        if isinstance(postcard, str):
+            postcard_id = postcard
+        elif isinstance(postcard, FeedNode):
+            assert postcard.node_type == FeedNodeType.NewPostcard
+            postcard_id = postcard.node_id
+        
+        variables = {"feedItemId": postcard_id}
+        result = await self._make_request(
+            query=queries.birds.POSTCARD_REANALYZE,
+            variables=variables,
+        )
+        return result["inferenceExternalPostcardReanalyze"]
+
     async def sighting_from_postcard(
         self,
         postcard: str | FeedNode,
@@ -547,6 +571,45 @@ class BirdBuddy:
             variables=variables,
         )
         return bool(result["mediaShareToggle"]["success"])
+
+    async def sighting_create(
+        self,
+        media_ids: list[str],
+    ) -> SightingCreateProgress:
+        """Identify birds in media, starting a background identification process."""
+        variables = {
+            "sightingCreateInput": {
+                "mediaIds": media_ids,
+            }
+        }
+        result = await self._make_request(
+            query=queries.birds.SIGHTING_CREATE,
+            variables=variables,
+        )
+        return SightingCreateProgress(
+            result["sightingCreate"]["sightingCreateProgress"]
+        )
+
+    async def sighting_create_check_progress(
+        self,
+        sighting_create_id: str,
+        watching_id: str,
+    ) -> SightingCreateProgress | SightingReport:
+        """Check the progress of a background bird identification."""
+        variables = {
+            "sightingCreateCheckProgressInput": {
+                "sightingCreateId": sighting_create_id,
+                "watchingId": watching_id,
+            }
+        }
+        result = await self._make_request(
+            query=queries.birds.SIGHTING_CREATE_PROGRESS,
+            variables=variables,
+        )
+        data = result["sightingCreateCheckProgress"]
+        if data.get("__typename") == "SightingReport":
+            return SightingReport(data)
+        return SightingCreateProgress(data)
 
     async def sighting_choose_species(
         self,
