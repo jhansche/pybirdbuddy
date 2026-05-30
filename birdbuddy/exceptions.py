@@ -25,9 +25,9 @@ class GraphqlError(Exception):
     def raise_errors(errors: list[dict]) -> None:
         """Parse and raise errors as needed."""
         converted = [GraphqlError._convert_error(err) for err in errors]
-        if errs := len(converted) == 0:
+        if (n := len(converted)) == 0:
             return
-        if errs > 1:
+        if n > 1:
             raise CompositeException(converted)
         raise converted[0]
 
