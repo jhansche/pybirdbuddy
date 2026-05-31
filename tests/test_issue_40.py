@@ -50,6 +50,11 @@ async def test_sighting_best_guess(
     graphql_mock: AsyncMock,
 ):
     original_report = issue_40["sighting"]["sightingReport"]
+    # Remove the recognized sighting to test fallback behavior without recognized species
+    original_report["sightings"] = [
+        s for s in original_report["sightings"]
+        if s["__typename"] != "SightingRecognizedBirdUnlocked"
+    ]
     modified_report = original_report.copy()
     modified_report["reportToken"] = original_report["reportToken"] + ".altered"
     # with BEST_GUESS strategy, we will attempt to choose the best species match
@@ -76,9 +81,6 @@ async def test_sighting_best_guess(
                 variables={
                     "sightingChooseSpeciesInput": {
                         "reportToken": ANY,
-                        # FIXME: This is a bad selection!
-                        #  Add a way to make this species selection more intelligent.
-                        #  Target species=35379866-a4c6-4991-a2af-e6da93eaec4f
                         "speciesId": "81a13484-a311-477d-8011-8873bd3c053c",
                         "sightingId": "233000f8-ecbe-430c-9227-2c826866323f",
                     },
@@ -89,12 +91,7 @@ async def test_sighting_best_guess(
                 query=ANY,  # sightingReportPostcardFinish
                 variables={
                     "sightingReportPostcardFinishInput": {
-                        "defaultCoverMedia": [
-                            {
-                                "mediaId": "e579818d-cb68-40d2-876c-fcfdf3483eb6",
-                                "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
-                            }
-                        ],
+                        "defaultCoverMedia": [],
                         "notSelectedMediaIds": [],
                         # postcard.id
                         "feedItemId": "ea7c32bb-e95b-4fe6-a8ef-64134c1ae97e",
@@ -109,7 +106,6 @@ async def test_sighting_best_guess(
     assert result is True
 
 
-@pytest.mark.skip(reason="issue#40")
 @pytest.mark.asyncio
 async def test_sighting_anomaly_correction(
     bbclient: BirdBuddy,

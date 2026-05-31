@@ -205,10 +205,32 @@ class SightingReport(UserDict[str, any]):
             confidence_threshold = SightingReport._BEST_GUESS_CONFIDENCE
         strategies = {}
         matches = self.highest_confidence_matches
+
+        recognized_species = None
+        for s in self.sightings:
+            if s.is_recognized and s.species:
+                recognized_species = s.species
+                break
+
         # pylint: disable=invalid-name
         for s in self.sightings:
             if s.is_recognized:
                 strategies[s.id] = (s, SightingFinishStrategy.RECOGNIZED.finish())
+            elif recognized_species and s.sighting_type in [
+                SightingType.CANNOT_DECIDE,
+                SightingType.MYSTERY_VISITOR,
+            ]:
+                # If there's a recognized species in the same report, override the best-guess
+                # or mystery visitor with the recognized species.
+                item = {
+                    "confidence": 100,
+                    "speciesCode": recognized_species.id,
+                    "type": "BIRD",
+                }
+                strategies[s.id] = (
+                    s,
+                    SightingFinishStrategy.BEST_GUESS.finish(item),
+                )
             else:
                 # Match sightings to highest confidence
                 for m, item in matches.items():
@@ -295,3 +317,18 @@ class PostcardSighting(UserDict[str, any]):
         """Initialize the source postcard id"""
         self.postcard_id = postcard_id
         return self
+
+
+class SightingCreateProgress(UserDict[str, any]):
+    """Sighting Create Progress object"""
+
+    @property
+    def id(self) -> str:
+        """Sighting create ID"""
+        return self["id"]
+
+    @property
+    def progress(self) -> float:
+        """Progress percentage"""
+        return float(self["progress"])
+
