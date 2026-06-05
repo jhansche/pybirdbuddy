@@ -828,23 +828,40 @@ class BirdBuddy:
                 del self._collections[collection.collection_id]
         return self._collections
 
-    async def collection(self, collection_id: str) -> dict[str, Media]:
-        """Return the media in the specified collection.
+    async def collection(
+        self, collection_id: str, page_size: int = 50
+    ) -> dict[str, Media]:
+        """Return all media in the specified collection.
 
-        The keys will be the ``media_id``, and values
+        The keys will be the ``media_id``, and the values are ``Media`` objects.
+        This method follows pagination so that collections with more than one
+        page of media are fully retrieved.
         """
-        variables = {
-            "collectionId": collection_id,
-            # other inputs: first, orderBy, last, after, before
-        }
-        data = await self._make_request(
-            query=queries.me.COLLECTIONS_MEDIA, variables=variables
-        )
-        # TODO: check [collection][media][pageInfo][hasNextPage]?
-        return {
-            (node := edge["node"]["media"])["id"]: Media(node)
-            for edge in data["collection"]["media"]["edges"]
-        }
+        result: dict[str, Media] = {}
+        after: str | None = None
+
+        while True:
+            variables = {
+                "collectionId": collection_id,
+                "first": page_size,
+                "after": after,
+            }
+            data = await self._make_request(
+                query=queries.me.COLLECTIONS_MEDIA, variables=variables
+            )
+            media = data["collection"]["media"]
+
+            for edge in media["edges"]:
+                node = edge["node"]["media"]
+                result[node["id"]] = Media(node)
+
+            page_info = media.get("pageInfo", {})
+            if page_info.get("hasNextPage"):
+                after = page_info["endCursor"]
+            else:
+                break
+
+        return result
 
     async def latest_collections(
         self,
