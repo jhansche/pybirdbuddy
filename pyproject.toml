@@ -33,3 +33,89 @@ Homepage = "https://github.com/jhansche/pybirdbuddy"
 
 [tool.setuptools.packages.find]
 include = ["birdbuddy*"]
+
+[tool.ruff]
+line-length = 79
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E", "W",  # pycodestyle errors and warnings
+    "F",       # Pyflakes (unused imports, undefined names)
+    "I",       # isort (import sorting)
+    "ANN",     # flake8-annotations (type hints required)
+    "ASYNC",   # flake8-async (async/await best practices)
+    "B",       # flake8-bugbear (likely bugs and design problems)
+    "BLE",     # flake8-blind-except (no broad exception catching)
+    "C4",      # flake8-comprehensions
+    "EM",      # flake8-errmsg (exception message formatting)
+    "G",       # flake8-logging-format (no f-strings in logging)
+    "PIE",     # flake8-pie (unnecessary code patterns)
+    "T20",     # flake8-print (disallow print statements)
+    "PT",      # flake8-pytest-style (pytest conventions)
+    "SIM",     # flake8-simplify (simplification suggestions)
+    "ARG",     # flake8-unused-arguments (unused function args)
+    "PTH",     # flake8-use-pathlib (prefer pathlib over os.path)
+    "TID252",  # flake8-tidy-imports (no relative imports)
+    "TRY",     # tryceratops (exception handling best practices)
+    "N",       # pep8-naming (naming conventions)
+    "PLC",     # Pylint convention (includes import-outside-top-level)
+    "PLR0915", # Pylint too-many-statements
+    "S110",    # flake8-bandit try-except-pass
+    "S112",    # flake8-bandit try-except-continue
+    "UP",      # pyupgrade
+    "D",       # pydocstyle
+]
+
+ignore = [
+    "D203",    # incompatible with D211 (no-blank-line-before-class)
+    "D213",    # incompatible with D212 (multi-line-summary-first-line)
+    "TRY003",  # long exception messages are fine
+]
+
+[tool.ruff.lint.pydocstyle]
+# Google-style docstrings so multi-line docstrings carry Args:/Returns:/Raises:.
+convention = "google"
+
+[tool.ruff.lint.pylint]
+max-statements = 40  # Google style guide recommends ~40 lines per function
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Ban ALL relative imports (including single-dot); require absolute paths.
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+# Relax the requirements for test files.
+"tests/*" = [
+    "ANN001",  # Missing type annotation for function argument
+    "ANN201",  # Missing return type annotation for public function
+    "ANN202",  # Missing return type annotation for private function
+    "ARG001",  # Unused function argument
+    "ARG002",  # Unused method argument
+    "ARG005",  # Unused lambda argument
+    "S101",    # asserts are expected in tests
+]
+# Dev/maintenance scripts may print progress.
+"scripts/*" = ["T201"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = [
+    "-q",
+    "--cov=birdbuddy",
+    "--cov-report=term",
+    "--cov-report=html",
+    "--junit-xml=junit.xml",
+]
+
+[tool.coverage.run]
+source = ["birdbuddy"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
