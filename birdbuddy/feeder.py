@@ -191,6 +191,11 @@ class Feeder(UserDict[str, Any]):
     @property
     def power_profile(self) -> PowerProfile:
         """Configured power profile of the Feeder."""
+        # TODO(roger): the "STANDARD" default does not match the enum value
+        # "STANDARD_MODE", so a Feeder missing powerProfile resolves to
+        # UNKNOWN instead of STANDARD. Dormant today (only owner responses
+        # carry the field, and they always include it); fix the default in
+        # a later release.
         return PowerProfile(self.get("powerProfile", "STANDARD"))
 
     @property
