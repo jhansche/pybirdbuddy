@@ -1,12 +1,12 @@
 """Shared pytest fixtures for the birdbuddy test suite."""
 
 from collections.abc import Iterator
+import json
 import pathlib
 from unittest import mock
 from unittest.mock import AsyncMock
 
 import pytest
-import yaml
 
 from birdbuddy.client import BirdBuddy
 
@@ -27,12 +27,28 @@ def load_fixture(filename: str) -> str:
     )
 
 
+def load_json_fixture(filename: str) -> dict:
+    """Read and parse a JSON fixture from ``tests/fixtures``.
+
+    Args:
+        filename: The JSON fixture file name under ``tests/fixtures``.
+
+    Returns:
+        The parsed JSON object.
+    """
+    return json.loads(load_fixture(filename))
+
+
 @pytest.fixture(name="postcard_sighting")
 def postcard_sighting_fixture() -> dict:
     """Load the postcard sighting fixture."""
-    return yaml.load(
-        load_fixture("postcard_sighting.yaml"), Loader=yaml.Loader
-    )
+    return load_json_fixture("postcard_sighting.json")
+
+
+@pytest.fixture(name="api_payloads")
+def api_payloads_fixture() -> dict:
+    """Load the sanitized real API payload fixture (2026-07 capture)."""
+    return load_json_fixture("api_payloads.json")
 
 
 @pytest.fixture(name="bbclient")

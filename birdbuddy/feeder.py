@@ -178,6 +178,11 @@ class Feeder(UserDict[str, Any]):
     @property
     def location(self) -> tuple[str | None, str | None]:
         """Configured location of the Feeder."""
+        # TODO(roger): the schema diverges by feeder type -- FeederForOwner
+        # nests location{city,country} while FeederForMember/Public expose
+        # flat locationCity/locationCountry (neither deprecated). This reads
+        # only the flat keys, so an owner feeder yields (None, None). Handle
+        # both shapes in a later release.
         return (self.get("locationCity"), self.get("locationCountry"))
 
     @property

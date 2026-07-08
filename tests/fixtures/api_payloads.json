@@ -1,0 +1,302 @@
+{
+  "feeders": {
+    "99d7d4ed-f828-575a-b430-75bae4a0f7a6": {
+      "battery": {
+        "charging": false,
+        "percentage": 92,
+        "state": "HIGH",
+        "__typename": "FeederMetricBattery"
+      },
+      "food": {
+        "state": "LOW",
+        "__typename": "FeederMetricFood"
+      },
+      "id": "99d7d4ed-f828-575a-b430-75bae4a0f7a6",
+      "name": "Test Bird Buddy",
+      "signal": {
+        "state": "LOW",
+        "value": -70,
+        "__typename": "FeederMetricSignal"
+      },
+      "state": "DEEP_SLEEP",
+      "temperature": {
+        "value": 0,
+        "__typename": "FeederMetricTemperature"
+      },
+      "__typename": "FeederForOwner",
+      "availableFirmwareVersion": "1.8.1",
+      "firmwareVersion": "1.8.1",
+      "invitationsAvailable": 9,
+      "offGrid": false,
+      "audioEnabled": true,
+      "powerProfile": "STANDARD_MODE",
+      "presenceUpdatedAt": "2026-07-06T21:29:59.490Z",
+      "serialNumber": "SN-TEST-0001",
+      "members": [],
+      "location": {
+        "city": "Testville",
+        "country": "US",
+        "__typename": "Location"
+      },
+      "frequency": "MEDIUM",
+      "lowBatteryNotification": true,
+      "lowFoodNotification": false,
+      "invitations": [
+        {
+          "id": "eddb089b-7d86-5f7e-8498-69af8a14d464",
+          "token": "<redacted-invite-token>",
+          "__typename": "FeederInvitation"
+        }
+      ]
+    }
+  },
+  "new_postcards": [
+    {
+      "id": "80722bed-4bcd-5433-a846-602686f24842",
+      "createdAt": "2026-07-07T23:40:41.241Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "e816addd-a346-5af2-a0ff-aaa70dfe3911",
+      "createdAt": "2026-07-07T23:05:14.890Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "f405863c-0393-5e26-8e68-e72adbecd040",
+      "createdAt": "2026-07-07T22:29:51.025Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "70690be9-95c4-5e9e-9def-3d8c4e49bbbb",
+      "createdAt": "2026-07-07T21:39:35.374Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "22d5a311-003e-5df1-a3af-268ad103cc5a",
+      "createdAt": "2026-07-07T19:57:45.237Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "37635d01-7dad-54ce-969e-21080fb9124e",
+      "createdAt": "2026-07-07T19:00:49.223Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "644c23b8-7749-5a15-8b67-5c0a8495f426",
+      "createdAt": "2026-07-07T17:48:06.958Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "508a1306-4186-5f2b-8996-6aa7cdc20b61",
+      "createdAt": "2026-07-07T16:16:22.083Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "3f66d76f-8331-52c2-89a2-902d6cf5d028",
+      "createdAt": "2026-07-07T15:42:23.927Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "36151dff-d3ff-56df-a2f0-e167d0902a37",
+      "createdAt": "2026-07-07T14:20:21.898Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "fe470236-253f-5348-ad5a-e88f864ba8c8",
+      "createdAt": "2026-07-07T13:42:36.414Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "15beead8-2722-5930-962d-6caea56af76b",
+      "createdAt": "2026-07-07T12:36:00.900Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "38536ae0-4eac-5184-be4f-f42f5d79c2ba",
+      "createdAt": "2026-07-07T03:35:47.433Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "557876a2-e1a2-5904-9f09-62b9d840c1d1",
+      "createdAt": "2026-07-07T02:52:31.345Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "768dd6ac-304c-50a8-88ce-2aa9963a3e5b",
+      "createdAt": "2026-07-06T23:01:52.641Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "aa284595-ae6a-572f-b1ab-998042893eb3",
+      "createdAt": "2026-07-06T22:10:37.395Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "62779c21-70ff-527c-8025-1ebab568a112",
+      "createdAt": "2026-07-06T17:37:04.106Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "afc933e9-6f3e-5d46-9bf1-310bf78dc144",
+      "createdAt": "2026-07-06T16:34:07.695Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "9320b1d8-e49c-5719-a31f-252512014b2f",
+      "createdAt": "2026-07-06T15:33:03.351Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "dbcccb7e-5aec-5f29-8b42-fe0c24a6733b",
+      "createdAt": "2026-07-06T15:04:08.694Z",
+      "__typename": "FeedItemNewPostcard"
+    }
+  ],
+  "reanalyze_postcard": {
+    "updatedFeedItem": {
+      "__typename": "FeedItemNewPostcard",
+      "id": "80722bed-4bcd-5433-a846-602686f24842",
+      "inferenceConfidenceLevel": "LOW_CONFIDENCE",
+      "inferenceExecutionMode": "MANUAL_COMPLETED",
+      "inferenceType": "ADVANCED",
+      "reanalyzeAvailability": "ALREADY_REANALYZED"
+    }
+  },
+  "sighting_from_postcard": {
+    "feeder": {
+      "id": "99d7d4ed-f828-575a-b430-75bae4a0f7a6",
+      "name": "Test Bird Buddy",
+      "state": "DEEP_SLEEP",
+      "__typename": "FeederForOwner"
+    },
+    "medias": [
+      {
+        "id": "b314e86d-df2f-5aca-a76e-106a998aac71",
+        "createdAt": "2026-07-07T23:39:38.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "81dbec1e-1a2b-5d83-b356-6da8380be500",
+        "createdAt": "2026-07-07T23:39:38.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "572f7476-4658-5095-80e5-fc864f449e54",
+        "createdAt": "2026-07-07T23:39:52.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "2a7a3671-43e6-5289-b8a0-25a0d209541d",
+        "createdAt": "2026-07-07T23:39:57.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "de38aaff-b25e-5e99-affe-cf2308c7529f",
+        "createdAt": "2026-07-07T23:40:03.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "0098c2a4-c0f0-5f3b-aa87-c773ef24a580",
+        "createdAt": "2026-07-07T23:40:09.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "5002f25b-9529-57da-b1c0-f430d50849b2",
+        "createdAt": "2026-07-07T23:40:14.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "2da363e8-d4d3-5162-8fb2-934ad184b2f5",
+        "createdAt": "2026-07-07T23:40:13.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "f9438830-b255-5583-9da2-b65593f4111e",
+        "createdAt": "2026-07-07T23:40:12.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      },
+      {
+        "id": "7bf96874-e8f9-563c-9bfd-e47e3a6df0ed",
+        "createdAt": "2026-07-07T23:40:10.000Z",
+        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+        "contentUrl": "https://media.example/.../CONTENT.jpg",
+        "__typename": "MediaImage"
+      }
+    ],
+    "sightingReport": {
+      "reportToken": "<redacted-report-token>",
+      "sightings": [
+        {
+          "id": "b86365c2-b95d-556b-979b-4d36f07ef6b9",
+          "matchTokens": [
+            "b314e86d-df2f-5aca-a76e-106a998aac71",
+            "81dbec1e-1a2b-5d83-b356-6da8380be500",
+            "572f7476-4658-5095-80e5-fc864f449e54",
+            "2a7a3671-43e6-5289-b8a0-25a0d209541d",
+            "de38aaff-b25e-5e99-affe-cf2308c7529f",
+            "0098c2a4-c0f0-5f3b-aa87-c773ef24a580",
+            "5002f25b-9529-57da-b1c0-f430d50849b2",
+            "2da363e8-d4d3-5162-8fb2-934ad184b2f5",
+            "f9438830-b255-5583-9da2-b65593f4111e",
+            "7bf96874-e8f9-563c-9bfd-e47e3a6df0ed"
+          ],
+          "__typename": "SightingRecognizedBird",
+          "color": "YELLOW",
+          "text": "Whoa! Can't get enough? 1st time today!",
+          "count": 7,
+          "icon": "HEARTS",
+          "shareableMatchTokens": [
+            "b314e86d-df2f-5aca-a76e-106a998aac71",
+            "81dbec1e-1a2b-5d83-b356-6da8380be500",
+            "572f7476-4658-5095-80e5-fc864f449e54",
+            "2a7a3671-43e6-5289-b8a0-25a0d209541d",
+            "de38aaff-b25e-5e99-affe-cf2308c7529f",
+            "0098c2a4-c0f0-5f3b-aa87-c773ef24a580",
+            "5002f25b-9529-57da-b1c0-f430d50849b2",
+            "2da363e8-d4d3-5162-8fb2-934ad184b2f5",
+            "f9438830-b255-5583-9da2-b65593f4111e",
+            "7bf96874-e8f9-563c-9bfd-e47e3a6df0ed"
+          ],
+          "species": {
+            "id": "ca898597-b669-577f-97fc-ae26a7310604",
+            "iconUrl": "https://media.example/.../THUMBNAIL.jpg",
+            "name": "Northern Cardinal",
+            "__typename": "SpeciesBird",
+            "isUnofficialName": false,
+            "mapUrl": "https://media.example/.../THUMBNAIL.jpg"
+          }
+        }
+      ],
+      "__typename": "SightingReport"
+    },
+    "videoMedia": {
+      "id": "a961fcb3-5f46-5892-96c8-82b6bbef7b44",
+      "createdAt": "2026-07-07T23:39:40.000Z",
+      "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
+      "contentUrl": "https://media.example/.../CONTENT.jpg",
+      "__typename": "MediaVideo"
+    },
+    "__typename": "SightingCreateFromPostcardResult"
+  },
+  "sighting_create": {
+    "error": "CompositeException([GraphqlError('GRAPHQL_VALIDATION_FAILED: {\\'message\\': \\'Unknown type \"SightingCreateInput\". Did you mean \"SightingIgnoreInput\", \"SettingsUpdateInput\", \"SightingRecognized\", or \"SightingReport\"?\\', \\'locations\\': [{\\'line\\': 1, \\'column\\': 47}], \\'extensions\\': {\\'code\\': \\'GRAPHQL_VALIDATION_FAILED\\'}}'), GraphqlError('GRAPHQL_VALIDATION_FAILED: {\\'message\\': \\'Cannot query field \"sightingCreate\" on type \"Mutation\". Did you mean \"sightingIgnore\"?\\', \\'locations\\': [{\\'line\\': 2, \\'column\\': 3}], \\'extensions\\': {\\'code\\': \\'GRAPHQL_VALIDATION_FAILED\\'}}')])"
+  }
+}
