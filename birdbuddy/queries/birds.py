@@ -673,3 +673,63 @@ fragment SightingRecognizedMysteryVisitorFields on SightingRecognizedMysteryVisi
   __typename
 }
 """.strip()
+
+
+_COLLECTED_POSTCARD_FIELDS = """
+fragment CollectedPostcardFields on FeedItemCollectedPostcard {
+  __typename
+  id
+  createdAt
+  hasMysteryVisitor
+  hasNewSpecies
+  inferenceExecutionMode
+  inferenceType
+  mediaSpeciesNameIdentificationConfidenceLevel
+  species {
+    id
+    name
+  }
+  mediaSpeciesAssignedName {
+    id
+    name
+    markedAsNew
+    species {
+      id
+      name
+    }
+  }
+  medias {
+    __typename
+    id
+    createdAt
+    thumbnailUrl
+    ... on MediaImage {
+      contentUrl(size: ORIGINAL)
+      __typename
+    }
+    ... on MediaVideo {
+      contentUrl(size: ORIGINAL)
+      __typename
+    }
+  }
+}
+"""
+
+
+POSTCARD_COLLECT = (
+    """
+mutation postcardCollect(
+  $feedItemId: ID!, $postcardCollectInput: PostcardCollectInput
+) {
+  postcardCollect(feedItemId: $feedItemId, input: $postcardCollectInput) {
+    postcardCollectedDetails {
+      isFirstCollectedPostcard
+    }
+    collectedPostcard {
+      ...CollectedPostcardFields
+    }
+  }
+}
+"""
+    + _COLLECTED_POSTCARD_FIELDS
+).strip()
