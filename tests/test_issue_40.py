@@ -1,4 +1,6 @@
-from unittest.mock import AsyncMock, ANY, call
+"""Tests for postcard finishing strategies (regression for issue #40)."""
+
+from unittest.mock import ANY, AsyncMock, call
 
 import pytest
 
@@ -12,6 +14,7 @@ async def test_sighting_recognized_single(
     issue_40: dict,
     graphql_mock: AsyncMock,
 ):
+    """RECOGNIZED strategy finishes without extra identification calls."""
     # By default, no extra identification happens
     graphql_mock.side_effect = [
         # sightingReportPostcardFinish
@@ -49,15 +52,19 @@ async def test_sighting_best_guess(
     issue_40: dict,
     graphql_mock: AsyncMock,
 ):
+    """BEST_GUESS chooses the highest-confidence species, then finishes."""
     original_report = issue_40["sighting"]["sightingReport"]
-    # Remove the recognized sighting to test fallback behavior without recognized species
+    # Drop the recognized sighting to exercise the no-recognized fallback.
     original_report["sightings"] = [
-        s for s in original_report["sightings"]
+        s
+        for s in original_report["sightings"]
         if s["__typename"] != "SightingRecognizedBirdUnlocked"
     ]
     modified_report = original_report.copy()
-    modified_report["reportToken"] = original_report["reportToken"] + ".altered"
-    # with BEST_GUESS strategy, we will attempt to choose the best species match
+    modified_report["reportToken"] = (
+        original_report["reportToken"] + ".altered"
+    )
+    # BEST_GUESS attempts to choose the best species match.
     graphql_mock.side_effect = [
         # sightingChooseSpecies
         {
@@ -112,10 +119,13 @@ async def test_sighting_anomaly_correction(
     issue_40: dict,
     graphql_mock: AsyncMock,
 ):
+    """A recognized species is propagated to correct an anomaly."""
     original_report = issue_40["sighting"]["sightingReport"]
     modified_report = original_report.copy()
-    modified_report["reportToken"] = original_report["reportToken"] + ".altered"
-    # with BEST_GUESS strategy, we will attempt to choose the best species match
+    modified_report["reportToken"] = (
+        original_report["reportToken"] + ".altered"
+    )
+    # BEST_GUESS attempts to choose the best species match.
     graphql_mock.side_effect = [
         # sightingChooseSpecies
         {"data": {"sightingChooseSpecies": modified_report}},
@@ -148,8 +158,8 @@ async def test_sighting_anomaly_correction(
                     "sightingReportPostcardFinishInput": {
                         "defaultCoverMedia": [
                             {
-                                "mediaId": "e579818d-cb68-40d2-876c-fcfdf3483eb6",
-                                "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",
+                                "mediaId": "e579818d-cb68-40d2-876c-fcfdf3483eb6",  # noqa: E501
+                                "speciesId": "35379866-a4c6-4991-a2af-e6da93eaec4f",  # noqa: E501
                             }
                         ],
                         "notSelectedMediaIds": [],

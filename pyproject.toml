@@ -36,6 +36,10 @@ Homepage = "https://github.com/jhansche/pybirdbuddy"
 [tool.setuptools.packages.find]
 include = ["birdbuddy*"]
 
+[tool.setuptools.package-data]
+# Ship the PEP 561 marker so downstream type-checkers consume our annotations.
+birdbuddy = ["py.typed"]
+
 [tool.ruff]
 line-length = 79
 target-version = "py310"
@@ -51,6 +55,7 @@ select = [
     "BLE",     # flake8-blind-except (no broad exception catching)
     "C4",      # flake8-comprehensions
     "EM",      # flake8-errmsg (exception message formatting)
+    "FA",      # flake8-future-annotations (require __future__ annotations)
     "G",       # flake8-logging-format (no f-strings in logging)
     "PIE",     # flake8-pie (unnecessary code patterns)
     "T20",     # flake8-print (disallow print statements)
@@ -63,6 +68,7 @@ select = [
     "N",       # pep8-naming (naming conventions)
     "PLC",     # Pylint convention (includes import-outside-top-level)
     "PLR0915", # Pylint too-many-statements
+    "S101",    # flake8-bandit assert (banned in source; allowed in tests)
     "S110",    # flake8-bandit try-except-pass
     "S112",    # flake8-bandit try-except-continue
     "UP",      # pyupgrade
@@ -104,6 +110,8 @@ split-on-trailing-comma = false
 ]
 # Dev/maintenance scripts may print progress.
 "scripts/*" = ["T201"]
+# GraphQL query strings are long by nature; don't wrap the query text.
+"birdbuddy/queries/*" = ["E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

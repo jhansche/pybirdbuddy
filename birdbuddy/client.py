@@ -4,23 +4,25 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime
+from typing import Any
 
 import langcodes
 from python_graphql_client import GraphqlClient
 
-from . import LOGGER, VERBOSE, queries
-from .const import BB_URL
-from .exceptions import (
+from birdbuddy import LOGGER, VERBOSE, queries
+from birdbuddy.const import BB_URL
+from birdbuddy.exceptions import (
     AuthenticationFailedError,
     AuthTokenExpiredError,
     GraphqlError,
     NoResponseError,
     UnexpectedResponseError,
 )
-from .feed import Feed, FeedNode, FeedNodeType
-from .feeder import Feeder, FeederUpdateStatus, PowerProfile
-from .media import Collection, Media
-from .sightings import (
+from birdbuddy.feed import Feed, FeedNode, FeedNodeType
+from birdbuddy.feeder import Feeder, FeederUpdateStatus, PowerProfile
+from birdbuddy.media import Collection, Media
+from birdbuddy.queries.debug import DUMP_SCHEMA
+from birdbuddy.sightings import (
     PostcardSighting,
     Sighting,
     SightingCreateProgress,
@@ -28,13 +30,13 @@ from .sightings import (
     SightingFinishStrategy,
     SightingReport,
 )
-from .user import BirdBuddyUser
+from birdbuddy.user import BirdBuddyUser
 
 _NO_VALUE = object()
 """Sentinel value to allow None to override a default value."""
 
 
-def _redact(data, redacted: bool = True):
+def _redact(data: object, redacted: bool = True) -> object:
     """Return a redacted string if necessary."""
     return "**REDACTED**" if redacted else data
 
@@ -51,7 +53,7 @@ class BirdBuddy:
     _me: BirdBuddyUser | None
     _feeders: dict[str, Feeder]
     _collections: dict[str, Collection]
-    _last_feed_date: datetime
+    _last_feed_date: datetime | None
 
     def __init__(
         self,
@@ -61,7 +63,14 @@ class BirdBuddy:
         refresh_token: str | None = None,
         access_token: str | None = None,
     ) -> None:
-        """Initialize the Bird Buddy client."""
+        """Initialize the Bird Buddy client.
+
+        Args:
+            email: Account email, for password login.
+            password: Account password, for password login.
+            refresh_token: An existing refresh token, to skip password login.
+            access_token: An existing access token.
+        """
         self._email = email
         self._password = password
         self._refresh_token = refresh_token
@@ -74,7 +83,7 @@ class BirdBuddy:
         self._collections = {}
         self.language_code = "en"
 
-    def _save_me(self, me_data: dict):
+    def _save_me(self, me_data: dict) -> bool:
         if not me_data:
             return False
         me_data["__last_updated"] = datetime.now()
@@ -100,16 +109,13 @@ class BirdBuddy:
             "Accept-Language": self._language_code,
         }
 
-    def _clear(self):
+    def _clear(self) -> None:
         self._access_token = None
         self._refresh_token = None
         self._me = None
 
     async def dump_schema(self) -> dict:
         """For debugging purposes: dump the entire GraphQL schema."""
-        # pylint: disable=import-outside-toplevel
-        from .queries.debug import DUMP_SCHEMA
-
         return await self._make_request(query=DUMP_SCHEMA, auth=False)
 
     async def _check_auth(self) -> bool:
@@ -122,7 +128,18 @@ class BirdBuddy:
         return not self._needs_login()
 
     async def _login(self) -> bool:
-        assert self._email and self._password
+        """Sign in with email/password and store the tokens.
+
+        Returns:
+            ``True`` if the user profile was saved.
+
+        Raises:
+            AuthenticationFailedError: If credentials are missing or the
+                sign-in request fails.
+        """
+        if not (self._email and self._password):
+            msg = "email and password are required to sign in"
+            raise AuthenticationFailedError(msg)
         variables = {
             "emailSignInInput": {
                 "email": self._email,
@@ -145,7 +162,18 @@ class BirdBuddy:
         return self._save_me(result["me"])
 
     async def _refresh_access_token(self) -> bool:
-        assert self._refresh_token
+        """Exchange the refresh token for a new access token.
+
+        Returns:
+            ``True`` once a new access token is set.
+
+        Raises:
+            AuthenticationFailedError: If no refresh token is set or the
+                refresh request fails.
+        """
+        if not self._refresh_token:
+            msg = "a refresh token is required to refresh the access token"
+            raise AuthenticationFailedError(msg)
         variables = {
             "refreshTokenInput": {
                 "token": self._refresh_token,
@@ -176,14 +204,33 @@ class BirdBuddy:
         reauth: bool = True,
         subscript: str | None = None,
     ) -> dict:
-        """Make the request, check for errors, and return the unwrapped data."""
+        """Execute a GraphQL request and return the unwrapped ``data``.
+
+        Args:
+            query: The GraphQL query or mutation string.
+            variables: GraphQL variables, if any.
+            auth: Whether to attach auth headers (refreshing tokens first).
+            reauth: Whether to retry once after an expired-token error.
+            subscript: If set, return ``data[subscript]`` instead of ``data``.
+
+        Returns:
+            The response ``data`` dict, or ``data[subscript]`` when given.
+
+        Raises:
+            NoResponseError: If the response was empty or not a dict.
+            UnexpectedResponseError: If the response carried no ``data``.
+            GraphqlError: If the response reported one or more errors.
+        """
         if auth:
             await self._check_auth()
             headers = self._headers()
         else:
             headers = {}
 
-        should_redact = query in [queries.auth.REFRESH_AUTH_TOKEN, queries.auth.SIGN_IN]
+        should_redact = query in [
+            queries.auth.REFRESH_AUTH_TOKEN,
+            queries.auth.SIGN_IN,
+        ]
         LOGGER.debug(
             "> GraphQL %s, vars=%s",
             query.partition("\n")[0],  # First line of query
@@ -191,7 +238,7 @@ class BirdBuddy:
         )
         response = await self.graphql.execute_async(
             query=query,
-            variables=variables,
+            variables=variables or {},
             headers=headers,
         )
 
@@ -233,11 +280,15 @@ class BirdBuddy:
         return self._language_code
 
     @language_code.setter
-    def language_code(self, language_code: str):
-        """Override the language used in API requests.
+    def language_code(self, language_code: str) -> None:
+        """Set the language used in API requests.
 
-        This is useful to get localized responses, including translated
-        bird species names.
+        Useful for localized responses, including translated bird species
+        names.
+
+        Args:
+            language_code: A BCP 47 language tag (e.g. ``"de"``), normalized
+                via ``langcodes.standardize_tag``.
         """
         self._language_code = langcodes.standardize_tag(language_code)
 
@@ -254,7 +305,14 @@ class BirdBuddy:
     ) -> Feeder:
         """Toggle the feeder's off-grid status.
 
-        Available to Owner account only.
+        Available to the owner account only.
+
+        Args:
+            feeder: The Feeder or its id to update.
+            is_off_grid: Whether to enable off-grid mode.
+
+        Returns:
+            The Feeder once the status has updated.
         """
         if isinstance(feeder, Feeder):
             feeder_id = feeder.id
@@ -282,7 +340,7 @@ class BirdBuddy:
         while new_off_grid != is_off_grid:
             LOGGER.debug("waiting for off-grid to update")
             await asyncio.sleep(1)
-            assert await self.refresh()
+            await self.refresh()
             new_off_grid = self.feeders[feeder_id].is_off_grid
         return self.feeders[feeder_id]
 
@@ -293,12 +351,21 @@ class BirdBuddy:
     ) -> Feeder:
         """Toggle the feeder's audio-enabled setting.
 
-        Available to Owner account only.
+        Available to the owner account only.
+
+        Args:
+            feeder: The Feeder or its id to update.
+            is_audio_enabled: Whether videos should include audio.
+
+        Returns:
+            The Feeder once the setting has updated.
         """
         if isinstance(feeder, Feeder):
             feeder_id = feeder.id
             if not feeder.is_owner:
-                LOGGER.warning("Audio setting is available only to owner accounts")
+                LOGGER.warning(
+                    "Audio setting is available only to owner accounts"
+                )
                 # The request will fail
         else:
             # We cannot check the owner status if we only have an id
@@ -321,7 +388,7 @@ class BirdBuddy:
         while new_setting != is_audio_enabled:
             LOGGER.debug("waiting for audio setting to update")
             await asyncio.sleep(1)
-            assert await self.refresh()
+            await self.refresh()
             new_setting = self.feeders[feeder_id].is_audio_enabled
         return self.feeders[feeder_id]
 
@@ -329,21 +396,26 @@ class BirdBuddy:
         self,
         first: int = 20,
         after: str | None = None,
-        last: int | None = None,
+        last: int | None = None,  # noqa: ARG002
         before: str | None = None,
     ) -> Feed:
         """Return the Bird Buddy Feed.
 
-        The returned dictionary contains a `"pageInfo"` key for pagination/cursor data; and an
-        `"edges"` key containing a list of FeedEdge nodes, most recent items listed first.
+        The result contains a ``"pageInfo"`` key for pagination/cursor data
+        and an ``"edges"`` key with FeedEdge nodes, newest first.
 
-        :param first: Return the first N items older than `after`
-        :param after: The cursor of the oldest item previously seen, to allow pagination of very long feeds
-        :param last: Return the last N items newer than `before`
-        :param before: The cursor of the newest item previously seen, to allow pagination of very long feeds
-        :param newer_than: `datetime` or `str` of the most recent feed item previously seen
+        Args:
+            first: Return the first N items older than ``after``.
+            after: Cursor of the oldest item previously seen (pagination).
+            last: Return the last N items newer than ``before``. Currently
+                ignored; the backward-pagination request path is disabled.
+            before: Cursor of the newest item previously seen. Currently
+                ignored (see ``last``).
+
+        Returns:
+            The Feed.
         """
-        variables = {
+        variables: dict[str, Any] = {
             # $first: Int,
             # $after: String,
             # $last: Int,
@@ -356,27 +428,36 @@ class BirdBuddy:
             variables["after"] = after
 
         if before:
-            # Not implemented: birdbuddy.exceptions.GraphqlError: 501: 'Not Implemented'
+            # Not implemented server-side (GraphqlError 501).
             #  variables["before"] = before
             #  variables["last"] = last if last else 20
             pass
 
-        data = await self._make_request(query=queries.me.FEED, variables=variables)
+        data = await self._make_request(
+            query=queries.me.FEED, variables=variables
+        )
         return Feed(data["me"]["feed"])
 
-    async def refresh_feed(self, since: datetime | str = _NO_VALUE) -> list[FeedNode]:
-        """Get only fresh feed items, new since the last Feed refresh.
+    async def refresh_feed(
+        self,
+        since: datetime | str = _NO_VALUE,  # type: ignore[assignment]
+    ) -> list[FeedNode]:
+        """Return only feed items new since the last refresh.
 
-        The most recent edge node timestamp will be saved as the last seen feed item,
-        which will become the new default value for `since`. This can be useful to,
+        The most recent edge node timestamp is saved as the last-seen feed
+        item, which becomes the new default value for ``since``. Useful to,
         for example, restore a last-seen timestamp in a new instance.
 
-        :param since: The `datetime` after which to restrict new feed items.
+        Args:
+            since: The time after which to restrict new feed items; defaults
+                to the last-seen timestamp.
+
+        Returns:
+            The new feed nodes.
         """
-        if since == _NO_VALUE:
-            since = self._last_feed_date
-        if isinstance(since, str):
-            since = FeedNode.parse_datetime(since)
+        resolved = self._last_feed_date if since is _NO_VALUE else since
+        if isinstance(resolved, str):
+            resolved = FeedNode.parse_datetime(resolved)
         feed = await self.feed()
         if (newest_edge := feed.newest_edge) and (
             newest_date := newest_edge.node.created_at
@@ -387,17 +468,25 @@ class BirdBuddy:
                 newest_date,
             )
             self._last_feed_date = newest_date
-        return feed.filter(newer_than=since)
+        return feed.filter(newer_than=resolved)
 
-    async def feed_nodes(self, node_type: str) -> list[FeedNode]:
-        """Return all feed items of type ``node_type``."""
+    async def feed_nodes(self, node_type: FeedNodeType) -> list[FeedNode]:
+        """Return all feed items of the given type.
+
+        Args:
+            node_type: The feed node type to filter by.
+
+        Returns:
+            The matching feed nodes.
+        """
         feed = await self.feed()
         return feed.filter(of_type=node_type)
 
     async def new_postcards(self) -> list[FeedNode]:
         """Return all new 'Postcard' feed items.
 
-        These Postcard node types will be converted into sightings using ``sighting_from_postcard``.
+        These node types are converted into sightings using
+        ``sighting_from_postcard``.
         """
         return await self.feed_nodes(FeedNodeType.NewPostcard)
 
@@ -407,16 +496,28 @@ class BirdBuddy:
     ) -> dict:
         """Trigger the AI identification (reanalysis) for a postcard.
 
-        This changes the inference execution mode from MANUAL_NOT_STARTED to MANUAL_COMPLETED
-        and populates the sighting report preview.
+        Changes the inference execution mode from MANUAL_NOT_STARTED to
+        MANUAL_COMPLETED and populates the sighting report preview.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+
+        Returns:
+            The ``inferenceExternalPostcardReanalyze`` result payload.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
         """
         postcard_id: str
         if isinstance(postcard, str):
             postcard_id = postcard
         elif isinstance(postcard, FeedNode):
-            assert postcard.node_type == FeedNodeType.NewPostcard
+            if postcard.node_type != FeedNodeType.NewPostcard:
+                msg = f"expected a NewPostcard, got {postcard.node_type}"
+                raise ValueError(msg)
             postcard_id = postcard.node_id
-        
+
         variables = {"feedItemId": postcard_id}
         result = await self._make_request(
             query=queries.birds.POSTCARD_REANALYZE,
@@ -428,17 +529,29 @@ class BirdBuddy:
         self,
         postcard: str | FeedNode,
     ) -> PostcardSighting:
-        """Convert a 'postcard' into a 'sighting report'.
+        """Convert a postcard into a sighting report.
 
-        Next step is to choose or confirm species and then finish the sighting.
-        If the sighting type is ``SightingRecognized``, we can collect the sighting with
-        ``finish_postcard``.
+        Next step is to choose or confirm species and then finish the
+        sighting. If the sighting type is ``SightingRecognized``, it can be
+        collected with ``finish_postcard``.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+
+        Returns:
+            The ``PostcardSighting`` for the postcard.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
         """
         postcard_id: str
         if isinstance(postcard, str):
             postcard_id = postcard
         elif isinstance(postcard, FeedNode):
-            assert postcard.node_type == FeedNodeType.NewPostcard
+            if postcard.node_type != FeedNodeType.NewPostcard:
+                msg = f"expected a NewPostcard, got {postcard.node_type}"
+                raise ValueError(msg)
             postcard_id = postcard.node_id
         variables = {
             "sightingCreateFromPostcardInput": {
@@ -450,7 +563,7 @@ class BirdBuddy:
             variables=variables,
         )
         data = result["sightingCreateFromPostcard"]
-        return PostcardSighting(data).with_postcard(postcard)
+        return PostcardSighting(data).with_postcard(postcard_id)
 
     async def finish_postcard(
         self,
@@ -460,16 +573,20 @@ class BirdBuddy:
         confidence_threshold: int | None = None,
         share_media: bool = False,
     ) -> bool:
-        """Finish collecting the postcard in your collections.
+        """Finish collecting the postcard into your collections.
 
-        :param feed_item_id the id from ``new_postcards``
-        :param sighting_result from ``sighting_from_postcard``, should contain sightings of type
-        ``SightingRecognizedBird`` or `SightingRecognizedBirdUnlocked``.
-        :param strategy Finishing strategy, one of `RECOGNIZED`, `BEST_GUESS`, or `MYSTERY`
-        :param confidence_threshold Threshold for `BEST_GUESS` strategy to accept the highest
-        confidence suggestion above this threshold. Defaults to 10 (%).
-        :param share_media ``True`` to automatically share finished media to the community.
-        Defaults to ``False``.
+        Args:
+            feed_item_id: The id from ``new_postcards``.
+            sighting_result: From ``sighting_from_postcard``; should contain
+                sightings of type ``SightingRecognizedBird`` or
+                ``SightingRecognizedBirdUnlocked``.
+            strategy: One of ``RECOGNIZED``, ``BEST_GUESS``, or ``MYSTERY``.
+            confidence_threshold: For ``BEST_GUESS``, accept the highest
+                confidence suggestion above this threshold (defaults to 10%).
+            share_media: ``True`` to share the finished media.
+
+        Returns:
+            ``True`` if the postcard was finished successfully.
         """
         if not isinstance(sighting_result, PostcardSighting):
             # See sighting_from_postcard()["sightingCreateFromPostcard"]
@@ -478,8 +595,8 @@ class BirdBuddy:
 
         report = sighting_result.report
 
-        sighting: Sighting = None
-        mod: SightingFinishMod = None
+        sighting: Sighting | None = None
+        mod: SightingFinishMod | None = None
         for sighting, mod in report.sighting_finishing_strategies(
             confidence_threshold
         ).values():
@@ -497,15 +614,17 @@ class BirdBuddy:
                     mod,
                 )
             elif mod.strategy == SightingFinishStrategy.BEST_GUESS:
-                # Choose the highest recommended species
+                # Choose the highest recommended species. BEST_GUESS always
+                # carries the match data (see SightingFinishStrategy.finish).
+                match_data = mod.data or {}
                 LOGGER.debug(
                     "selecting highest confidence: %s%% for species %s",
-                    mod.data["confidence"],
-                    mod.data["speciesCode"],
+                    match_data["confidence"],
+                    match_data["speciesCode"],
                 )
                 new_report = await self.sighting_choose_species(
                     sighting.id,
-                    mod.data["speciesCode"],
+                    match_data["speciesCode"],
                     report,
                 )
                 LOGGER.debug(
@@ -520,7 +639,7 @@ class BirdBuddy:
                     report,
                 )
                 LOGGER.debug(
-                    "replacing report after converting to mystery:\nold=%s\nnew=%s",
+                    "replacing report (mystery):\nold=%s\nnew=%s",
                     report,
                     new_report,
                 )
@@ -537,7 +656,9 @@ class BirdBuddy:
             }
         }
         if video := next(iter(sighting_result.video_media), None):
-            variables["sightingReportPostcardFinishInput"]["videoMediaId"] = video.id
+            variables["sightingReportPostcardFinishInput"]["videoMediaId"] = (
+                video.id
+            )
         data = await self._make_request(
             query=queries.birds.FINISH_SIGHTING,
             variables=variables,
@@ -547,7 +668,9 @@ class BirdBuddy:
             media_ids = [m.id for m in sighting_result.medias]
             try:
                 share_result = await self.share_medias(media_ids, share=True)
-                LOGGER.info("Sharing %d medias: %s", len(media_ids), share_result)
+                LOGGER.info(
+                    "Sharing %d medias: %s", len(media_ids), share_result
+                )
             except Exception as err:  # pylint: disable=broad-except  # noqa: BLE001
                 LOGGER.error(
                     "Error sharing %d medias: %s",
@@ -558,8 +681,18 @@ class BirdBuddy:
                 share_result = False
         return result
 
-    async def share_medias(self, media_ids: list[str], share: bool = True) -> bool:
-        """Toggle media sharing."""
+    async def share_medias(
+        self, media_ids: list[str], share: bool = True
+    ) -> bool:
+        """Toggle sharing for the given media.
+
+        Args:
+            media_ids: The media ids to update.
+            share: ``True`` to share, ``False`` to unshare.
+
+        Returns:
+            ``True`` if the toggle succeeded.
+        """
         variables = {
             "mediaShareToggleInput": {
                 "mediaIds": media_ids,
@@ -576,7 +709,14 @@ class BirdBuddy:
         self,
         media_ids: list[str],
     ) -> SightingCreateProgress:
-        """Identify birds in media, starting a background identification process."""
+        """Identify birds in media via a background process.
+
+        Args:
+            media_ids: The media ids to analyze.
+
+        Returns:
+            The initial ``SightingCreateProgress``.
+        """
         variables = {
             "sightingCreateInput": {
                 "mediaIds": media_ids,
@@ -595,7 +735,16 @@ class BirdBuddy:
         sighting_create_id: str,
         watching_id: str,
     ) -> SightingCreateProgress | SightingReport:
-        """Check the progress of a background bird identification."""
+        """Check the progress of a background bird identification.
+
+        Args:
+            sighting_create_id: The id from ``sighting_create``.
+            watching_id: The watching id to poll.
+
+        Returns:
+            A ``SightingCreateProgress`` while pending, or a ``SightingReport``
+            once identification completes.
+        """
         variables = {
             "sightingCreateCheckProgressInput": {
                 "sightingCreateId": sighting_create_id,
@@ -615,18 +764,29 @@ class BirdBuddy:
         self,
         sighting_id: str,
         species_id: str,
-        sighting_data: SightingReport | str = None,
+        sighting_data: SightingReport | str | None = None,
     ) -> SightingReport:
-        """Manually assign a species to a sighting."""
-        token: str
+        """Manually assign a species to a sighting.
+
+        Args:
+            sighting_id: The sighting to update.
+            species_id: The species to assign.
+            sighting_data: The ``SightingReport`` or its report token.
+
+        Returns:
+            The updated ``SightingReport``.
+
+        Raises:
+            TypeError: If ``sighting_data`` is not a SightingReport or token.
+        """
+        token: str | None
         if isinstance(sighting_data, SightingReport):
             token = sighting_data.token
         elif isinstance(sighting_data, str):
             token = sighting_data
         else:
-            raise TypeError(
-                "sighting_data should be the `SightingReport` or `SightingReport.token`"
-            )
+            msg = "sighting_data should be a SightingReport or its token"
+            raise TypeError(msg)
         variables = {
             "sightingChooseSpeciesInput": {
                 "sightingId": sighting_id,
@@ -643,18 +803,28 @@ class BirdBuddy:
     async def sighting_choose_mystery(
         self,
         sighting_id: str,
-        sighting_data: SightingReport | str = None,
+        sighting_data: SightingReport | str | None = None,
     ) -> SightingReport:
-        """Convert the sighting into a mystery visitor."""
-        token: str
+        """Convert the sighting into a mystery visitor.
+
+        Args:
+            sighting_id: The sighting to convert.
+            sighting_data: The ``SightingReport`` or its report token.
+
+        Returns:
+            The updated ``SightingReport``.
+
+        Raises:
+            TypeError: If ``sighting_data`` is not a SightingReport or token.
+        """
+        token: str | None
         if isinstance(sighting_data, SightingReport):
             token = sighting_data.token
         elif isinstance(sighting_data, str):
             token = sighting_data
         else:
-            raise TypeError(
-                "sighting_data should be the `SightingReport` or `SightingReport.token`"
-            )
+            msg = "sighting_data should be a SightingReport or its token"
+            raise TypeError(msg)
         variables = {
             "sightingConvertToMysteryVisitorInput": {
                 "sightingId": sighting_id,
@@ -667,8 +837,17 @@ class BirdBuddy:
         )
         return SightingReport(data["sightingConvertToMysteryVisitor"])
 
-    async def refresh_collections(self, of_type: str = "bird") -> dict[str, Collection]:
-        """Return the remote bird collections."""
+    async def refresh_collections(
+        self, of_type: str = "bird"
+    ) -> dict[str, Collection]:
+        """Fetch and cache the remote collections.
+
+        Args:
+            of_type: The collection type to keep (e.g. ``"bird"``).
+
+        Returns:
+            The cached collections, keyed by collection id.
+        """
         data = await self._make_request(query=queries.me.COLLECTIONS)
         collections = {
             (c := Collection(d)).collection_id: c
@@ -679,21 +858,26 @@ class BirdBuddy:
         self._collections.update(collections)
         return self._collections
 
-    async def set_feeder_options(self, feeder: Feeder | str, **kwargs) -> dict:
+    async def set_feeder_options(
+        self, feeder: Feeder | str, **kwargs: bool | str
+    ) -> dict:
         """Update Feeder options.
 
-        Options can be specified as `kwargs`:
-        * `lowBatteryNotification: bool`
-        * `lowFoodNotification: bool`
-        * `name: str`
-        * `offGrid: bool`
-        * `offlineMode: bool`
+        Args:
+            feeder: The Feeder or its id to update.
+            **kwargs: Feeder options to set. Recognized keys:
+                ``lowBatteryNotification`` (bool), ``lowFoodNotification``
+                (bool), ``name`` (str), ``offGrid`` (bool), ``offlineMode``
+                (bool).
+
+        Returns:
+            The updated feeder-options payload.
         """
         if isinstance(feeder, Feeder):
             feeder_id = feeder.id
             if not feeder.is_owner:
                 LOGGER.warning(
-                    "Setting Feeder options is available only to owner accounts"
+                    "Setting Feeder options requires an owner account"
                 )
         else:
             feeder_id = feeder
@@ -723,11 +907,21 @@ class BirdBuddy:
     async def set_power_profile(
         self, feeder: Feeder | str, profile: PowerProfile
     ) -> dict:
-        """Update the power profile."""
+        """Update the feeder's power profile.
+
+        Args:
+            feeder: The Feeder or its id to update.
+            profile: The power profile to set.
+
+        Returns:
+            A dict with the resulting ``powerProfile``.
+        """
         if isinstance(feeder, Feeder):
             feeder_id = feeder.id
             if not feeder.is_owner:
-                LOGGER.warning("Frequency setting is available only to owner accounts")
+                LOGGER.warning(
+                    "Frequency setting is available only to owner accounts"
+                )
         else:
             feeder_id = feeder
         variables = {
@@ -741,9 +935,11 @@ class BirdBuddy:
             variables=variables,
             subscript="feederUpdatePowerProfile",
         )
-        # This may raise GraphqlError code `PAYMENTS_SUBSCRIPTION_IS_NOT_ACTIVE`,
+        # May raise GraphqlError `PAYMENTS_SUBSCRIPTION_IS_NOT_ACTIVE`,
         # implying that `FRENZY_MODE` is a paid feature.
-        updated = {"powerProfile": result.get("feeder", {}).get("powerProfile", None)}
+        updated = {
+            "powerProfile": result.get("feeder", {}).get("powerProfile", None)
+        }
 
         if result["__typename"] == "FeederUpdatePowerProfileInProgressResult":
             # Refresh after a short delay
@@ -751,13 +947,24 @@ class BirdBuddy:
             LOGGER.debug("PowerProfile update is in progress")
             await asyncio.sleep(0.25)
             await self.refresh()
-            updated["powerProfile"] = self.feeders[feeder_id].power_profile.value
+            updated["powerProfile"] = self.feeders[
+                feeder_id
+            ].power_profile.value
         else:
             self.feeders[feeder_id].update(updated)
         return updated
 
-    async def update_firmware_start(self, feeder: Feeder | str) -> FeederUpdateStatus:
-        """Start a firmware update."""
+    async def update_firmware_start(
+        self, feeder: Feeder | str
+    ) -> FeederUpdateStatus:
+        """Start a firmware update.
+
+        Args:
+            feeder: The Feeder or its id to update.
+
+        Returns:
+            The firmware update status.
+        """
         current_status = await self.update_firmware_check(feeder)
 
         if current_status.is_in_progress:
@@ -767,7 +974,9 @@ class BirdBuddy:
         feeder_id: str
         if isinstance(feeder, Feeder):
             if not feeder.is_owner:
-                LOGGER.warning("Firmware update is available only to owner accounts")
+                LOGGER.warning(
+                    "Firmware update is available only to owner accounts"
+                )
                 # The request will fail
             feeder_id = feeder.id
         else:
@@ -790,11 +999,22 @@ class BirdBuddy:
             self.feeders[feeder_id].update(result.get("feeder", {}))
         return result
 
-    async def update_firmware_check(self, feeder: Feeder | str):
-        """Check on a firmware update."""
+    async def update_firmware_check(
+        self, feeder: Feeder | str
+    ) -> FeederUpdateStatus:
+        """Check on a firmware update.
+
+        Args:
+            feeder: The Feeder or its id to check.
+
+        Returns:
+            The current firmware update status.
+        """
         if isinstance(feeder, Feeder):
             if not feeder.is_owner:
-                LOGGER.warning("Firmware update is available only to owner accounts")
+                LOGGER.warning(
+                    "Firmware update is available only to owner accounts"
+                )
                 # The request will fail
             feeder_id = feeder.id
         else:
@@ -831,7 +1051,11 @@ class BirdBuddy:
     async def collection(self, collection_id: str) -> dict[str, Media]:
         """Return the media in the specified collection.
 
-        The keys will be the ``media_id``, and values
+        Args:
+            collection_id: The collection ``UUID``.
+
+        Returns:
+            A mapping of ``media_id`` to its ``Media``.
         """
         variables = {
             "collectionId": collection_id,
@@ -850,7 +1074,10 @@ class BirdBuddy:
         self,
     ) -> dict[str, Collection]:
         """Return the latest collections."""
-        return await self._make_request(query=queries.me.LATEST_MEDIA)
+        # TODO(roger): queries.me has no LATEST_MEDIA, so this raises
+        # AttributeError at runtime.
+        query = queries.me.LATEST_MEDIA  # type: ignore[attr-defined]
+        return await self._make_request(query=query)
 
     @property
     def feeders(self) -> dict[str, Feeder]:

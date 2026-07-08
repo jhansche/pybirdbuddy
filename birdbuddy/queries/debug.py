@@ -1,3 +1,5 @@
+"""GraphQL introspection query for dumping the schema."""
+
 DUMP_SCHEMA = """
 fragment FullType on __Type {
   kind

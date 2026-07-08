@@ -1,6 +1,5 @@
-"""GraphQL query strings"""
+"""GraphQL query strings."""
 
-from . import auth
-from . import birds
-from . import feeder
-from . import me
+from birdbuddy.queries import auth, birds, feeder, me
+
+__all__ = ["auth", "birds", "feeder", "me"]
