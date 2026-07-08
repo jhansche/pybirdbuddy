@@ -27,10 +27,12 @@ def load_fixture(filename: str) -> str:
     )
 
 
-@pytest.fixture(name="issue_40")
-def issue_40_yaml_fixture() -> dict:
-    """Load the issue-40 postcard sighting fixture."""
-    return yaml.load(load_fixture("issue-40.yaml"), Loader=yaml.Loader)
+@pytest.fixture(name="postcard_sighting")
+def postcard_sighting_fixture() -> dict:
+    """Load the postcard sighting fixture."""
+    return yaml.load(
+        load_fixture("postcard_sighting.yaml"), Loader=yaml.Loader
+    )
 
 
 @pytest.fixture(name="bbclient")
