@@ -517,6 +517,9 @@ class BirdBuddy:
                 msg = f"expected a NewPostcard, got {postcard.node_type}"
                 raise ValueError(msg)
             postcard_id = postcard.node_id
+        else:
+            msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
+            raise TypeError(msg)
 
         variables = {"feedItemId": postcard_id}
         result = await self._make_request(
@@ -553,6 +556,9 @@ class BirdBuddy:
                 msg = f"expected a NewPostcard, got {postcard.node_type}"
                 raise ValueError(msg)
             postcard_id = postcard.node_id
+        else:
+            msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
+            raise TypeError(msg)
         variables = {
             "sightingCreateFromPostcardInput": {
                 "feedItemId": postcard_id,

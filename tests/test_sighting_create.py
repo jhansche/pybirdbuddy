@@ -159,3 +159,10 @@ async def test_reanalyze_postcard(
         },
         headers=ANY,
     )
+
+
+@pytest.mark.asyncio
+async def test_reanalyze_postcard_rejects_bad_type(bbclient: BirdBuddy):
+    """A non-str/FeedNode postcard raises TypeError before any request."""
+    with pytest.raises(TypeError):
+        await bbclient.reanalyze_postcard(123)  # type: ignore[arg-type]
