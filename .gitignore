@@ -228,3 +228,6 @@ junit.xml
 *.iml
 .vscode
 *.whl
+
+# Local API payload dumps
+*.dump.json

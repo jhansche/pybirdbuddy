@@ -108,8 +108,8 @@ split-on-trailing-comma = false
     "ARG005",  # Unused lambda argument
     "S101",    # asserts are expected in tests
 ]
-# Dev/maintenance scripts may print progress.
-"scripts/*" = ["T201"]
+# Dev/maintenance scripts may print progress and use dynamic Any helpers.
+"scripts/*" = ["T201", "ANN401"]
 # GraphQL query strings are long by nature; don't wrap the query text.
 "birdbuddy/queries/*" = ["E501"]
 
