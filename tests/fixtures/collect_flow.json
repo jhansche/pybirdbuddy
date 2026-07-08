@@ -1,0 +1,434 @@
+{
+  "feeders": {
+    "21db9a95-9762-506a-935c-64adfe4caa91": {
+      "battery": {
+        "charging": false,
+        "percentage": 94,
+        "state": "HIGH",
+        "__typename": "FeederMetricBattery"
+      },
+      "food": {
+        "state": "LOW",
+        "__typename": "FeederMetricFood"
+      },
+      "id": "21db9a95-9762-506a-935c-64adfe4caa91",
+      "name": "Test Bird Buddy",
+      "signal": {
+        "state": "MEDIUM",
+        "value": -62,
+        "__typename": "FeederMetricSignal"
+      },
+      "state": "READY_TO_STREAM",
+      "temperature": {
+        "value": 0,
+        "__typename": "FeederMetricTemperature"
+      },
+      "__typename": "FeederForOwner",
+      "availableFirmwareVersion": "1.8.1",
+      "firmwareVersion": "1.8.1",
+      "invitationsAvailable": 9,
+      "offGrid": false,
+      "audioEnabled": true,
+      "powerProfile": "STANDARD_MODE",
+      "presenceUpdatedAt": "2026-07-08T23:15:44.899Z",
+      "serialNumber": "SN-TEST-0001",
+      "members": [],
+      "location": {
+        "city": "Testville",
+        "country": "US",
+        "__typename": "Location"
+      },
+      "frequency": "MEDIUM",
+      "lowBatteryNotification": true,
+      "lowFoodNotification": false,
+      "invitations": [
+        {
+          "id": "f51b6b3f-05cf-5e23-8d52-e6eb6f29e29b",
+          "token": "<redacted-invite-token>",
+          "__typename": "FeederInvitation"
+        }
+      ]
+    }
+  },
+  "new_postcards": [
+    {
+      "id": "c23dcde1-047e-537e-ae90-a2dec2f4b7cb",
+      "createdAt": "2026-07-08T17:48:43.424Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "da23779d-35a8-5cf8-81b3-7f3b85add564",
+      "createdAt": "2026-07-08T14:08:44.749Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "80d944af-ec79-5c67-96fd-57053e31c5ee",
+      "createdAt": "2026-07-08T13:31:08.961Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "615d45f0-2e2d-5c19-bd67-8793ef7a4ac3",
+      "createdAt": "2026-07-08T12:49:05.221Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "853510ec-64ba-54eb-bf06-359612622674",
+      "createdAt": "2026-07-07T23:40:41.241Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "3af3825f-164b-5437-af9c-c16887b94a09",
+      "createdAt": "2026-07-07T23:05:14.890Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "967fa4c1-12b9-538e-8c32-9b8219f032b8",
+      "createdAt": "2026-07-07T22:29:51.025Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "d002a303-879d-539b-89df-d33118d63636",
+      "createdAt": "2026-07-07T21:39:35.374Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "61456589-b257-56f4-af8e-84181ca8dc87",
+      "createdAt": "2026-07-07T19:57:45.237Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "1ab8d8f4-6a1d-5674-ac70-b98f2a36d77e",
+      "createdAt": "2026-07-07T19:00:49.223Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "3efa2564-d9a1-5484-ae61-4d0f273bb4b9",
+      "createdAt": "2026-07-07T17:48:06.958Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "85992f08-932a-54e5-adce-7e510fdaec2d",
+      "createdAt": "2026-07-07T16:16:22.083Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "427da884-1756-5f54-95e5-f90b356df970",
+      "createdAt": "2026-07-07T15:42:23.927Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "566973eb-3791-5904-8ef9-1b74de8f3e8a",
+      "createdAt": "2026-07-07T14:20:21.898Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "20c0e592-ece7-5662-836b-464a3fc83b40",
+      "createdAt": "2026-07-07T13:42:36.414Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "96eb157c-ada3-5d67-b9eb-3a32a707d550",
+      "createdAt": "2026-07-07T12:36:00.900Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "cd6b67d0-c08d-5ad7-b91b-6b58b86e49ba",
+      "createdAt": "2026-07-07T03:35:47.433Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "0cdb3fd8-8b23-5767-9c06-9d5daf275f92",
+      "createdAt": "2026-07-07T02:52:31.345Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "76e6b8d7-f86a-59dd-8cda-ddf1efae7131",
+      "createdAt": "2026-07-06T23:01:52.641Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "2093c8a0-0655-52e3-9c9d-76af899ce9d3",
+      "createdAt": "2026-07-06T22:10:37.395Z",
+      "__typename": "FeedItemNewPostcard"
+    }
+  ],
+  "reanalyze": {
+    "c23dcde1-047e-537e-ae90-a2dec2f4b7cb": {
+      "inferenceExternalPostcardReanalyze": {
+        "updatedFeedItem": {
+          "__typename": "FeedItemNewPostcard",
+          "id": "c23dcde1-047e-537e-ae90-a2dec2f4b7cb",
+          "inferenceExecutionMode": "MANUAL_COMPLETED",
+          "inferenceType": "ADVANCED",
+          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
+          "reanalyzeAvailability": "ALREADY_REANALYZED",
+          "mediaSpeciesNameIdentificationConfidenceLevel": null,
+          "mediaSpeciesNameAssignmentAvailability": "UNAVAILABLE",
+          "mediaSpeciesStateDisplay": null,
+          "medias": [
+            {
+              "__typename": "MediaImage",
+              "id": "699d6339-addc-55ca-8437-f6b5d547c435",
+              "createdAt": "2026-07-08T17:47:35.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "87ad827c-a3fd-5d0f-9be0-e8d686670f54",
+              "createdAt": "2026-07-08T17:47:56.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "77156c9d-88ab-5b9c-bf32-48be82efddb7",
+              "createdAt": "2026-07-08T17:47:47.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "c40f3e5f-8e80-5d40-999c-081dfff0bbc1",
+              "createdAt": "2026-07-08T17:47:47.000Z"
+            },
+            {
+              "__typename": "MediaVideo",
+              "id": "5d554853-9dd2-5845-ba09-38a4b821570b",
+              "createdAt": "2026-07-08T17:47:28.000Z"
+            }
+          ],
+          "mediaSpeciesAssignedName": null,
+          "sightingReportPreview": {
+            "sightings": [
+              {
+                "__typename": "SightingRecognizedBird"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "da23779d-35a8-5cf8-81b3-7f3b85add564": {
+      "inferenceExternalPostcardReanalyze": {
+        "updatedFeedItem": {
+          "__typename": "FeedItemNewPostcard",
+          "id": "da23779d-35a8-5cf8-81b3-7f3b85add564",
+          "inferenceExecutionMode": "MANUAL_COMPLETED",
+          "inferenceType": "ADVANCED",
+          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
+          "reanalyzeAvailability": "ALREADY_REANALYZED",
+          "mediaSpeciesNameIdentificationConfidenceLevel": null,
+          "mediaSpeciesNameAssignmentAvailability": "AVAILABLE",
+          "mediaSpeciesStateDisplay": null,
+          "medias": [
+            {
+              "__typename": "MediaImage",
+              "id": "a09d7e39-1cfb-5501-9d41-bd07fec1d0b7",
+              "createdAt": "2026-07-08T14:07:51.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "263c9f07-4627-5fb4-9476-3d7f56fbe064",
+              "createdAt": "2026-07-08T14:07:55.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "f2b8b8dc-1f0f-5f7e-9100-34f4e574c5f8",
+              "createdAt": "2026-07-08T14:08:02.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "4bf6500c-6d9c-5c37-9629-71d4e97de29c",
+              "createdAt": "2026-07-08T14:08:12.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "f6fa31fb-2825-5894-9cd2-d4ace6589f69",
+              "createdAt": "2026-07-08T14:08:10.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "c274f83b-dff7-583a-9c0a-dcaa8d02bdf9",
+              "createdAt": "2026-07-08T14:08:09.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "94453a92-9143-5ead-b237-61d48102b751",
+              "createdAt": "2026-07-08T14:08:08.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "a4676233-9ae7-5dcc-a316-9b346445be6b",
+              "createdAt": "2026-07-08T14:08:06.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "e658c1d7-2b12-571d-b020-779637c11088",
+              "createdAt": "2026-07-08T14:08:05.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "6dac1a47-d5ad-587e-b4a7-b1af8a6f2bcc",
+              "createdAt": "2026-07-08T14:08:04.000Z"
+            },
+            {
+              "__typename": "MediaVideo",
+              "id": "e6cc06aa-038c-5f12-895a-aea20f26eca9",
+              "createdAt": "2026-07-08T14:07:49.000Z"
+            }
+          ],
+          "mediaSpeciesAssignedName": null,
+          "sightingReportPreview": {
+            "sightings": [
+              {
+                "__typename": "SightingRecognizedBird"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "80d944af-ec79-5c67-96fd-57053e31c5ee": {
+      "inferenceExternalPostcardReanalyze": {
+        "updatedFeedItem": {
+          "__typename": "FeedItemNewPostcard",
+          "id": "80d944af-ec79-5c67-96fd-57053e31c5ee",
+          "inferenceExecutionMode": "MANUAL_COMPLETED",
+          "inferenceType": "ADVANCED",
+          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
+          "reanalyzeAvailability": "ALREADY_REANALYZED",
+          "mediaSpeciesNameIdentificationConfidenceLevel": null,
+          "mediaSpeciesNameAssignmentAvailability": "AVAILABLE",
+          "mediaSpeciesStateDisplay": null,
+          "medias": [
+            {
+              "__typename": "MediaImage",
+              "id": "878d2a67-a60b-5f4f-a403-373fc325b3b5",
+              "createdAt": "2026-07-08T13:30:14.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "d6f037f4-e65d-5329-94f3-f92adea1213f",
+              "createdAt": "2026-07-08T13:30:26.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "e90f531c-5e40-505d-925c-f56eca3a96f4",
+              "createdAt": "2026-07-08T13:30:34.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "1344adf2-3d0b-547c-acf8-adfb6cb97711",
+              "createdAt": "2026-07-08T13:30:32.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "750a80f0-a662-5e15-8455-99e3ae9e9016",
+              "createdAt": "2026-07-08T13:30:31.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "b7797079-10b4-5060-a41d-1449232e0072",
+              "createdAt": "2026-07-08T13:30:30.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "584c8219-cd8f-5b42-817b-df895965481a",
+              "createdAt": "2026-07-08T13:30:29.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "eb417017-4421-5cff-95f6-3dcd4de7a9f0",
+              "createdAt": "2026-07-08T13:30:28.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "ac03cea2-7ab9-5a63-a492-79e54de2ff2b",
+              "createdAt": "2026-07-08T13:30:25.000Z"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "27e92019-1877-5305-b18f-b4b67cc0887d",
+              "createdAt": "2026-07-08T13:30:24.000Z"
+            },
+            {
+              "__typename": "MediaVideo",
+              "id": "903b3388-1284-5b72-a830-a48bf8f336f0",
+              "createdAt": "2026-07-08T13:30:13.000Z"
+            }
+          ],
+          "mediaSpeciesAssignedName": null,
+          "sightingReportPreview": {
+            "sightings": [
+              {
+                "__typename": "SightingRecognizedBird"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "postcard_collect": {
+    "postcardCollect": {
+      "collectedPostcard": {
+        "__typename": "FeedItemCollectedPostcard",
+        "id": "da23779d-35a8-5cf8-81b3-7f3b85add564",
+        "species": [
+          {
+            "id": "6d06a209-2813-5ca6-9124-d68aa258503e",
+            "name": "California Scrub-Jay"
+          }
+        ],
+        "hasMysteryVisitor": false,
+        "hasNewSpecies": false,
+        "inferenceExecutionMode": "MANUAL_COMPLETED",
+        "mediaSpeciesAssignedName": null,
+        "medias": [
+          {
+            "__typename": "MediaImage",
+            "id": "a09d7e39-1cfb-5501-9d41-bd07fec1d0b7"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "263c9f07-4627-5fb4-9476-3d7f56fbe064"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "f2b8b8dc-1f0f-5f7e-9100-34f4e574c5f8"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "4bf6500c-6d9c-5c37-9629-71d4e97de29c"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "f6fa31fb-2825-5894-9cd2-d4ace6589f69"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "c274f83b-dff7-583a-9c0a-dcaa8d02bdf9"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "94453a92-9143-5ead-b237-61d48102b751"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "a4676233-9ae7-5dcc-a316-9b346445be6b"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "e658c1d7-2b12-571d-b020-779637c11088"
+          },
+          {
+            "__typename": "MediaImage",
+            "id": "6dac1a47-d5ad-587e-b4a7-b1af8a6f2bcc"
+          },
+          {
+            "__typename": "MediaVideo",
+            "id": "e6cc06aa-038c-5f12-895a-aea20f26eca9"
+          }
+        ]
+      },
+      "postcardCollectedDetails": {
+        "isFirstCollectedPostcard": false
+      }
+    }
+  }
+}
