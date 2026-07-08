@@ -1,4 +1,4 @@
-"""Queries related to the logged in user"""
+"""Queries related to the logged in user."""
 
 ME = """
 query me {

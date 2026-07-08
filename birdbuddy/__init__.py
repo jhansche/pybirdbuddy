@@ -1,4 +1,4 @@
-"""Bird Buddy api library"""
+"""Bird Buddy api library."""
 
 import logging
 
