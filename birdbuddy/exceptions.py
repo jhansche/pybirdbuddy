@@ -70,6 +70,10 @@ class AuthenticationFailedError(Exception):
     """The login attempt failed."""
 
 
+class NoFirmwareUpdateAvailableError(Exception):
+    """A firmware update was requested but the feeder is already current."""
+
+
 class UnexpectedResponseError(Exception):
     """The response did not contain the expected fields."""
 

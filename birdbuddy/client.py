@@ -16,6 +16,7 @@ from birdbuddy.exceptions import (
     AuthenticationFailedError,
     AuthTokenExpiredError,
     GraphqlError,
+    NoFirmwareUpdateAvailableError,
     NoResponseError,
     UnexpectedResponseError,
 )
@@ -844,12 +845,25 @@ class BirdBuddy:
 
         Returns:
             The firmware update status.
+
+        Raises:
+            NoFirmwareUpdateAvailableError: If the feeder already runs the
+                latest firmware (the API errors internally otherwise).
         """
         current_status = await self.update_firmware_check(feeder)
 
         if current_status.is_in_progress:
             # There's already an update in progress
             return current_status
+
+        # The API returns an internal error when asked to start an update that
+        # is not available, so guard on the versions the check reported.
+        reported = Feeder(current_status.get("feeder") or {})
+        if reported.version and reported.version == (
+            reported.version_update_available
+        ):
+            msg = f"feeder already on the latest firmware ({reported.version})"
+            raise NoFirmwareUpdateAvailableError(msg)
 
         feeder_id: str
         if isinstance(feeder, Feeder):

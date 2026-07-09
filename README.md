@@ -118,6 +118,9 @@ sighting-report input types were dropped from the API. v0.1.0 follows suit:
 - **Timestamps.** `Media.created_at` and `Collection.last_visit` return
   `datetime` (they are non-null in the schema); `FeedNode.created_at` stays
   optional.
+- **Firmware.** `update_firmware_start` raises
+  `NoFirmwareUpdateAvailableError` when the feeder already runs the latest
+  firmware, rather than surfacing the API's internal error.
 
 ## Development
 
