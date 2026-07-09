@@ -1,302 +1,299 @@
 {
-  "feeders": {
-    "99d7d4ed-f828-575a-b430-75bae4a0f7a6": {
-      "battery": {
-        "charging": false,
-        "percentage": 92,
-        "state": "HIGH",
-        "__typename": "FeederMetricBattery"
-      },
-      "food": {
-        "state": "LOW",
-        "__typename": "FeederMetricFood"
-      },
-      "id": "99d7d4ed-f828-575a-b430-75bae4a0f7a6",
+  "me": {
+    "user": {
+      "avatarUrl": "https://example.invalid/asset",
+      "email": "owner@example.invalid",
+      "id": "be0be1d6-188b-5640-a53f-31328800425f",
       "name": "Test Bird Buddy",
-      "signal": {
-        "state": "LOW",
-        "value": -70,
-        "__typename": "FeederMetricSignal"
-      },
-      "state": "DEEP_SLEEP",
-      "temperature": {
-        "value": 0,
-        "__typename": "FeederMetricTemperature"
-      },
-      "__typename": "FeederForOwner",
-      "availableFirmwareVersion": "1.8.1",
-      "firmwareVersion": "1.8.1",
-      "invitationsAvailable": 9,
-      "offGrid": false,
-      "audioEnabled": true,
-      "powerProfile": "STANDARD_MODE",
-      "presenceUpdatedAt": "2026-07-06T21:29:59.490Z",
-      "serialNumber": "SN-TEST-0001",
-      "members": [],
-      "location": {
-        "city": "Testville",
-        "country": "US",
-        "__typename": "Location"
-      },
-      "frequency": "MEDIUM",
-      "lowBatteryNotification": true,
-      "lowFoodNotification": false,
-      "invitations": [
-        {
-          "id": "eddb089b-7d86-5f7e-8498-69af8a14d464",
-          "token": "<redacted-invite-token>",
-          "__typename": "FeederInvitation"
+      "signInType": "EMAIL",
+      "__typename": "User"
+    },
+    "settings": {
+      "notificationDisabled": null,
+      "__typename": "Settings"
+    },
+    "feeders": [
+      {
+        "battery": {
+          "charging": false,
+          "percentage": 94,
+          "state": "HIGH",
+          "__typename": "FeederMetricBattery"
+        },
+        "food": {
+          "state": "LOW",
+          "__typename": "FeederMetricFood"
+        },
+        "id": "33149978-ad92-5752-b6e5-1580b262ccf9",
+        "name": "Test Bird Buddy",
+        "signal": {
+          "state": "MEDIUM",
+          "value": -64,
+          "__typename": "FeederMetricSignal"
+        },
+        "state": "READY_TO_STREAM",
+        "temperature": {
+          "value": 0,
+          "__typename": "FeederMetricTemperature"
+        },
+        "__typename": "FeederForOwner",
+        "availableFirmwareVersion": "1.8.1",
+        "firmwareVersion": "1.8.1",
+        "serialNumber": "SN-TEST-0001",
+        "invitationsAvailable": 9,
+        "offGrid": false,
+        "audioEnabled": true,
+        "powerProfile": "STANDARD_MODE",
+        "presenceUpdatedAt": "2026-07-09T00:11:15.555Z",
+        "members": [],
+        "location": {
+          "city": "Testville",
+          "country": "US",
+          "__typename": "Location"
         }
-      ]
-    }
-  },
-  "new_postcards": [
-    {
-      "id": "80722bed-4bcd-5433-a846-602686f24842",
-      "createdAt": "2026-07-07T23:40:41.241Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "e816addd-a346-5af2-a0ff-aaa70dfe3911",
-      "createdAt": "2026-07-07T23:05:14.890Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "f405863c-0393-5e26-8e68-e72adbecd040",
-      "createdAt": "2026-07-07T22:29:51.025Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "70690be9-95c4-5e9e-9def-3d8c4e49bbbb",
-      "createdAt": "2026-07-07T21:39:35.374Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "22d5a311-003e-5df1-a3af-268ad103cc5a",
-      "createdAt": "2026-07-07T19:57:45.237Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "37635d01-7dad-54ce-969e-21080fb9124e",
-      "createdAt": "2026-07-07T19:00:49.223Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "644c23b8-7749-5a15-8b67-5c0a8495f426",
-      "createdAt": "2026-07-07T17:48:06.958Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "508a1306-4186-5f2b-8996-6aa7cdc20b61",
-      "createdAt": "2026-07-07T16:16:22.083Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "3f66d76f-8331-52c2-89a2-902d6cf5d028",
-      "createdAt": "2026-07-07T15:42:23.927Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "36151dff-d3ff-56df-a2f0-e167d0902a37",
-      "createdAt": "2026-07-07T14:20:21.898Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "fe470236-253f-5348-ad5a-e88f864ba8c8",
-      "createdAt": "2026-07-07T13:42:36.414Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "15beead8-2722-5930-962d-6caea56af76b",
-      "createdAt": "2026-07-07T12:36:00.900Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "38536ae0-4eac-5184-be4f-f42f5d79c2ba",
-      "createdAt": "2026-07-07T03:35:47.433Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "557876a2-e1a2-5904-9f09-62b9d840c1d1",
-      "createdAt": "2026-07-07T02:52:31.345Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "768dd6ac-304c-50a8-88ce-2aa9963a3e5b",
-      "createdAt": "2026-07-06T23:01:52.641Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "aa284595-ae6a-572f-b1ab-998042893eb3",
-      "createdAt": "2026-07-06T22:10:37.395Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "62779c21-70ff-527c-8025-1ebab568a112",
-      "createdAt": "2026-07-06T17:37:04.106Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "afc933e9-6f3e-5d46-9bf1-310bf78dc144",
-      "createdAt": "2026-07-06T16:34:07.695Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "9320b1d8-e49c-5719-a31f-252512014b2f",
-      "createdAt": "2026-07-06T15:33:03.351Z",
-      "__typename": "FeedItemNewPostcard"
-    },
-    {
-      "id": "dbcccb7e-5aec-5f29-8b42-fe0c24a6733b",
-      "createdAt": "2026-07-06T15:04:08.694Z",
-      "__typename": "FeedItemNewPostcard"
-    }
-  ],
-  "reanalyze_postcard": {
-    "updatedFeedItem": {
-      "__typename": "FeedItemNewPostcard",
-      "id": "80722bed-4bcd-5433-a846-602686f24842",
-      "inferenceConfidenceLevel": "LOW_CONFIDENCE",
-      "inferenceExecutionMode": "MANUAL_COMPLETED",
-      "inferenceType": "ADVANCED",
-      "reanalyzeAvailability": "ALREADY_REANALYZED"
-    }
-  },
-  "sighting_from_postcard": {
-    "feeder": {
-      "id": "99d7d4ed-f828-575a-b430-75bae4a0f7a6",
-      "name": "Test Bird Buddy",
-      "state": "DEEP_SLEEP",
-      "__typename": "FeederForOwner"
-    },
-    "medias": [
-      {
-        "id": "b314e86d-df2f-5aca-a76e-106a998aac71",
-        "createdAt": "2026-07-07T23:39:38.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "81dbec1e-1a2b-5d83-b356-6da8380be500",
-        "createdAt": "2026-07-07T23:39:38.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "572f7476-4658-5095-80e5-fc864f449e54",
-        "createdAt": "2026-07-07T23:39:52.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "2a7a3671-43e6-5289-b8a0-25a0d209541d",
-        "createdAt": "2026-07-07T23:39:57.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "de38aaff-b25e-5e99-affe-cf2308c7529f",
-        "createdAt": "2026-07-07T23:40:03.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "0098c2a4-c0f0-5f3b-aa87-c773ef24a580",
-        "createdAt": "2026-07-07T23:40:09.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "5002f25b-9529-57da-b1c0-f430d50849b2",
-        "createdAt": "2026-07-07T23:40:14.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "2da363e8-d4d3-5162-8fb2-934ad184b2f5",
-        "createdAt": "2026-07-07T23:40:13.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "f9438830-b255-5583-9da2-b65593f4111e",
-        "createdAt": "2026-07-07T23:40:12.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
-      },
-      {
-        "id": "7bf96874-e8f9-563c-9bfd-e47e3a6df0ed",
-        "createdAt": "2026-07-07T23:40:10.000Z",
-        "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-        "contentUrl": "https://media.example/.../CONTENT.jpg",
-        "__typename": "MediaImage"
       }
     ],
-    "sightingReport": {
-      "reportToken": "<redacted-report-token>",
-      "sightings": [
+    "__typename": "Me"
+  },
+  "collections": [
+    {
+      "id": "679ee54c-36bd-569b-9e71-82dad0ffe4fa",
+      "coverCollectionMedia": {
+        "id": "ff85750b-8577-5522-a961-86ab678e2574",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "ff85750b-8577-5522-a961-86ab678e2574",
+          "createdAt": "2025-02-23T18:35:36.055Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 1,
+      "visitLastTime": "2025-02-23T19:18:45.160Z",
+      "previewMedia": [
         {
-          "id": "b86365c2-b95d-556b-979b-4d36f07ef6b9",
-          "matchTokens": [
-            "b314e86d-df2f-5aca-a76e-106a998aac71",
-            "81dbec1e-1a2b-5d83-b356-6da8380be500",
-            "572f7476-4658-5095-80e5-fc864f449e54",
-            "2a7a3671-43e6-5289-b8a0-25a0d209541d",
-            "de38aaff-b25e-5e99-affe-cf2308c7529f",
-            "0098c2a4-c0f0-5f3b-aa87-c773ef24a580",
-            "5002f25b-9529-57da-b1c0-f430d50849b2",
-            "2da363e8-d4d3-5162-8fb2-934ad184b2f5",
-            "f9438830-b255-5583-9da2-b65593f4111e",
-            "7bf96874-e8f9-563c-9bfd-e47e3a6df0ed"
-          ],
-          "__typename": "SightingRecognizedBird",
-          "color": "YELLOW",
-          "text": "Whoa! Can't get enough? 1st time today!",
-          "count": 7,
-          "icon": "HEARTS",
-          "shareableMatchTokens": [
-            "b314e86d-df2f-5aca-a76e-106a998aac71",
-            "81dbec1e-1a2b-5d83-b356-6da8380be500",
-            "572f7476-4658-5095-80e5-fc864f449e54",
-            "2a7a3671-43e6-5289-b8a0-25a0d209541d",
-            "de38aaff-b25e-5e99-affe-cf2308c7529f",
-            "0098c2a4-c0f0-5f3b-aa87-c773ef24a580",
-            "5002f25b-9529-57da-b1c0-f430d50849b2",
-            "2da363e8-d4d3-5162-8fb2-934ad184b2f5",
-            "f9438830-b255-5583-9da2-b65593f4111e",
-            "7bf96874-e8f9-563c-9bfd-e47e3a6df0ed"
-          ],
-          "species": {
-            "id": "ca898597-b669-577f-97fc-ae26a7310604",
-            "iconUrl": "https://media.example/.../THUMBNAIL.jpg",
-            "name": "Northern Cardinal",
-            "__typename": "SpeciesBird",
-            "isUnofficialName": false,
-            "mapUrl": "https://media.example/.../THUMBNAIL.jpg"
-          }
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
         }
       ],
-      "__typename": "SightingReport"
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "de09fd32-9b8c-5949-9a45-049d8957049c",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "Black-Capped Chickadee",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/6bc27d4e-9f1a-41dc-8316-2086a9f79022_Black-capped%20Chickadee%20%281%29.svg"
+      }
     },
-    "videoMedia": {
-      "id": "a961fcb3-5f46-5892-96c8-82b6bbef7b44",
-      "createdAt": "2026-07-07T23:39:40.000Z",
-      "thumbnailUrl": "https://media.example/.../THUMBNAIL.jpg",
-      "contentUrl": "https://media.example/.../CONTENT.jpg",
-      "__typename": "MediaVideo"
+    {
+      "id": "de48ab88-6cfb-5a21-86ef-918908fa3baa",
+      "coverCollectionMedia": {
+        "id": "a28237a9-5820-5e0e-aa68-66304f40e548",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "a28237a9-5820-5e0e-aa68-66304f40e548",
+          "createdAt": "2025-02-22T19:21:35.272Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 6,
+      "visitLastTime": "2025-02-25T20:21:46.240Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "9b520e99-3710-5a5d-8c1f-0f6a432c13d2",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "Pine Siskin",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/a34bcd83-2d18-4d2a-8b97-2f591ff79985_Pine%20Siskin.svg"
+      }
     },
-    "__typename": "SightingCreateFromPostcardResult"
-  },
-  "sighting_create": {
-    "error": "CompositeException([GraphqlError('GRAPHQL_VALIDATION_FAILED: {\\'message\\': \\'Unknown type \"SightingCreateInput\". Did you mean \"SightingIgnoreInput\", \"SettingsUpdateInput\", \"SightingRecognized\", or \"SightingReport\"?\\', \\'locations\\': [{\\'line\\': 1, \\'column\\': 47}], \\'extensions\\': {\\'code\\': \\'GRAPHQL_VALIDATION_FAILED\\'}}'), GraphqlError('GRAPHQL_VALIDATION_FAILED: {\\'message\\': \\'Cannot query field \"sightingCreate\" on type \"Mutation\". Did you mean \"sightingIgnore\"?\\', \\'locations\\': [{\\'line\\': 2, \\'column\\': 3}], \\'extensions\\': {\\'code\\': \\'GRAPHQL_VALIDATION_FAILED\\'}}')])"
-  }
+    {
+      "id": "1503d851-9f03-521e-95a8-0e26671e829d",
+      "coverCollectionMedia": {
+        "id": "28575835-7b65-5086-8a25-f47602a1fe54",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "28575835-7b65-5086-8a25-f47602a1fe54",
+          "createdAt": "2025-02-22T16:49:42.906Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 10,
+      "visitLastTime": "2025-08-10T06:38:48.795Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "fe0cee0d-05df-593c-8a34-0e2cddcfc50d",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "House Finch",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/d8c20684-d366-4933-8ceb-4955ec9459a1_House%20Finch.svg"
+      }
+    },
+    {
+      "id": "6b91784e-fa49-5178-8bcc-8fa9f6c92885",
+      "coverCollectionMedia": {
+        "id": "63683b02-dcb6-5e89-867c-e874d1e3806a",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "63683b02-dcb6-5e89-867c-e874d1e3806a",
+          "createdAt": "2025-02-26T21:20:17.587Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 3,
+      "visitLastTime": "2025-02-26T21:47:12.588Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "8ec96be4-a8a2-5a3d-9003-be179dc9353a",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "Red-Breasted Nuthatch",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/bd6ef12e-955d-488c-af4e-c5462d6979aa_Red-Breasted%20Nuthatch.svg"
+      }
+    },
+    {
+      "id": "80d6e8fb-6dfb-56e0-ab08-a2723c5850ed",
+      "coverCollectionMedia": {
+        "id": "7f839866-d341-5e17-a2ef-846c69e159bb",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "7f839866-d341-5e17-a2ef-846c69e159bb",
+          "createdAt": "2025-02-24T21:59:09.843Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 5,
+      "visitLastTime": "2025-08-10T06:38:48.795Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionMysteryVisitor"
+    }
+  ],
+  "new_postcards": [
+    {
+      "id": "91c2524c-233f-516f-8a4c-58e077085c62",
+      "createdAt": "2026-07-09T01:10:56.363Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "244eb9b5-9d50-531b-83a2-a7e1a2bb875d",
+      "createdAt": "2026-07-08T17:48:43.424Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "2b549742-86c5-5190-9211-7caeaad6a680",
+      "createdAt": "2026-07-08T13:31:08.961Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "20bfaced-bc61-5671-a6f5-e45b2049dbca",
+      "createdAt": "2026-07-08T12:49:05.221Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "951a8f75-2276-5fe4-82d2-573eda498ab2",
+      "createdAt": "2026-07-07T23:40:41.241Z",
+      "__typename": "FeedItemNewPostcard"
+    }
+  ]
 }
