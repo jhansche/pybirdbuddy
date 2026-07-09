@@ -231,3 +231,4 @@ junit.xml
 
 # Local API payload dumps
 *.dump.json
+*.sanitized.json
