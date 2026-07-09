@@ -21,6 +21,7 @@ from birdbuddy.exceptions import (
 from birdbuddy.feed import Feed, FeedNode, FeedNodeType
 from birdbuddy.feeder import Feeder, FeederUpdateStatus, PowerProfile
 from birdbuddy.media import Collection, Media
+from birdbuddy.postcards import CollectedPostcard
 from birdbuddy.queries.debug import DUMP_SCHEMA
 from birdbuddy.sightings import (
     PostcardSighting,
@@ -490,6 +491,30 @@ class BirdBuddy:
         """
         return await self.feed_nodes(FeedNodeType.NewPostcard)
 
+    def _postcard_id(self, postcard: str | FeedNode) -> str:
+        """Resolve a postcard argument to its feed-item id.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+
+        Returns:
+            The feed-item id.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
+            TypeError: If ``postcard`` is neither a str nor a FeedNode.
+        """
+        if isinstance(postcard, str):
+            return postcard
+        if isinstance(postcard, FeedNode):
+            if postcard.node_type != FeedNodeType.NewPostcard:
+                msg = f"expected a NewPostcard, got {postcard.node_type}"
+                raise ValueError(msg)
+            return postcard.node_id
+        msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
+        raise TypeError(msg)
+
     async def reanalyze_postcard(
         self,
         postcard: str | FeedNode,
@@ -497,7 +522,9 @@ class BirdBuddy:
         """Trigger the AI identification (reanalysis) for a postcard.
 
         Changes the inference execution mode from MANUAL_NOT_STARTED to
-        MANUAL_COMPLETED and populates the sighting report preview.
+        MANUAL_COMPLETED and populates the sighting report preview. It is
+        idempotent: an already-analyzed postcard returns MANUAL_COMPLETED
+        with reanalyzeAvailability ALREADY_REANALYZED.
 
         Args:
             postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
@@ -509,24 +536,49 @@ class BirdBuddy:
             ValueError: If ``postcard`` is a FeedNode that is not a
                 NewPostcard.
         """
-        postcard_id: str
-        if isinstance(postcard, str):
-            postcard_id = postcard
-        elif isinstance(postcard, FeedNode):
-            if postcard.node_type != FeedNodeType.NewPostcard:
-                msg = f"expected a NewPostcard, got {postcard.node_type}"
-                raise ValueError(msg)
-            postcard_id = postcard.node_id
-        else:
-            msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
-            raise TypeError(msg)
-
-        variables = {"feedItemId": postcard_id}
+        variables = {"feedItemId": self._postcard_id(postcard)}
         result = await self._make_request(
             query=queries.birds.POSTCARD_REANALYZE,
             variables=variables,
         )
         return result["inferenceExternalPostcardReanalyze"]
+
+    async def collect_postcard(
+        self,
+        postcard: str | FeedNode,
+        *,
+        share: bool = False,
+    ) -> CollectedPostcard:
+        """Collect a postcard into your account.
+
+        Reanalyzes the postcard first (idempotent, so it is safe whether or
+        not inference has already run), then collects it with the species the
+        backend recognized.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+            share: Whether to share the collected media.
+
+        Returns:
+            The collected postcard.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
+            TypeError: If ``postcard`` is neither a str nor a FeedNode.
+        """
+        postcard_id = self._postcard_id(postcard)
+        await self.reanalyze_postcard(postcard_id)
+        result = await self._make_request(
+            query=queries.birds.POSTCARD_COLLECT,
+            variables={
+                "feedItemId": postcard_id,
+                "postcardCollectInput": {"share": share},
+            },
+        )
+        return CollectedPostcard(
+            result["postcardCollect"]["collectedPostcard"]
+        )
 
     async def sighting_from_postcard(
         self,
