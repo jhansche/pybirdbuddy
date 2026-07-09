@@ -7,6 +7,7 @@ import pytest
 from birdbuddy.client import BirdBuddy
 from birdbuddy.exceptions import NoFirmwareUpdateAvailableError
 from birdbuddy.feeder import Feeder
+from birdbuddy.postcards import CollectedPostcard
 from birdbuddy.sightings import PostcardSighting, SightingFinishStrategy
 
 _POSTCARD_ID = "725af10e-8be1-5252-96fe-d49565053c44"
@@ -453,3 +454,51 @@ async def test_update_firmware_start_guards_when_up_to_date(
         await bbclient.update_firmware_start(fid)
     # Only the check ran; the start mutation was never sent.
     assert graphql_mock.call_count == 1
+
+
+_PID = "postcard-1"
+_REANALYZED = {
+    "data": {
+        "inferenceExternalPostcardReanalyze": {
+            "updatedFeedItem": {
+                "__typename": "FeedItemNewPostcard",
+                "id": _PID,
+                "inferenceExecutionMode": "MANUAL_COMPLETED",
+                "reanalyzeAvailability": "ALREADY_REANALYZED",
+            }
+        }
+    }
+}
+
+
+@pytest.mark.asyncio
+async def test_collect_postcard(
+    bbclient: BirdBuddy,
+    graphql_mock: AsyncMock,
+    collect_flow: dict,
+):
+    """collect_postcard reanalyzes, then collects into a CollectedPostcard."""
+    collected = collect_flow["postcard_collect"]["postcardCollect"]
+    graphql_mock.side_effect = [
+        _REANALYZED,
+        {"data": {"postcardCollect": collected}},
+    ]
+    result = await bbclient.collect_postcard(_PID)
+    assert isinstance(result, CollectedPostcard)
+    assert result.has_mystery_visitor is False
+    assert [s.name for s in result.species] == ["California Scrub-Jay"]
+    assert result.medias
+    graphql_mock.assert_has_calls(
+        calls=[
+            call(query=ANY, variables={"feedItemId": _PID}, headers=ANY),
+            call(
+                query=ANY,
+                variables={
+                    "feedItemId": _PID,
+                    "postcardCollectInput": {"share": False},
+                },
+                headers=ANY,
+            ),
+        ],
+        any_order=False,
+    )
