@@ -470,7 +470,8 @@ class BirdBuddy:
         and an ``"edges"`` key with FeedEdge nodes, newest first.
 
         Args:
-            first: Return the first N items older than ``after``.
+            first: Return the first N items older than ``after``. Must be
+                1-100; the API returns an internal error for larger values.
             after: Cursor of the oldest item previously seen (pagination).
             last: Return the last N items newer than ``before``. Currently
                 ignored; the backward-pagination request path is disabled.
@@ -479,7 +480,11 @@ class BirdBuddy:
 
         Returns:
             The Feed.
+
+        Raises:
+            ValueError: If ``first`` is not between 1 and 100.
         """
+        _require_page_size(first)
         variables: dict[str, Any] = {
             # $first: Int,
             # $after: String,
@@ -503,49 +508,94 @@ class BirdBuddy:
         )
         return Feed(data["me"]["feed"])
 
-    async def refresh_feed(
-        self,
-        since: datetime | str = _NO_VALUE,  # type: ignore[assignment]
-    ) -> list[FeedNode]:
-        """Return only feed items new since the last refresh.
+    def _feed_pages(self) -> AsyncIterator[dict]:
+        """Iterate feed connection pages, newest first, one per request."""
+        return self._iter_pages(
+            query=queries.me.FEED,
+            variables={"first": _MAX_PAGE_SIZE},
+            connection=lambda data: data["me"]["feed"],
+        )
 
-        The most recent edge node timestamp is saved as the last-seen feed
-        item, which becomes the new default value for ``since``. Useful to,
-        for example, restore a last-seen timestamp in a new instance.
+    def _note_newest_feed_date(self, feed: Feed) -> None:
+        """Advance the saved last-seen timestamp to a page's newest item.
 
         Args:
-            since: The time after which to restrict new feed items; defaults
-                to the last-seen timestamp.
-
-        Returns:
-            The new feed nodes.
+            feed: A feed page; its newest edge sets the last-seen timestamp.
         """
-        resolved = self._last_feed_date if since is _NO_VALUE else since
-        if isinstance(resolved, str):
-            resolved = FeedNode.parse_datetime(resolved)
-        feed = await self.feed()
-        if (newest_edge := feed.newest_edge) and (
-            newest_date := newest_edge.node.created_at
-        ) != self._last_feed_date:
+        if not (newest_edge := feed.newest_edge):
+            return
+        newest_date = newest_edge.node.created_at
+        if newest_date is not None and newest_date != self._last_feed_date:
             LOGGER.debug(
                 "Updating latest seen Feed timestamp: %s -> %s",
                 self._last_feed_date,
                 newest_date,
             )
             self._last_feed_date = newest_date
-        return feed.filter(newer_than=resolved)
+
+    async def refresh_feed(
+        self,
+        since: datetime | str = _NO_VALUE,  # type: ignore[assignment]
+    ) -> list[FeedNode]:
+        """Return only feed items new since the last refresh.
+
+        Pages backward through the feed (newest first) until it reaches
+        items no newer than ``since``, so more than one page of new items is
+        returned rather than truncated at the first page. The newest item's
+        timestamp is saved as the last-seen feed item, the new default for
+        ``since``.
+
+        With no ``since`` and no prior refresh there is no lower bound to
+        page toward, so only the most recent page is returned; this avoids
+        replaying the entire history on a first refresh.
+
+        Args:
+            since: The time after which to restrict new feed items; defaults
+                to the last-seen timestamp.
+
+        Returns:
+            The new feed nodes, newest first.
+        """
+        resolved = self._last_feed_date if since is _NO_VALUE else since
+        if isinstance(resolved, str):
+            resolved = FeedNode.parse_datetime(resolved)
+
+        if resolved is None:
+            feed = await self.feed()
+            self._note_newest_feed_date(feed)
+            return feed.filter(newer_than=None)
+
+        new_nodes: list[FeedNode] = []
+        noted = False
+        async for page in self._feed_pages():
+            feed = Feed(page)
+            if not noted:
+                self._note_newest_feed_date(feed)
+                noted = True
+            new_nodes.extend(feed.filter(newer_than=resolved))
+            oldest = min(
+                (n.created_at for n in feed.nodes if n.created_at),
+                default=None,
+            )
+            if oldest is not None and oldest <= resolved:
+                # Reached items no newer than the cutoff; older pages hold
+                # nothing new.
+                break
+        return new_nodes
 
     async def feed_nodes(self, node_type: FeedNodeType) -> list[FeedNode]:
-        """Return all feed items of the given type.
+        """Return all feed items of the given type across every page.
 
         Args:
             node_type: The feed node type to filter by.
 
         Returns:
-            The matching feed nodes.
+            The matching feed nodes, newest first.
         """
-        feed = await self.feed()
-        return feed.filter(of_type=node_type)
+        nodes: list[FeedNode] = []
+        async for page in self._feed_pages():
+            nodes.extend(Feed(page).filter(of_type=node_type))
+        return nodes
 
     async def new_postcards(self) -> list[FeedNode]:
         """Return all new 'Postcard' feed items.
