@@ -9,7 +9,7 @@
 `pybirdbuddy` is an asynchronous Python client for the undocumented GraphQL
 API behind the Bird Buddy smart bird feeder. Sign in with a Bird Buddy account
 to read your feeders and their state, browse your collections and media, and
-finish the "postcard" sightings the feeder captures.
+collect the "postcards" the feeder captures.
 
 It is an unofficial client for an undocumented API that can change without
 notice, and is not affiliated with or endorsed by Bird Buddy.
@@ -91,6 +91,33 @@ async def main():
     birds = [c.species.name for c in collections.values()]
     print(birds)
 ```
+
+## Breaking changes (v0.0.x → v0.1.0)
+
+The Bird Buddy app moved entirely to the `postcardCollect` flow, and the old
+sighting-report input types were dropped from the API. v0.1.0 follows suit:
+
+- **Postcard flow replaced.** `sighting_from_postcard`, `finish_postcard`,
+  `sighting_choose_species`, and `sighting_choose_mystery` are gone. Collect a
+  postcard with `collect_postcard(postcard, share=False)`, which reanalyzes it
+  (running inference if needed) and returns a `CollectedPostcard`. The
+  `birdbuddy.sightings` module and its models (`PostcardSighting`,
+  `SightingReport`, `Sighting`, and the best-guess/anomaly helpers) were
+  removed; the backend now reports species and confidence directly.
+- **Dead methods removed.** `sighting_create` and
+  `sighting_create_check_progress` are gone — their input types no longer
+  exist upstream.
+- **`collection()` returns all media.** It paginates to completion instead of
+  returning only the first page, and takes an optional `page_size` (1–100).
+- **Feed pagination.** `refresh_feed`, `feed_nodes`, and `new_postcards` follow
+  pagination; `feed(first=...)` must be 1–100.
+- **`Feeder.power_profile`** returns `PowerProfile.UNKNOWN` when the feeder
+  reports no profile, rather than defaulting to `STANDARD`.
+- **`Feeder.location`** reads the owner feeder's nested `location` as well as
+  the flat member/public fields.
+- **Timestamps.** `Media.created_at` and `Collection.last_visit` return
+  `datetime` (they are non-null in the schema); `FeedNode.created_at` stays
+  optional.
 
 ## Development
 
