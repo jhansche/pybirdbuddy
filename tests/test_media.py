@@ -1,5 +1,6 @@
 """Basic tests for the birdbuddy.media models."""
 
+from datetime import datetime
 import time
 
 from birdbuddy.media import Collection, Media, is_media_expired
@@ -32,7 +33,7 @@ def test_media_image_properties():
     assert media.is_video is False
     assert media.thumbnail_url == future_url
     assert media.content_url == "https://cdn.example/full.jpg"
-    assert media.created_at is not None
+    assert isinstance(media.created_at, datetime)
     assert media.is_expired is False
 
 
@@ -75,7 +76,7 @@ def test_collection_properties():
     assert collection.species is not None
     assert collection.species.id == "sp1"
     assert collection.total_visits == 5
-    assert collection.last_visit is not None
+    assert isinstance(collection.last_visit, datetime)
     assert collection.feeder_name == "Backyard"
     assert collection.cover_media.id == "m1"
 

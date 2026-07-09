@@ -6,7 +6,7 @@ from collections import UserDict
 from collections.abc import Iterator
 from datetime import datetime
 from enum import Enum
-from typing import Any, cast
+from typing import Any
 
 from propcache import cached_property
 
@@ -51,17 +51,15 @@ class FeedNode(UserDict[str, Any]):
     :func:`datetime.fromisoformat()`, so it has to be parsed manually."""
 
     @staticmethod
-    def parse_datetime(timestr: str | None) -> datetime | None:
+    def parse_datetime(timestr: str) -> datetime:
         """Parse a GraphQL timestamp string into a datetime.
 
         Args:
-            timestr: The timestamp string, or ``None``.
+            timestr: The timestamp string.
 
         Returns:
-            The parsed ``datetime``, or ``None`` when ``timestr`` is ``None``.
+            The parsed ``datetime``.
         """
-        if timestr is None:
-            return None
         if len(timestr) == 24:
             # The known expected datetime format in the BirdBuddy feed
             return datetime.strptime(timestr, FeedNode._DATETIME_FORMAT)
@@ -79,8 +77,13 @@ class FeedNode(UserDict[str, Any]):
 
     @property
     def created_at(self) -> datetime | None:
-        """The `datetime` when the FeedNode item was created."""
-        return FeedNode.parse_datetime(self.get("createdAt"))
+        """The `datetime` when the item was created, or None if absent.
+
+        Feed items are ``AnyFeedItem`` union members; a member the query does
+        not select ``createdAt`` for carries no timestamp, hence ``None``.
+        """
+        timestr = self.get("createdAt")
+        return FeedNode.parse_datetime(timestr) if timestr else None
 
 
 class FeedEdge(UserDict[str, Any]):
@@ -117,12 +120,13 @@ class Feed(UserDict[str, Any]):
 
     @cached_property
     def newest_edge(self) -> FeedEdge | None:
-        """Returns the newest `FeedEdge`, by `FeedNode.created_at`."""
-        return max(
-            (e for e in self.edges if e.node.created_at),
-            key=lambda edge: cast(datetime, edge.node.created_at),
-            default=None,
-        )
+        """Return the newest `FeedEdge` by time, or None when all undated."""
+        dated = [
+            (created, edge)
+            for edge in self.edges
+            if (created := edge.node.created_at) is not None
+        ]
+        return max(dated, key=lambda pair: pair[0])[1] if dated else None
 
     def filter(
         self,

@@ -12,15 +12,16 @@ def test_feed_node_type_known_and_unknown():
     assert FeedNodeType("NopeNotReal") is FeedNodeType.Unknown
 
 
-def test_parse_datetime_none_and_formats():
-    """parse_datetime handles None, the 24-char feed format, and ISO."""
-    assert FeedNode.parse_datetime(None) is None
-    feed_fmt = FeedNode.parse_datetime("2023-01-01T00:00:00.000Z")
-    assert feed_fmt is not None
-    assert feed_fmt.year == 2023
-    iso = FeedNode.parse_datetime("2023-06-15T12:30:00+00:00")
-    assert iso is not None
-    assert iso.month == 6
+def test_parse_datetime_formats():
+    """parse_datetime handles the 24-char feed format and ISO strings."""
+    assert FeedNode.parse_datetime("2023-01-01T00:00:00.000Z").year == 2023
+    assert FeedNode.parse_datetime("2023-06-15T12:30:00+00:00").month == 6
+
+
+def test_feed_node_created_at_absent_is_none():
+    """A feed node without createdAt reports None (union member gap)."""
+    node = FeedNode({"id": "x", "__typename": "FeedItemEditorsChoice"})
+    assert node.created_at is None
 
 
 def test_feed_node_properties():

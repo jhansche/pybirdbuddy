@@ -26,8 +26,12 @@ class Media(UserDict[str, Any]):
         return self["__typename"] == "MediaVideo"
 
     @property
-    def created_at(self) -> datetime | None:
-        """Creation timestamp."""
+    def created_at(self) -> datetime:
+        """Creation timestamp.
+
+        ``createdAt`` is non-null in the schema and selected by every query
+        that returns Media, so it is always present.
+        """
         return FeedNode.parse_datetime(self["createdAt"])
 
     @property
@@ -91,8 +95,12 @@ class Collection(UserDict[str, Any]):
         return int(self.get("visitsAllTime", 0))
 
     @property
-    def last_visit(self) -> datetime | None:
-        """Most recent visit time."""
+    def last_visit(self) -> datetime:
+        """Most recent visit time.
+
+        ``visitLastTime`` is non-null in the schema and selected by every
+        collection query, so it is always present.
+        """
         return FeedNode.parse_datetime(self["visitLastTime"])
 
     @property
