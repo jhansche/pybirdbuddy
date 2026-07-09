@@ -130,3 +130,26 @@ def test_power_profile_missing_logs_no_warning(caplog):
     with caplog.at_level(logging.WARNING, logger="birdbuddy"):
         assert Feeder({"id": "f"}).power_profile is PowerProfile.UNKNOWN
     assert "power profile" not in caplog.text.lower()
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param(
+            {"location": {"city": "Testville", "country": "US"}},
+            id="owner_nested",
+        ),
+        pytest.param(
+            {"locationCity": "Testville", "locationCountry": "US"},
+            id="member_flat",
+        ),
+    ],
+)
+def test_feeder_location_both_shapes(payload):
+    """Owner (nested) and member/public (flat) location both resolve."""
+    assert Feeder(payload).location == ("Testville", "US")
+
+
+def test_feeder_location_absent():
+    """A feeder with no location yields (None, None)."""
+    assert Feeder({"id": "f"}).location == (None, None)

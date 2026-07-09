@@ -23,10 +23,9 @@ def test_owner_feeder_parses_from_real_payload(api_payloads):
     assert feeder.battery.state is MetricState.HIGH
     assert feeder.signal.rssi == -70
     assert feeder.power_profile is PowerProfile.STANDARD
-    # FeederForOwner nests location as location{city,country}; this property
-    # reads flat locationCity/locationCountry (the member/public shape), so an
-    # owner feeder yields (None, None). Pinned here; see the feeder.py TODO.
-    assert feeder.location == (None, None)
+    # FeederForOwner nests location as location{city,country}; Feeder.location
+    # reads it (the fixture's owner feeder is Testville, US).
+    assert feeder.location == ("Testville", "US")
 
 
 def test_new_postcards_parse_as_feed_nodes(api_payloads):
