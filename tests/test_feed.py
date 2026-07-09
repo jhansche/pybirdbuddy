@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 
 from birdbuddy.feed import Feed, FeedNode, FeedNodeType
+from birdbuddy.queries.me import FEED
 
 
 def test_feed_node_type_known_and_unknown():
@@ -77,3 +78,99 @@ def test_feed_newest_edge_and_filter():
     cutoff = datetime(2023, 2, 1, tzinfo=timezone.utc)
     recent = feed.filter(newer_than=cutoff)
     assert [n.node_id for n in recent] == ["n1"]
+
+
+def _feed_from_nodes(nodes: list[dict]) -> Feed:
+    """Build a Feed from raw node dicts (each may omit createdAt)."""
+    edges = [{"cursor": f"c{i}", "node": node} for i, node in enumerate(nodes)]
+    return Feed({"edges": edges, "pageInfo": {"endCursor": "END"}})
+
+
+_NEW = "FeedItemNewPostcard"
+# A union member the query does not enumerate: it returns only __typename,
+# hence no createdAt -- the condition behind issue #24.
+_UNDATED = "FeedItemEditorsChoice"
+
+
+def test_newest_edge_skips_nodes_without_created_at():
+    """newest_edge ignores createdAt-less nodes and picks the newest dated."""
+    feed = _feed_from_nodes(
+        [
+            {
+                "id": "old",
+                "__typename": _NEW,
+                "createdAt": "2023-01-01T00:00:00.000Z",
+            },
+            {"id": "undated", "__typename": _UNDATED},
+            {
+                "id": "new",
+                "__typename": _NEW,
+                "createdAt": "2023-03-01T00:00:00.000Z",
+            },
+        ]
+    )
+    newest = feed.newest_edge
+    assert newest is not None
+    assert newest.node.node_id == "new"
+
+
+def test_newest_edge_all_undated_returns_none():
+    """When no node carries createdAt, newest_edge is None (no crash)."""
+    feed = _feed_from_nodes(
+        [
+            {"id": "u1", "__typename": _UNDATED},
+            {"id": "u2", "__typename": _UNDATED},
+        ]
+    )
+    assert feed.newest_edge is None
+
+
+def test_filter_newer_than_tolerates_missing_created_at():
+    """filter(newer_than=...) does not raise on a createdAt-less node.
+
+    Regression for issue #24: "'>' not supported between instances of
+    'NoneType' and 'datetime.datetime'". A feed item with no created_at must
+    be skipped by the recency comparison rather than crashing it.
+    """
+    feed = _feed_from_nodes(
+        [
+            {"id": "undated", "__typename": _UNDATED},
+            {
+                "id": "dated",
+                "__typename": _NEW,
+                "createdAt": "2023-03-01T00:00:00.000Z",
+            },
+        ]
+    )
+    cutoff = datetime(2023, 2, 1, tzinfo=timezone.utc)
+    result = feed.filter(newer_than=cutoff)  # must not raise
+    assert [n.node_id for n in result] == ["dated"]
+
+
+def test_filter_without_cutoff_keeps_undated_nodes():
+    """Filtering with no newer_than keeps matching nodes even when undated."""
+    feed = _feed_from_nodes(
+        [
+            {"id": "undated", "__typename": _NEW},
+            {
+                "id": "dated",
+                "__typename": _NEW,
+                "createdAt": "2023-03-01T00:00:00.000Z",
+            },
+        ]
+    )
+    result = feed.filter(of_type=FeedNodeType.NewPostcard)
+    assert {n.node_id for n in result} == {"undated", "dated"}
+
+
+def test_feed_query_requests_created_at_for_all_union_members():
+    """The FEED query selects createdAt on the FeedItem interface.
+
+    AnyFeedItem is a union whose members all implement FeedItem{id,createdAt}.
+    An interface inline fragment makes every member -- including types not
+    individually enumerated -- return createdAt, fixing the issue #24 root
+    cause at the source rather than only guarding it downstream.
+    """
+    assert "... on FeedItem {" in FEED
+    interface = FEED.split("... on FeedItem {", 1)[1].split("}", 1)[0]
+    assert "createdAt" in interface
