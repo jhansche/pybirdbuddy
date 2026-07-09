@@ -1,5 +1,7 @@
 """Basic tests for the birdbuddy.feeder models."""
 
+import logging
+
 import pytest
 
 from birdbuddy.feeder import (
@@ -18,6 +20,7 @@ from birdbuddy.feeder import (
     [
         (MetricState, "HIGH", MetricState.HIGH),
         (PowerProfile, "FRENZY_MODE", PowerProfile.FRENZY),
+        (PowerProfile, "ULTRA_FRENZY_MODE", PowerProfile.ULTRA_FRENZY),
         (FeederState, "READY_TO_STREAM", FeederState.READY_TO_STREAM),
     ],
 )
@@ -88,12 +91,10 @@ def test_feeder_properties():
 
 
 def test_feeder_defaults():
-    """A sparse Feeder payload falls back for name and state.
+    """A sparse Feeder payload falls back for name, state, and power profile.
 
-    A Feeder without a powerProfile key resolves to UNKNOWN: the "STANDARD"
-    default does not match the PowerProfile value "STANDARD_MODE". This is
-    dormant in practice -- owner responses (the only ones carrying the
-    field) always include powerProfile -- but pinned as current behavior.
+    A Feeder without a powerProfile reports UNKNOWN (only owner responses
+    carry the field).
     """
     feeder = Feeder({"id": "f2"})
     assert feeder.name == "Bird Buddy"
@@ -117,3 +118,15 @@ def test_feeder_update_status():
     assert status.is_failed is False
     assert status.progress == 42
     assert status.feeder.id == "f1"
+
+
+def test_power_profile_missing_logs_no_warning(caplog):
+    """A feeder without a powerProfile is UNKNOWN and logs no warning.
+
+    The old "STANDARD" default fed an unknown value into PowerProfile, which
+    logged a spurious "Unexpected power profile" warning; this asserts it no
+    longer does.
+    """
+    with caplog.at_level(logging.WARNING, logger="birdbuddy"):
+        assert Feeder({"id": "f"}).power_profile is PowerProfile.UNKNOWN
+    assert "power profile" not in caplog.text.lower()
