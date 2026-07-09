@@ -1,10 +1,12 @@
 """Tests for the BirdBuddy client methods."""
 
+import copy
 from unittest.mock import ANY, AsyncMock, call
 
 import pytest
 
 from birdbuddy.client import BirdBuddy
+from birdbuddy.feeder import Feeder, PowerProfile
 from birdbuddy.postcards import CollectedPostcard
 
 
@@ -320,3 +322,178 @@ async def test_new_postcards_paginates_all_pages(
 
     assert {n.node_id for n in result} == {"p1", "p2"}
     assert graphql_mock.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_refresh_populates_user_and_feeders(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock, api_payloads: dict
+):
+    """refresh() parses the ME payload into the user and feeder cache."""
+    graphql_mock.side_effect = [{"data": {"me": api_payloads["me"]}}]
+    assert await bbclient.refresh() is True
+    assert bbclient.user is not None
+    fid = api_payloads["me"]["feeders"][0]["id"]
+    assert fid in bbclient.feeders
+    assert bbclient.feeders[fid].is_owner is True
+
+
+@pytest.mark.asyncio
+async def test_login_parses_auth_and_profile(
+    graphql_mock: AsyncMock, api_payloads: dict
+):
+    """A fresh client signs in, stores tokens, and saves the profile."""
+    bb = BirdBuddy("user@email", "passw0rd")  # no tokens -> login required
+    sign_in = {
+        "data": {
+            "authEmailSignIn": {
+                "__typename": "Auth",
+                "accessToken": "acc",
+                "refreshToken": "ref",
+                "me": api_payloads["me"],
+            }
+        }
+    }
+    graphql_mock.side_effect = [sign_in, {"data": {"me": api_payloads["me"]}}]
+    assert await bb.refresh() is True
+    assert bb._access_token == "acc"  # noqa: SLF001
+    assert bb.user is not None
+    assert len(bb.feeders) == 1
+    assert graphql_mock.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_refresh_access_token_exchanges_refresh_token(
+    graphql_mock: AsyncMock, api_payloads: dict
+):
+    """With only a refresh token, the client exchanges it before requesting."""
+    bb = BirdBuddy("user@email", "passw0rd", refresh_token="old-refresh")
+    refreshed = {
+        "data": {
+            "authRefreshToken": {
+                "accessToken": "new-acc",
+                "refreshToken": "new-ref",
+            }
+        }
+    }
+    graphql_mock.side_effect = [
+        refreshed,
+        {"data": {"me": api_payloads["me"]}},
+    ]
+    await bb.refresh()
+    assert bb._access_token == "new-acc"  # noqa: SLF001
+    assert bb._refresh_token == "new-ref"  # noqa: SLF001
+
+
+@pytest.mark.asyncio
+async def test_refresh_collections_keeps_only_birds(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock, api_payloads: dict
+):
+    """refresh_collections keeps CollectionBird and keys by collection id."""
+    graphql_mock.side_effect = [
+        {"data": {"me": {"collections": api_payloads["collections"]}}}
+    ]
+    result = await bbclient.refresh_collections()
+    # The fixture holds 4 CollectionBird + 1 CollectionMysteryVisitor.
+    assert len(result) == 4
+    assert all(c["__typename"] == "CollectionBird" for c in result.values())
+
+
+@pytest.mark.asyncio
+async def test_set_feeder_options_filters_unknown_keys(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock, api_payloads: dict
+):
+    """set_feeder_options sends only recognized keys and caches the result.
+
+    Response shape matches the SET_OPTIONS selection set (FeederForOwner).
+    """
+    feeder_data = api_payloads["me"]["feeders"][0]
+    fid = feeder_data["id"]
+    bbclient._feeders[fid] = Feeder(feeder_data)  # noqa: SLF001
+    updated = {"id": fid, "name": "Renamed", "__typename": "FeederForOwner"}
+    graphql_mock.side_effect = [{"data": {"feederUpdate": updated}}]
+    result = await bbclient.set_feeder_options(fid, name="Renamed", bogus="x")
+    assert result == updated
+    variables = graphql_mock.call_args_list[0].kwargs["variables"]
+    assert variables["feederId"] == fid
+    assert variables["feederUpdateInput"] == {"name": "Renamed"}
+    assert bbclient.feeders[fid]["name"] == "Renamed"
+
+
+@pytest.mark.asyncio
+async def test_share_medias(bbclient: BirdBuddy, graphql_mock: AsyncMock):
+    """share_medias posts the media ids and returns the success flag."""
+    graphql_mock.side_effect = [
+        {"data": {"mediaShareToggle": {"success": True}}}
+    ]
+    assert await bbclient.share_medias(["m1", "m2"], share=True) is True
+    variables = graphql_mock.call_args_list[0].kwargs["variables"]
+    assert variables["mediaShareToggleInput"] == {
+        "mediaIds": ["m1", "m2"],
+        "share": True,
+    }
+
+
+@pytest.mark.asyncio
+async def test_set_power_profile_refreshes_after_async_change(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock, api_payloads: dict
+):
+    """set_power_profile refreshes to read the applied profile.
+
+    Verified live: the mutation returns InProgressResult with the *old*
+    profile (the change applies asynchronously), so the client refreshes and
+    reads the new value from the updated feeder.
+    """
+    feeder_data = api_payloads["me"]["feeders"][0]
+    fid = feeder_data["id"]
+    bbclient._feeders[fid] = Feeder(feeder_data)  # noqa: SLF001
+    in_progress = {
+        "data": {
+            "feederUpdatePowerProfile": {
+                "__typename": "FeederUpdatePowerProfileInProgressResult",
+                # Stale value: the change has not applied yet.
+                "feeder": {"powerProfile": "STANDARD_MODE"},
+            }
+        }
+    }
+    me_after = copy.deepcopy(api_payloads["me"])
+    me_after["feeders"][0]["powerProfile"] = "POWER_SAVER_MODE"
+    graphql_mock.side_effect = [in_progress, {"data": {"me": me_after}}]
+
+    result = await bbclient.set_power_profile(fid, PowerProfile.POWER_SAVE)
+    assert result == {"powerProfile": "POWER_SAVER_MODE"}
+    sent = graphql_mock.call_args_list[0].kwargs["variables"]
+    assert sent["feederUpdatePowerProfileInput"] == {
+        "powerProfile": "POWER_SAVER_MODE"
+    }
+
+
+@pytest.mark.asyncio
+async def test_update_firmware_check_up_to_date(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock, api_payloads: dict
+):
+    """update_firmware_check parses an up-to-date firmware status.
+
+    Verified live: a feeder already on the latest firmware returns
+    SucceededResult with matching firmwareVersion/availableFirmwareVersion,
+    which is_complete, so the client refreshes its cached feeder.
+    """
+    feeder_data = api_payloads["me"]["feeders"][0]
+    fid = feeder_data["id"]
+    bbclient._feeders[fid] = Feeder(feeder_data)  # noqa: SLF001
+    graphql_mock.side_effect = [
+        {
+            "data": {
+                "feederFirmwareUpdateCheckProgress": {
+                    "__typename": "FeederFirmwareUpdateSucceededResult",
+                    "feeder": {
+                        "availableFirmwareVersion": "1.8.1",
+                        "firmwareVersion": "1.8.1",
+                    },
+                }
+            }
+        }
+    ]
+    status = await bbclient.update_firmware_check(fid)
+    assert status.is_complete is True
+    assert status.is_in_progress is False
+    assert status.feeder.version == "1.8.1"
