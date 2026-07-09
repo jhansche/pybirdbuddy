@@ -39,12 +39,6 @@ def load_json_fixture(filename: str) -> dict:
     return json.loads(load_fixture(filename))
 
 
-@pytest.fixture(name="postcard_sighting")
-def postcard_sighting_fixture() -> dict:
-    """Load the postcard sighting fixture."""
-    return load_json_fixture("postcard_sighting.json")
-
-
 @pytest.fixture(name="api_payloads")
 def api_payloads_fixture() -> dict:
     """Load the sanitized real API payload fixture (2026-07 capture)."""

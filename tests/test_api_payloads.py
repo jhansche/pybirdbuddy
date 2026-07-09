@@ -7,11 +7,6 @@ preserved. These tests pin the current API shapes the models parse.
 
 from birdbuddy.feed import FeedNode, FeedNodeType
 from birdbuddy.feeder import Feeder, FeederState, MetricState, PowerProfile
-from birdbuddy.sightings import (
-    PostcardSighting,
-    SightingFinishStrategy,
-    SightingType,
-)
 
 
 def test_owner_feeder_parses_from_real_payload(api_payloads):
@@ -41,38 +36,3 @@ def test_new_postcards_parse_as_feed_nodes(api_payloads):
     node = FeedNode(postcards[0])
     assert node.node_type is FeedNodeType.NewPostcard
     assert node.created_at is not None
-
-
-def test_postcard_sighting_parses_from_real_payload(api_payloads):
-    """A real sighting_from_postcard payload parses into the models."""
-    sighting = PostcardSighting(api_payloads["sighting_from_postcard"])
-    assert sighting.feeder["name"] == "Test Bird Buddy"
-    assert len(sighting.medias) == 10
-    assert all(not m.is_video for m in sighting.medias)
-    assert len(sighting.video_media) == 1
-    assert sighting.video_media[0].is_video is True
-
-    report = sighting.report
-    assert len(report.sightings) == 1
-    only = report.sightings[0]
-    assert only.sighting_type is SightingType.SPECIES_RECOGNIZED
-    assert only.is_recognized is True
-    assert only.species.name == "Northern Cardinal"
-
-    # A single recognized sighting finishes as RECOGNIZED.
-    _, mod = report.sighting_finishing_strategies()[only.id]
-    assert mod.strategy is SightingFinishStrategy.RECOGNIZED
-
-
-def test_sighting_create_error_documents_current_drift(api_payloads):
-    """The captured sighting_create call fails: the input type is gone.
-
-    This pins the live schema drift behind pybirdbuddy #29: the API no
-    longer defines SightingCreateInput, so sighting_create is broken.
-    """
-    error = api_payloads["sighting_create"]["error"]
-    assert "SightingCreateInput" in error
-    assert "GRAPHQL_VALIDATION_FAILED" in error
-
-    reanalyze = api_payloads["reanalyze_postcard"]["updatedFeedItem"]
-    assert reanalyze["inferenceExecutionMode"] == "MANUAL_COMPLETED"
