@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator, Callable
 from datetime import datetime
 from typing import Any
 
@@ -28,10 +29,28 @@ from birdbuddy.user import BirdBuddyUser
 _NO_VALUE = object()
 """Sentinel value to allow None to override a default value."""
 
+_MAX_PAGE_SIZE = 100
+"""The largest page size the API accepts; a larger ``first`` errors server
+side (HTTP 200 with a GraphQL ``INTERNAL_SERVER_ERROR``)."""
+
 
 def _redact(data: object, redacted: bool = True) -> object:
     """Return a redacted string if necessary."""
     return "**REDACTED**" if redacted else data
+
+
+def _require_page_size(page_size: int) -> None:
+    """Validate a pagination page size.
+
+    Args:
+        page_size: The requested per-page item count.
+
+    Raises:
+        ValueError: If ``page_size`` is not between 1 and the API's limit.
+    """
+    if not 1 <= page_size <= _MAX_PAGE_SIZE:
+        msg = f"page size must be between 1 and {_MAX_PAGE_SIZE}"
+        raise ValueError(msg)
 
 
 class BirdBuddy:
@@ -261,6 +280,59 @@ class BirdBuddy:
         if subscript:
             return result[subscript]
         return result
+
+    async def _iter_pages(
+        self,
+        query: str,
+        variables: dict[str, Any],
+        connection: Callable[[dict], dict],
+    ) -> AsyncIterator[dict]:
+        """Yield successive pages of a Relay connection, following the cursor.
+
+        Requests ``query`` repeatedly, advancing ``after`` by the previous
+        page's ``endCursor`` until ``hasNextPage`` is false. Terminates
+        defensively if the server reports another page but returns no usable
+        cursor (missing, null, or one already seen), rather than looping
+        forever on a stuck cursor.
+
+        Args:
+            query: The GraphQL query text; it must accept an ``after`` cursor
+                and select ``pageInfo { hasNextPage endCursor }``.
+            variables: Base variables sent with every page (e.g. ``first``);
+                ``after`` is injected per page.
+            connection: Extracts the connection object (the one carrying
+                ``edges`` and ``pageInfo``) from a response ``data`` dict.
+
+        Yields:
+            Each page's connection object, oldest cursor first.
+        """
+        after: str | None = None
+        seen: set[str] = set()
+        while True:
+            page_vars = dict(variables)
+            if after is not None:
+                # The API errors on an explicit ``after: null``; omit it for
+                # the first page and only send a real cursor.
+                page_vars["after"] = after
+            data = await self._make_request(query=query, variables=page_vars)
+            page = connection(data)
+            yield page
+
+            page_info = page.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+            cursor = page_info.get("endCursor")
+            if not cursor or cursor in seen:
+                # Defensive: the server claims another page but gave no new
+                # cursor to advance with. Stop instead of re-requesting.
+                LOGGER.debug(
+                    "Pagination stopped: hasNextPage but cursor did not "
+                    "advance (endCursor=%r)",
+                    cursor,
+                )
+                return
+            seen.add(cursor)
+            after = cursor
 
     @property
     def user(self) -> None | BirdBuddyUser:
@@ -806,27 +878,38 @@ class BirdBuddy:
                 del self._collections[collection.collection_id]
         return self._collections
 
-    async def collection(self, collection_id: str) -> dict[str, Media]:
-        """Return the media in the specified collection.
+    async def collection(
+        self, collection_id: str, page_size: int = 50
+    ) -> dict[str, Media]:
+        """Return all media in the specified collection.
+
+        Follows pagination so collections larger than one page are fully
+        retrieved (not truncated to the first page).
 
         Args:
             collection_id: The collection ``UUID``.
+            page_size: How many media to request per page. Must be 1-100; the
+                API returns an internal error for larger page sizes.
 
         Returns:
             A mapping of ``media_id`` to its ``Media``.
+
+        Raises:
+            ValueError: If ``page_size`` is not between 1 and 100.
         """
-        variables = {
-            "collectionId": collection_id,
-            # other inputs: first, orderBy, last, after, before
-        }
-        data = await self._make_request(
-            query=queries.me.COLLECTIONS_MEDIA, variables=variables
+        _require_page_size(page_size)
+        result: dict[str, Media] = {}
+        variables = {"collectionId": collection_id, "first": page_size}
+        pages = self._iter_pages(
+            query=queries.me.COLLECTIONS_MEDIA,
+            variables=variables,
+            connection=lambda data: data["collection"]["media"],
         )
-        # TODO: check [collection][media][pageInfo][hasNextPage]?
-        return {
-            (node := edge["node"]["media"])["id"]: Media(node)
-            for edge in data["collection"]["media"]["edges"]
-        }
+        async for media in pages:
+            for edge in media["edges"]:
+                node = edge["node"]["media"]
+                result[node["id"]] = Media(node)
+        return result
 
     async def latest_collections(
         self,
