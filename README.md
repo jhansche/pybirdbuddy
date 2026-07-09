@@ -121,6 +121,9 @@ sighting-report input types were dropped from the API. v0.1.0 follows suit:
 - **Firmware.** `update_firmware_start` raises
   `NoFirmwareUpdateAvailableError` when the feeder already runs the latest
   firmware, rather than surfacing the API's internal error.
+- **Removed `latest_collections`.** The method referenced a query that no
+  longer exists and raised `AttributeError` on every call; use
+  `refresh_collections` instead.
 
 ## Development
 

@@ -975,15 +975,6 @@ class BirdBuddy:
                 result[node["id"]] = Media(node)
         return result
 
-    async def latest_collections(
-        self,
-    ) -> dict[str, Collection]:
-        """Return the latest collections."""
-        # TODO(roger): queries.me has no LATEST_MEDIA, so this raises
-        # AttributeError at runtime.
-        query = queries.me.LATEST_MEDIA  # type: ignore[attr-defined]
-        return await self._make_request(query=query)
-
     @property
     def feeders(self) -> dict[str, Feeder]:
         """The Feeder devices associated with the account."""
