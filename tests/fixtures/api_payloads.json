@@ -1,0 +1,299 @@
+{
+  "me": {
+    "user": {
+      "avatarUrl": "https://example.invalid/asset",
+      "email": "owner@example.invalid",
+      "id": "be0be1d6-188b-5640-a53f-31328800425f",
+      "name": "Test Bird Buddy",
+      "signInType": "EMAIL",
+      "__typename": "User"
+    },
+    "settings": {
+      "notificationDisabled": null,
+      "__typename": "Settings"
+    },
+    "feeders": [
+      {
+        "battery": {
+          "charging": false,
+          "percentage": 94,
+          "state": "HIGH",
+          "__typename": "FeederMetricBattery"
+        },
+        "food": {
+          "state": "LOW",
+          "__typename": "FeederMetricFood"
+        },
+        "id": "33149978-ad92-5752-b6e5-1580b262ccf9",
+        "name": "Test Bird Buddy",
+        "signal": {
+          "state": "MEDIUM",
+          "value": -64,
+          "__typename": "FeederMetricSignal"
+        },
+        "state": "READY_TO_STREAM",
+        "temperature": {
+          "value": 0,
+          "__typename": "FeederMetricTemperature"
+        },
+        "__typename": "FeederForOwner",
+        "availableFirmwareVersion": "1.8.1",
+        "firmwareVersion": "1.8.1",
+        "serialNumber": "SN-TEST-0001",
+        "invitationsAvailable": 9,
+        "offGrid": false,
+        "audioEnabled": true,
+        "powerProfile": "STANDARD_MODE",
+        "presenceUpdatedAt": "2026-07-09T00:11:15.555Z",
+        "members": [],
+        "location": {
+          "city": "Testville",
+          "country": "US",
+          "__typename": "Location"
+        }
+      }
+    ],
+    "__typename": "Me"
+  },
+  "collections": [
+    {
+      "id": "679ee54c-36bd-569b-9e71-82dad0ffe4fa",
+      "coverCollectionMedia": {
+        "id": "ff85750b-8577-5522-a961-86ab678e2574",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "ff85750b-8577-5522-a961-86ab678e2574",
+          "createdAt": "2025-02-23T18:35:36.055Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 1,
+      "visitLastTime": "2025-02-23T19:18:45.160Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "de09fd32-9b8c-5949-9a45-049d8957049c",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "Black-Capped Chickadee",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/6bc27d4e-9f1a-41dc-8316-2086a9f79022_Black-capped%20Chickadee%20%281%29.svg"
+      }
+    },
+    {
+      "id": "de48ab88-6cfb-5a21-86ef-918908fa3baa",
+      "coverCollectionMedia": {
+        "id": "a28237a9-5820-5e0e-aa68-66304f40e548",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "a28237a9-5820-5e0e-aa68-66304f40e548",
+          "createdAt": "2025-02-22T19:21:35.272Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 6,
+      "visitLastTime": "2025-02-25T20:21:46.240Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "9b520e99-3710-5a5d-8c1f-0f6a432c13d2",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "Pine Siskin",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/a34bcd83-2d18-4d2a-8b97-2f591ff79985_Pine%20Siskin.svg"
+      }
+    },
+    {
+      "id": "1503d851-9f03-521e-95a8-0e26671e829d",
+      "coverCollectionMedia": {
+        "id": "28575835-7b65-5086-8a25-f47602a1fe54",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "28575835-7b65-5086-8a25-f47602a1fe54",
+          "createdAt": "2025-02-22T16:49:42.906Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 10,
+      "visitLastTime": "2025-08-10T06:38:48.795Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "fe0cee0d-05df-593c-8a34-0e2cddcfc50d",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "House Finch",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/d8c20684-d366-4933-8ceb-4955ec9459a1_House%20Finch.svg"
+      }
+    },
+    {
+      "id": "6b91784e-fa49-5178-8bcc-8fa9f6c92885",
+      "coverCollectionMedia": {
+        "id": "63683b02-dcb6-5e89-867c-e874d1e3806a",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "63683b02-dcb6-5e89-867c-e874d1e3806a",
+          "createdAt": "2025-02-26T21:20:17.587Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 3,
+      "visitLastTime": "2025-02-26T21:47:12.588Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionBird",
+      "species": {
+        "id": "8ec96be4-a8a2-5a3d-9003-be179dc9353a",
+        "iconUrl": "https://example.invalid/asset",
+        "name": "Red-Breasted Nuthatch",
+        "__typename": "SpeciesBird",
+        "isUnofficialName": false,
+        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/bd6ef12e-955d-488c-af4e-c5462d6979aa_Red-Breasted%20Nuthatch.svg"
+      }
+    },
+    {
+      "id": "80d6e8fb-6dfb-56e0-ab08-a2723c5850ed",
+      "coverCollectionMedia": {
+        "id": "7f839866-d341-5e17-a2ef-846c69e159bb",
+        "feederName": "Test Bird Buddy",
+        "liked": false,
+        "likes": 0,
+        "isShared": false,
+        "locationCity": "Testville",
+        "locationCountry": "US",
+        "owning": true,
+        "ownerName": "Tester",
+        "origin": "POSTCARD",
+        "media": {
+          "id": "7f839866-d341-5e17-a2ef-846c69e159bb",
+          "createdAt": "2025-02-24T21:59:09.843Z",
+          "thumbnailUrl": "https://example.invalid/asset",
+          "contentUrl": "https://example.invalid/asset",
+          "__typename": "MediaImage"
+        },
+        "__typename": "CollectionMedia"
+      },
+      "markedAsNew": false,
+      "visitsAllTime": 5,
+      "visitLastTime": "2025-08-10T06:38:48.795Z",
+      "previewMedia": [
+        {
+          "media": {
+            "thumbnailUrl": "https://example.invalid/asset",
+            "__typename": "MediaImage"
+          },
+          "__typename": "CollectionMedia"
+        }
+      ],
+      "__typename": "CollectionMysteryVisitor"
+    }
+  ],
+  "new_postcards": [
+    {
+      "id": "91c2524c-233f-516f-8a4c-58e077085c62",
+      "createdAt": "2026-07-09T01:10:56.363Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "244eb9b5-9d50-531b-83a2-a7e1a2bb875d",
+      "createdAt": "2026-07-08T17:48:43.424Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "2b549742-86c5-5190-9211-7caeaad6a680",
+      "createdAt": "2026-07-08T13:31:08.961Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "20bfaced-bc61-5671-a6f5-e45b2049dbca",
+      "createdAt": "2026-07-08T12:49:05.221Z",
+      "__typename": "FeedItemNewPostcard"
+    },
+    {
+      "id": "951a8f75-2276-5fe4-82d2-573eda498ab2",
+      "createdAt": "2026-07-07T23:40:41.241Z",
+      "__typename": "FeedItemNewPostcard"
+    }
+  ]
+}

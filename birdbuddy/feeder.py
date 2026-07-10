@@ -1,9 +1,12 @@
 """Bird Buddy feeder models."""
 
+from __future__ import annotations
+
 from collections import UserDict
 from enum import Enum
+from typing import Any
 
-from . import LOGGER
+from birdbuddy import LOGGER
 
 
 class MetricState(Enum):
@@ -16,7 +19,7 @@ class MetricState(Enum):
     UNKNOWN = "UNKNOWN"
 
     @classmethod
-    def _missing_(cls, value: str):
+    def _missing_(cls, value: object) -> MetricState:
         LOGGER.warning("Unexpected metric state: %s", value)
         return MetricState.UNKNOWN
 
@@ -25,13 +28,14 @@ class PowerProfile(Enum):
     """Feeder power profiles."""
 
     FRENZY = "FRENZY_MODE"
+    ULTRA_FRENZY = "ULTRA_FRENZY_MODE"
     POWER_SAVE = "POWER_SAVER_MODE"
     STANDARD = "STANDARD_MODE"
 
     UNKNOWN = "UNKNOWN"
 
     @classmethod
-    def _missing_(cls, value: str):
+    def _missing_(cls, value: object) -> PowerProfile:
         LOGGER.warning("Unexpected power profile: %s", value)
         return PowerProfile.UNKNOWN
 
@@ -55,12 +59,12 @@ class FeederState(Enum):
     UNKNOWN = "UNKNOWN"
 
     @classmethod
-    def _missing_(cls, value: str):
+    def _missing_(cls, value: object) -> FeederState:
         LOGGER.warning("Unexpected feeder.state: %s", value)
         return FeederState.UNKNOWN
 
 
-class Signal(UserDict[str, any]):
+class Signal(UserDict[str, Any]):
     """Wifi signal metrics."""
 
     @property
@@ -74,7 +78,7 @@ class Signal(UserDict[str, any]):
         return MetricState(self.get("state", "UNKNOWN"))
 
 
-class Battery(UserDict[str, any]):
+class Battery(UserDict[str, Any]):
     """Battery info."""
 
     @property
@@ -93,50 +97,52 @@ class Battery(UserDict[str, any]):
         return MetricState(self.get("state", "UNKNOWN"))
 
 
-class Feeder(UserDict[str, any]):
+class Feeder(UserDict[str, Any]):
     """Represents one Bird Buddy device."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the Feeder."""
-        return f"<Feeder: {self.name}, {self.state}, " f"{self.battery.percentage}%>"
+        return (
+            f"<Feeder: {self.name}, {self.state}, {self.battery.percentage}%>"
+        )
 
     @property
-    def id(self):
+    def id(self) -> str:
         """UUID."""
         return self["id"]
 
     @property
-    def serial(self):
+    def serial(self) -> str:
         """Feeder SN."""
         return self["serialNumber"]
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Feeder name, as set in the app."""
         return self.get("name", "Bird Buddy")
 
     @property
-    def is_owner(self):
+    def is_owner(self) -> bool:
         """Whether the logged in user is the owner of this feeder."""
         return self.get("__typename") == "FeederForOwner"
 
     @property
-    def is_pending(self):
-        """``True`` if waiting for the owner account to approve access to the Feeder."""
+    def is_pending(self) -> bool:
+        """``True`` if waiting for the owner account to approve access."""
         return self.get("__typename") == "FeederForMemberPending"
 
     @property
-    def is_public(self):
+    def is_public(self) -> bool:
         """Whether this is a public feeder."""
         return self.get("__typename") == "FeederForPublic"
 
     @property
-    def version(self) -> str:
+    def version(self) -> str | None:
         """Firmware version (owner only)."""
         return self.get("firmwareVersion")
 
     @property
-    def version_update_available(self) -> str:
+    def version_update_available(self) -> str | None:
         """Firmware update version (owner only)."""
         return self.get("availableFirmwareVersion", None)
 
@@ -146,17 +152,17 @@ class Feeder(UserDict[str, any]):
         return FeederState(self.get("state", "UNKNOWN"))
 
     @property
-    def is_off_grid(self) -> bool:
+    def is_off_grid(self) -> bool | None:
         """Whether `state` is `FeederState.OFF_GRID`."""
         return self.get("offGrid", None)
 
     @property
-    def is_audio_enabled(self) -> bool:
+    def is_audio_enabled(self) -> bool | None:
         """Whether videos will contain audio."""
         return self.get("audioEnabled", None)
 
     @property
-    def owner(self) -> str:
+    def owner(self) -> str | None:
         """The username who first paired the Feeder."""
         return self.get("ownerName")
 
@@ -172,19 +178,32 @@ class Feeder(UserDict[str, any]):
 
     @property
     def location(self) -> tuple[str | None, str | None]:
-        """Configured location of the Feeder."""
+        """Configured location of the Feeder as ``(city, country)``.
+
+        Owner feeders nest it as ``location{city,country}``; member and
+        public feeders expose flat ``locationCity``/``locationCountry``.
+        """
+        if nested := self.get("location"):
+            return (nested.get("city"), nested.get("country"))
         return (self.get("locationCity"), self.get("locationCountry"))
 
     @property
     def frequency(self) -> MetricState:
         """Configured frequency of the Feeder."""
-        LOGGER.warning("Feeder.frequency is deprecated. Use power_profile instead")
+        LOGGER.warning(
+            "Feeder.frequency is deprecated. Use power_profile instead"
+        )
         return MetricState(self.get("frequency", "UNKNOWN"))
 
     @property
     def power_profile(self) -> PowerProfile:
-        """Configured power profile of the Feeder."""
-        return PowerProfile(self.get("powerProfile", "STANDARD"))
+        """Configured power profile of the Feeder.
+
+        Returns ``UNKNOWN`` when the feeder does not report a power profile
+        (e.g. non-owner feeders); only owner responses carry the field.
+        """
+        value = self.get("powerProfile")
+        return PowerProfile(value) if value else PowerProfile.UNKNOWN
 
     @property
     # @incubating
@@ -207,7 +226,7 @@ class Feeder(UserDict[str, any]):
         return self.get("temperature", {}).get("value", 0)
 
 
-class FeederUpdateStatus(UserDict[str, any]):
+class FeederUpdateStatus(UserDict[str, Any]):
     """Feeder update status."""
 
     @property
@@ -234,11 +253,11 @@ class FeederUpdateStatus(UserDict[str, any]):
         return self["__typename"] == "FeederFirmwareUpdateFailedResult"
 
     @property
-    def failure_reason(self) -> str:
+    def failure_reason(self) -> str | None:
         """Failure reason, or `None` if no failure."""
         return self.get("failedReason", None)
 
     @property
-    def progress(self) -> int:
+    def progress(self) -> int | None:
         """Current firmware installation progress."""
         return self.get("progress", None)

@@ -1,4 +1,4 @@
-"""Feeder queries"""
+"""Feeder queries."""
 
 TOGGLE_OFF_GRID = """
 mutation feederToggleOffGrid($feederId: ID!, $feederToggleOffGridInput: FeederToggleOffGridInput!) {

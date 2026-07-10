@@ -1,4 +1,4 @@
-"""Queries related to the logged in user"""
+"""Queries related to the logged in user."""
 
 ME = """
 query me {
@@ -137,6 +137,11 @@ fragment FeedConnectionFields on FeedConnection {
   __typename
 }
 fragment AnyFeedItemFields on AnyFeedItem {
+  ... on FeedItem {
+    id
+    createdAt
+    __typename
+  }
   ... on FeedItemFeederInvitationConfirmed {
     ...FeederInvitationConfirmedFields
     __typename
