@@ -8,6 +8,7 @@ API shapes the models parse.
 
 from birdbuddy.feed import FeedNode, FeedNodeType
 from birdbuddy.feeder import Feeder, FeederState, MetricState, PowerProfile
+from birdbuddy.postcards import PostcardAnalysis
 
 
 def test_owner_feeder_parses_from_real_payload(api_payloads):
@@ -32,3 +33,25 @@ def test_new_postcards_parse_as_feed_nodes(api_payloads):
     node = FeedNode(postcards[0])
     assert node.node_type is FeedNodeType.NewPostcard
     assert node.created_at is not None
+
+
+def test_identify_postcard_parses_analysis(collect_flow):
+    """An identified postcard yields species + media WITHOUT collecting.
+
+    The ``reanalyze`` block is captured with the library's own
+    ``POSTCARD_REANALYZE`` query, so this pins the exact shape
+    ``identify_postcard`` returns.
+    """
+    entry = next(iter(collect_flow["reanalyze"].values()))
+    item = entry["inferenceExternalPostcardReanalyze"]["updatedFeedItem"]
+    analysis = PostcardAnalysis(item)
+    # Recognized species come from the sighting-report preview (no collect).
+    assert analysis.species
+    assert all(s.name for s in analysis.species)
+    # Media resolves a content URL (a sanitized placeholder in the fixture).
+    assert analysis.medias
+    assert analysis.medias[0].content_url
+    # Feeder attribution + inference metadata are present.
+    assert analysis.feeder is not None
+    assert analysis.feeder.id
+    assert analysis.inference_execution_mode == "MANUAL_COMPLETED"

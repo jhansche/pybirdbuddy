@@ -37,52 +37,11 @@ _SANITIZED = _RAW.with_name("birdbuddy_payload.sanitized.json")
 # How many new postcards to reanalyze (captures both inference states).
 _REANALYZE_LIMIT = 3
 
-# Rich reanalyze: capture a postcard's full analyzed state (inference mode,
-# confidence levels, assigned species, preview) -- fields verified against the
-# 2026-07 schema.
-_REANALYZE = """
-mutation reanalyze($feedItemId: ID!) {
-  inferenceExternalPostcardReanalyze(feedItemId: $feedItemId) {
-    updatedFeedItem {
-      __typename
-      ... on FeedItemNewPostcard {
-        id
-        inferenceExecutionMode
-        inferenceType
-        inferenceConfidenceLevel
-        reanalyzeAvailability
-        mediaSpeciesNameIdentificationConfidenceLevel
-        mediaSpeciesNameAssignmentAvailability
-        mediaSpeciesStateDisplay { state }
-        medias { __typename id createdAt }
-        mediaSpeciesAssignedName { id name markedAsNew species { id name } }
-        sightingReportPreview { sightings { __typename } }
-      }
-    }
-  }
-}
-"""
-
-# Destructive: collect the postcard into the account. Only sent when opted in.
-_COLLECT = """
-mutation postcardCollect(
-  $feedItemId: ID!, $postcardCollectInput: PostcardCollectInput
-) {
-  postcardCollect(feedItemId: $feedItemId, input: $postcardCollectInput) {
-    collectedPostcard {
-      __typename
-      id
-      species { id name }
-      hasMysteryVisitor
-      hasNewSpecies
-      inferenceExecutionMode
-      mediaSpeciesAssignedName { id name species { id name } }
-      medias { __typename id }
-    }
-    postcardCollectedDetails { isFirstCollectedPostcard }
-  }
-}
-"""
+# Capture via the LIBRARY's own queries (never hand-copied) so the fixtures
+# cannot drift from what the client actually sends -- that drift is what once
+# hid a malformed collect query and a metadata-only reanalyze from the tests.
+_REANALYZE = queries.birds.POSTCARD_REANALYZE
+_COLLECT = queries.birds.POSTCARD_COLLECT
 
 # --- Sanitizer ------------------------------------------------------------
 

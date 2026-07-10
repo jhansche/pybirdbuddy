@@ -153,210 +153,215 @@
     }
   ],
   "reanalyze": {
-    "c23dcde1-047e-537e-ae90-a2dec2f4b7cb": {
+    "12c5ca14-3120-5c08-9113-ae79a1ef48d5": {
       "inferenceExternalPostcardReanalyze": {
         "updatedFeedItem": {
           "__typename": "FeedItemNewPostcard",
-          "id": "c23dcde1-047e-537e-ae90-a2dec2f4b7cb",
+          "id": "12c5ca14-3120-5c08-9113-ae79a1ef48d5",
+          "createdAt": "2026-07-09T19:42:32.473Z",
+          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
           "inferenceExecutionMode": "MANUAL_COMPLETED",
           "inferenceType": "ADVANCED",
-          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
           "reanalyzeAvailability": "ALREADY_REANALYZED",
-          "mediaSpeciesNameIdentificationConfidenceLevel": null,
-          "mediaSpeciesNameAssignmentAvailability": "UNAVAILABLE",
-          "mediaSpeciesStateDisplay": null,
+          "feeder": {
+            "__typename": "FeederForOwner",
+            "id": "33149978-ad92-5752-b6e5-1580b262ccf9",
+            "name": "Test Bird Buddy"
+          },
           "medias": [
             {
               "__typename": "MediaImage",
-              "id": "699d6339-addc-55ca-8437-f6b5d547c435",
-              "createdAt": "2026-07-08T17:47:35.000Z"
+              "id": "20d40dce-3a42-595d-8459-447f9d3a42aa",
+              "createdAt": "2026-07-09T19:41:20.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "87ad827c-a3fd-5d0f-9be0-e8d686670f54",
-              "createdAt": "2026-07-08T17:47:56.000Z"
+              "id": "2997fcec-27fd-5164-9603-da0849d008b8",
+              "createdAt": "2026-07-09T19:41:42.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "77156c9d-88ab-5b9c-bf32-48be82efddb7",
-              "createdAt": "2026-07-08T17:47:47.000Z"
+              "id": "27e02700-2061-5dd4-9501-a4f66942b629",
+              "createdAt": "2026-07-09T19:41:56.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "c40f3e5f-8e80-5d40-999c-081dfff0bbc1",
-              "createdAt": "2026-07-08T17:47:47.000Z"
+              "id": "8c62f06e-89af-5c94-8fbe-c7ac9c005c07",
+              "createdAt": "2026-07-09T19:41:58.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
+            },
+            {
+              "__typename": "MediaImage",
+              "id": "359f27e7-2683-5ec4-a5f8-a7ce5d733c4d",
+              "createdAt": "2026-07-09T19:42:17.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaVideo",
-              "id": "5d554853-9dd2-5845-ba09-38a4b821570b",
-              "createdAt": "2026-07-08T17:47:28.000Z"
+              "id": "40dc9347-6b1b-539f-b3ef-30d92172d903",
+              "createdAt": "2026-07-09T19:41:21.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             }
           ],
-          "mediaSpeciesAssignedName": null,
           "sightingReportPreview": {
             "sightings": [
               {
-                "__typename": "SightingRecognizedBird"
+                "__typename": "SightingRecognizedBird",
+                "species": {
+                  "__typename": "SpeciesBird",
+                  "id": "3cfcfa55-3081-586c-a9f7-8e885cbf2e19",
+                  "name": "California Scrub-Jay"
+                }
               }
             ]
           }
         }
       }
     },
-    "da23779d-35a8-5cf8-81b3-7f3b85add564": {
+    "55d1d0a1-ccf0-5807-95bb-66c13d589c9b": {
       "inferenceExternalPostcardReanalyze": {
         "updatedFeedItem": {
           "__typename": "FeedItemNewPostcard",
-          "id": "da23779d-35a8-5cf8-81b3-7f3b85add564",
+          "id": "55d1d0a1-ccf0-5807-95bb-66c13d589c9b",
+          "createdAt": "2026-07-09T17:34:52.683Z",
+          "inferenceConfidenceLevel": "HIGH_CONFIDENCE",
           "inferenceExecutionMode": "MANUAL_COMPLETED",
           "inferenceType": "ADVANCED",
-          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
           "reanalyzeAvailability": "ALREADY_REANALYZED",
-          "mediaSpeciesNameIdentificationConfidenceLevel": null,
-          "mediaSpeciesNameAssignmentAvailability": "AVAILABLE",
-          "mediaSpeciesStateDisplay": null,
+          "feeder": {
+            "__typename": "FeederForOwner",
+            "id": "33149978-ad92-5752-b6e5-1580b262ccf9",
+            "name": "Test Bird Buddy"
+          },
           "medias": [
             {
               "__typename": "MediaImage",
-              "id": "a09d7e39-1cfb-5501-9d41-bd07fec1d0b7",
-              "createdAt": "2026-07-08T14:07:51.000Z"
+              "id": "6986a83f-cf1c-5dcd-8a1a-842ec2272956",
+              "createdAt": "2026-07-09T17:33:43.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "263c9f07-4627-5fb4-9476-3d7f56fbe064",
-              "createdAt": "2026-07-08T14:07:55.000Z"
+              "id": "2a1ccf41-57fa-51cd-8725-2d5ea9dd4ce7",
+              "createdAt": "2026-07-09T17:33:57.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "f2b8b8dc-1f0f-5f7e-9100-34f4e574c5f8",
-              "createdAt": "2026-07-08T14:08:02.000Z"
+              "id": "d0c45ac1-3427-59bb-8ed7-64632673eea6",
+              "createdAt": "2026-07-09T17:34:02.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "4bf6500c-6d9c-5c37-9629-71d4e97de29c",
-              "createdAt": "2026-07-08T14:08:12.000Z"
+              "id": "6e925a3e-0fbb-5149-aac0-6d55a6eb4ce8",
+              "createdAt": "2026-07-09T17:34:00.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "f6fa31fb-2825-5894-9cd2-d4ace6589f69",
-              "createdAt": "2026-07-08T14:08:10.000Z"
+              "id": "ec94e60c-07ad-5b22-a0b9-b0d6f0978b51",
+              "createdAt": "2026-07-09T17:33:59.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "c274f83b-dff7-583a-9c0a-dcaa8d02bdf9",
-              "createdAt": "2026-07-08T14:08:09.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "94453a92-9143-5ead-b237-61d48102b751",
-              "createdAt": "2026-07-08T14:08:08.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "a4676233-9ae7-5dcc-a316-9b346445be6b",
-              "createdAt": "2026-07-08T14:08:06.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "e658c1d7-2b12-571d-b020-779637c11088",
-              "createdAt": "2026-07-08T14:08:05.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "6dac1a47-d5ad-587e-b4a7-b1af8a6f2bcc",
-              "createdAt": "2026-07-08T14:08:04.000Z"
+              "id": "c7696d8c-ff42-54dc-bb77-c7bec3ab2cad",
+              "createdAt": "2026-07-09T17:33:57.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaVideo",
-              "id": "e6cc06aa-038c-5f12-895a-aea20f26eca9",
-              "createdAt": "2026-07-08T14:07:49.000Z"
+              "id": "cd84f188-7fb4-59e1-b8a7-c25105ffea26",
+              "createdAt": "2026-07-09T17:33:45.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             }
           ],
-          "mediaSpeciesAssignedName": null,
           "sightingReportPreview": {
             "sightings": [
               {
-                "__typename": "SightingRecognizedBird"
+                "__typename": "SightingRecognizedBird",
+                "species": {
+                  "__typename": "SpeciesBird",
+                  "id": "3cfcfa55-3081-586c-a9f7-8e885cbf2e19",
+                  "name": "California Scrub-Jay"
+                }
               }
             ]
           }
         }
       }
     },
-    "80d944af-ec79-5c67-96fd-57053e31c5ee": {
+    "82f9785d-01c4-5da0-8c66-a4baf468631a": {
       "inferenceExternalPostcardReanalyze": {
         "updatedFeedItem": {
           "__typename": "FeedItemNewPostcard",
-          "id": "80d944af-ec79-5c67-96fd-57053e31c5ee",
+          "id": "82f9785d-01c4-5da0-8c66-a4baf468631a",
+          "createdAt": "2026-07-09T13:49:13.992Z",
+          "inferenceConfidenceLevel": "HIGH_CONFIDENCE",
           "inferenceExecutionMode": "MANUAL_COMPLETED",
           "inferenceType": "ADVANCED",
-          "inferenceConfidenceLevel": "LOW_CONFIDENCE",
           "reanalyzeAvailability": "ALREADY_REANALYZED",
-          "mediaSpeciesNameIdentificationConfidenceLevel": null,
-          "mediaSpeciesNameAssignmentAvailability": "AVAILABLE",
-          "mediaSpeciesStateDisplay": null,
+          "feeder": {
+            "__typename": "FeederForOwner",
+            "id": "33149978-ad92-5752-b6e5-1580b262ccf9",
+            "name": "Test Bird Buddy"
+          },
           "medias": [
             {
               "__typename": "MediaImage",
-              "id": "878d2a67-a60b-5f4f-a403-373fc325b3b5",
-              "createdAt": "2026-07-08T13:30:14.000Z"
+              "id": "cae0d17b-5e83-5ed5-83fc-d87332ad0c71",
+              "createdAt": "2026-07-09T13:48:05.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "d6f037f4-e65d-5329-94f3-f92adea1213f",
-              "createdAt": "2026-07-08T13:30:26.000Z"
+              "id": "85179131-2579-5163-b649-b0f552661e9b",
+              "createdAt": "2026-07-09T13:48:27.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaImage",
-              "id": "e90f531c-5e40-505d-925c-f56eca3a96f4",
-              "createdAt": "2026-07-08T13:30:34.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "1344adf2-3d0b-547c-acf8-adfb6cb97711",
-              "createdAt": "2026-07-08T13:30:32.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "750a80f0-a662-5e15-8455-99e3ae9e9016",
-              "createdAt": "2026-07-08T13:30:31.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "b7797079-10b4-5060-a41d-1449232e0072",
-              "createdAt": "2026-07-08T13:30:30.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "584c8219-cd8f-5b42-817b-df895965481a",
-              "createdAt": "2026-07-08T13:30:29.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "eb417017-4421-5cff-95f6-3dcd4de7a9f0",
-              "createdAt": "2026-07-08T13:30:28.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "ac03cea2-7ab9-5a63-a492-79e54de2ff2b",
-              "createdAt": "2026-07-08T13:30:25.000Z"
-            },
-            {
-              "__typename": "MediaImage",
-              "id": "27e92019-1877-5305-b18f-b4b67cc0887d",
-              "createdAt": "2026-07-08T13:30:24.000Z"
+              "id": "30c6a128-5b54-5cf6-8547-cfb00e0ed71b",
+              "createdAt": "2026-07-09T13:48:31.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             },
             {
               "__typename": "MediaVideo",
-              "id": "903b3388-1284-5b72-a830-a48bf8f336f0",
-              "createdAt": "2026-07-08T13:30:13.000Z"
+              "id": "54b32274-a152-52e7-9a52-667cdf24037c",
+              "createdAt": "2026-07-09T13:48:07.000Z",
+              "thumbnailUrl": "https://example.invalid/asset",
+              "contentUrl": "https://example.invalid/asset"
             }
           ],
-          "mediaSpeciesAssignedName": null,
           "sightingReportPreview": {
             "sightings": [
               {
-                "__typename": "SightingRecognizedBird"
+                "__typename": "SightingRecognizedBird",
+                "species": {
+                  "__typename": "SpeciesBird",
+                  "id": "1d945be4-4a58-555a-bd44-03c1da3d1a34",
+                  "name": "Black-Headed Grosbeak"
+                }
               }
             ]
           }

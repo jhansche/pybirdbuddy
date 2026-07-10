@@ -73,13 +73,17 @@ async def main():
 The Bird Buddy app moved entirely to the `postcardCollect` flow, and the old
 sighting-report input types were dropped from the API. v0.1.0 follows suit:
 
-- **Postcard flow replaced.** `sighting_from_postcard`, `finish_postcard`,
-  `sighting_choose_species`, and `sighting_choose_mystery` are gone. Collect a
-  postcard with `collect_postcard(postcard, share=False)`, which reanalyzes it
-  (running inference if needed) and returns a `CollectedPostcard`. The
-  `birdbuddy.sightings` module and its models (`PostcardSighting`,
-  `SightingReport`, `Sighting`, and the best-guess/anomaly helpers) were
-  removed; the backend now reports species and confidence directly.
+- **Postcard flow replaced.** The report-token sighting flow is gone
+  (`sighting_from_postcard`, `finish_postcard`, `sighting_choose_species`,
+  `sighting_choose_mystery`), along with the `birdbuddy.sightings` module and
+  its models (`PostcardSighting`, `SightingReport`, `Sighting`, and the
+  best-guess/anomaly helpers). Two methods replace it:
+  - `identify_postcard(postcard)` runs the AI identification ("Identify this
+    visitor") and returns a `PostcardAnalysis` — the recognized species and
+    media **without collecting** (the read/preview the old
+    `sighting_from_postcard` provided).
+  - `collect_postcard(postcard, share=False)` collects the postcard into your
+    account and returns a `CollectedPostcard`.
 - **Dead methods removed.** `sighting_create` and
   `sighting_create_check_progress` are gone — their input types no longer
   exist upstream.

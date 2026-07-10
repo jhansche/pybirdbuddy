@@ -8,14 +8,12 @@ import pytest
 from birdbuddy.client import BirdBuddy
 from birdbuddy.exceptions import NoFirmwareUpdateAvailableError
 from birdbuddy.feeder import Feeder, PowerProfile
-from birdbuddy.postcards import CollectedPostcard
+from birdbuddy.postcards import CollectedPostcard, PostcardAnalysis
 
 
 @pytest.mark.asyncio
-async def test_reanalyze_postcard(
-    bbclient: BirdBuddy, graphql_mock: AsyncMock
-):
-    """reanalyze_postcard returns the updated feed item payload."""
+async def test_identify_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
+    """identify_postcard parses the feed item into a PostcardAnalysis."""
     graphql_mock.side_effect = [
         {
             "data": {
@@ -24,15 +22,28 @@ async def test_reanalyze_postcard(
                         "__typename": "FeedItemNewPostcard",
                         "id": "postcard-id-1",
                         "inferenceExecutionMode": "MANUAL_COMPLETED",
+                        "sightingReportPreview": {
+                            "sightings": [
+                                {
+                                    "__typename": "SightingRecognizedBird",
+                                    "species": {
+                                        "id": "s1",
+                                        "name": "American Robin",
+                                    },
+                                }
+                            ]
+                        },
                     }
                 }
             }
         }
     ]
-    result = await bbclient.reanalyze_postcard("postcard-id-1")
+    result = await bbclient.identify_postcard("postcard-id-1")
 
-    assert isinstance(result, dict)
-    assert result["updatedFeedItem"]["id"] == "postcard-id-1"
+    assert isinstance(result, PostcardAnalysis)
+    assert result.id == "postcard-id-1"
+    assert result.inference_execution_mode == "MANUAL_COMPLETED"
+    assert [s.name for s in result.species] == ["American Robin"]
 
     graphql_mock.assert_called_once_with(
         query=ANY,
@@ -42,10 +53,10 @@ async def test_reanalyze_postcard(
 
 
 @pytest.mark.asyncio
-async def test_reanalyze_postcard_rejects_bad_type(bbclient: BirdBuddy):
+async def test_identify_postcard_rejects_bad_type(bbclient: BirdBuddy):
     """A non-str/FeedNode postcard raises TypeError before any request."""
     with pytest.raises(TypeError):
-        await bbclient.reanalyze_postcard(123)  # type: ignore[arg-type]
+        await bbclient.identify_postcard(123)  # type: ignore[arg-type]
 
 
 _PID = "postcard-1"
