@@ -15,6 +15,9 @@ def test_is_media_expired():
     assert is_media_expired("") is None
     assert is_media_expired(_signed_url(int(time.time()) - 1000)) is True
     assert is_media_expired(_signed_url(int(time.time()) + 1000)) is False
+    # A non-empty URL without an Expires param returns None (not KeyError).
+    assert is_media_expired("https://cdn.example/i.jpg") is None
+    assert is_media_expired("https://cdn.example/i.jpg?Signature=abc") is None
 
 
 def test_media_image_properties():
