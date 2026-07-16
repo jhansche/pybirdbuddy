@@ -1,38 +1,31 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
+# Install the package with its dev extra and run the test suite.
 name: Python package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-  schedule:
-    - cron: "30 16 * * MON"
+    branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  test:
+    name: pytest (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 4
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-
+          cache: pip
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.test.txt
-
+        run: pip install ".[dev]"
       - name: Run pytest
-        run: |
-          pytest
+        run: pytest

@@ -1,0 +1,29 @@
+version: 2
+
+updates:
+  # Python dependencies (runtime + the dev extra pinned in pyproject.toml).
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "16:00"
+    groups:
+      pip:
+        patterns: ["*"]
+    # Hold major bumps for manual review: a major dependency change can
+    # break downstream consumers of this library.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "16:00"
+    groups:
+      github-actions:
+        patterns: ["*"]
