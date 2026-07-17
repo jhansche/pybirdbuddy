@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pybirdbuddy"
+version = "0.0.21"
+description = "A library to query data about a Bird Buddy smart bird feeder"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT-0"
+license-files = ["LICENSE"]
+authors = [{ name = "jhansche", email = "madcoder@gmail.com" }]
+dependencies = [
+    "python-graphql-client",
+    "langcodes",
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage==7.0.5",
+    "pytest==7.2.1",
+    "pytest-cov==3.0.0",
+    "pytest-aiohttp==1.0.4",
+    "pytest-asyncio==0.20.2",
+    "pyyaml==6.0.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/jhansche/pybirdbuddy"
+
+[tool.setuptools.packages.find]
+include = ["birdbuddy*"]
