@@ -1,5 +1,29 @@
 # pybirdbuddy
 
+[![Build Status][build-status-shield]][build-status]
+![Maintenance][maintenance-shield]
+[![GitHub Release][releases-shield]][releases]
+[![PyPI Version][pypi-shield]][pypi]
+[![License][license-shield]](LICENSE)
+
+`pybirdbuddy` is an asynchronous Python client for the undocumented GraphQL
+API behind the Bird Buddy smart bird feeder. Sign in with a Bird Buddy account
+to read your feeders and their state, browse your collections and media, and
+finish the "postcard" sightings the feeder captures.
+
+It is an unofficial client for an undocumented API that can change without
+notice, and is not affiliated with or endorsed by Bird Buddy.
+
+## Installation
+
+```bash
+pip install pybirdbuddy
+```
+
+Python 3.10–3.14 is supported.
+
+## Usage
+
 ```python
 import asyncio
 import pprint
@@ -54,16 +78,63 @@ fragment ListFeederFields on FeederForPrivate {
 
 API responses can return translated strings by setting the client's
 `language_code` property. Language codes are parsed using
-[`langcodes`](https://pypi.org/project/langcodes/)
+[`langcodes`][langcodes].
 
 ```python
-from birdbuddy import BirdBuddy
+from birdbuddy.client import BirdBuddy
 
 async def main():
-    bb = BirdBuddy
+    bb = BirdBuddy("user@email.com", "Pa$$w0rd")
     bb.language_code = "de"
-    
+
     collections = await bb.refresh_collections()
     birds = [c.species.name for c in collections.values()]
     print(birds)
 ```
+
+## Development
+
+Install [pyenv] and the pinned interpreter, then use the Makefile — every
+target runs inside the project venv automatically:
+
+```bash
+pyenv install 3.10.20   # matches .python-version
+make deps               # create the venv and install the [dev] extra
+
+make test     # ruff + ruff format --check + markdownlint + pyright + pytest
+make check    # alias for `make test`
+make format   # auto-fix ruff issues and reformat
+make schema   # refresh schema.json from the live API
+```
+
+Alternatively, install the tooling into an existing environment with
+`pip install -e '.[dev]'`.
+
+## Releasing
+
+The package is published to [PyPI][pypi]. To cut a release:
+
+1. Bump `version` in `pyproject.toml` (if needed).
+2. `make build` — build the sdist and wheel into `dist/`.
+3. `make publish` — rebuild, run `twine check`, then upload to PyPI.
+
+`make publish` uses [Twine], which reads credentials from `~/.pypirc` or the
+`TWINE_USERNAME` / `TWINE_PASSWORD` environment variables; use `__token__` as
+the username and a PyPI API token (the value includes its `pypi-` prefix) as
+the password.
+
+## License
+
+Released under the [MIT No Attribution](LICENSE) license (MIT-0).
+
+[build-status]: https://github.com/jhansche/pybirdbuddy/actions/workflows/python-package.yml?query=branch%3Amain
+[build-status-shield]: https://img.shields.io/github/actions/workflow/status/jhansche/pybirdbuddy/python-package.yml?branch=main&style=for-the-badge
+[langcodes]: https://pypi.org/project/langcodes/
+[license-shield]: https://img.shields.io/github/license/jhansche/pybirdbuddy.svg?style=for-the-badge
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2026?style=for-the-badge
+[pyenv]: https://github.com/pyenv/pyenv
+[pypi]: https://pypi.org/project/pybirdbuddy/
+[pypi-shield]: https://img.shields.io/pypi/v/pybirdbuddy?style=for-the-badge
+[releases]: https://github.com/jhansche/pybirdbuddy/releases
+[releases-shield]: https://img.shields.io/github/v/release/jhansche/pybirdbuddy.svg?style=for-the-badge
+[twine]: https://twine.readthedocs.io/
