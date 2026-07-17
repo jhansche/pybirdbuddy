@@ -1,4 +1,4 @@
-"""Queries related to birds and sightings"""
+"""Queries related to birds and sightings."""
 
 POSTCARD_REANALYZE = """
 mutation ReanalyzePostcard($feedItemId: ID!) {

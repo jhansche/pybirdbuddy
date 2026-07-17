@@ -36,6 +36,10 @@ Homepage = "https://github.com/jhansche/pybirdbuddy"
 [tool.setuptools.packages.find]
 include = ["birdbuddy*"]
 
+[tool.setuptools.package-data]
+# Ship the PEP 561 marker so downstream type-checkers consume our annotations.
+birdbuddy = ["py.typed"]
+
 # https://docs.astral.sh/ruff/configuration/
 [tool.ruff]
 # 88 is the default line length for both ruff and Black.

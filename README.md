@@ -19,10 +19,11 @@ pprint.pprint(result)
 pprint.pprint(bb.feeders)
 ```
 
-Note: only password login is supported currently. Google and other SSOs are not supported. If
-you've already set up your Bird Buddy with SSO, one option could be to register a new account with
-a password, and then redeem an invite code to your Bird Buddy under the new account. Some fields
-will be missing (such as firmware versions and off-grid status).
+Note: only password login is supported currently. Google and other SSOs are
+not supported. If you've already set up your Bird Buddy with SSO, one option
+could be to register a new account with a password, and then redeem an invite
+code to your Bird Buddy under the new account. Some fields will be missing
+(such as firmware versions and off-grid status).
 
 The `feeders` property will be an array of feeders with the following fields:
 
@@ -51,8 +52,9 @@ fragment ListFeederFields on FeederForPrivate {
 
 ## Translations
 
-API responses can return translated strings by setting the client's `language_code` property.
-Language codes are parsed using [`langcodes`](https://pypi.org/project/langcodes/)
+API responses can return translated strings by setting the client's
+`language_code` property. Language codes are parsed using
+[`langcodes`](https://pypi.org/project/langcodes/)
 
 ```python
 from birdbuddy import BirdBuddy

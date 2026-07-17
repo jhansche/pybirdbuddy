@@ -1,21 +1,23 @@
-"""Bird Buddy collections and media"""
+"""Bird Buddy collections and media."""
 
 from __future__ import annotations
+
 from collections import UserDict
 from datetime import datetime
 import time
-from urllib.parse import urlparse, parse_qs
+from typing import Any
+from urllib.parse import parse_qs, urlparse
 
-from .birds import Species
-from .feed import FeedNode
+from birdbuddy.birds import Species
+from birdbuddy.feed import FeedNode
 
 
-class Media(UserDict):
-    """Represents one ``MediaImage`` or ``MediaVideo`` type"""
+class Media(UserDict[str, Any]):
+    """Represents one ``MediaImage`` or ``MediaVideo`` type."""
 
     @property
     def id(self) -> str:
-        """The media id"""
+        """The media id."""
         return self["id"]
 
     @property
@@ -24,73 +26,81 @@ class Media(UserDict):
         return self["__typename"] == "MediaVideo"
 
     @property
-    def created_at(self) -> datetime:
-        """Creation timestamp"""
+    def created_at(self) -> datetime | None:
+        """Creation timestamp."""
         return FeedNode.parse_datetime(self["createdAt"])
 
     @property
     def thumbnail_url(self) -> str:
-        """Thumbnail URL"""
+        """Thumbnail URL."""
         return self["thumbnailUrl"]
 
     @property
-    def content_url(self) -> str:
-        """Large content URL"""
+    def content_url(self) -> str | None:
+        """Large content URL."""
         return self.get("contentUrl", None)
 
     @property
-    def is_expired(self) -> bool:
-        """`True` if the media URL is expired"""
+    def is_expired(self) -> bool | None:
+        """`True` if the media URL is expired."""
         return is_media_expired(self.thumbnail_url)
 
 
-def is_media_expired(media_url: str) -> bool:
-    """`True` if the media URL is expired"""
+def is_media_expired(media_url: str) -> bool | None:
+    """Report whether a signed media URL has expired.
+
+    Args:
+        media_url: A signed media URL carrying an ``Expires`` query param.
+
+    Returns:
+        ``True`` if expired, ``False`` if still valid, or ``None`` when the
+        URL is empty or carries no expiry.
+    """
     if not media_url:
         return None
-    expiry = int(parse_qs(urlparse(media_url).query).get("Expires", None).pop())
+    expiry = int(parse_qs(urlparse(media_url).query)["Expires"].pop())
     if not expiry:
         return None
     now = time.time()
     return expiry < now
 
 
-class Collection(UserDict):
+class Collection(UserDict[str, Any]):
     """Collection of media for a particular bird species."""
 
     @property
-    def bird_name(self) -> str:
-        """The bird species in this collection"""
+    def bird_name(self) -> str | None:
+        """The bird species in this collection."""
         return self.get("species", {}).get("name", None)
 
     @property
     def species(self) -> Species | None:
-        """The bird species of this collection"""
+        """The bird species of this collection."""
         if s := self.get("species", None):
             return Species(s)
         return None
 
     @property
     def collection_id(self) -> str:
-        """The collection ``UUID``"""
+        """The collection ``UUID``."""
         return self["id"]
 
     @property
     def total_visits(self) -> int:
-        """Total number of visits"""
+        """Total number of visits."""
         return int(self.get("visitsAllTime", 0))
 
     @property
-    def last_visit(self) -> datetime:
-        """Most recent visit time"""
+    def last_visit(self) -> datetime | None:
+        """Most recent visit time."""
         return FeedNode.parse_datetime(self["visitLastTime"])
 
     @property
     def feeder_name(self) -> str | None:
-        """The feeder that captured this cover"""
+        """The feeder that captured this cover."""
         return self["coverCollectionMedia"].get("feederName")
 
     @property
     def cover_media(self) -> Media:
-        """The cover media"""
+        """The cover media."""
         return Media(self["coverCollectionMedia"]["media"])
