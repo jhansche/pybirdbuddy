@@ -1,4 +1,4 @@
-"""Authentication queries"""
+"""Authentication queries."""
 
 SIGN_IN = """
 mutation emailSignIn($emailSignInInput: EmailSignInInput!) {

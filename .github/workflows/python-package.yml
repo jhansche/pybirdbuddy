@@ -1,4 +1,7 @@
-# Install the package with its dev extra and run the test suite.
+# Install dependencies, lint, type-check, test, and publish results across
+# Python versions.
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
 name: Python package
 
 on:
@@ -10,22 +13,43 @@ on:
 
 permissions:
   contents: read
+  checks: write # dorny/test-reporter publishes the JUnit results as a check run
+  pull-requests: write
 
 jobs:
   test:
-    name: pytest (py${{ matrix.python-version }})
+    name: make test (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+      # make test runs markdownlint (npx) and pyright, which both run on Node.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
       - name: Install dependencies
-        run: pip install ".[dev]"
-      - name: Run pytest
-        run: pytest
+        run: make deps
+      - name: Lint, type-check, and test
+        run: make test
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-py${{ matrix.python-version }}
+          path: |
+            junit.xml
+            htmlcov/
+      - name: Publish test results
+        uses: dorny/test-reporter@v3
+        if: success() || failure()
+        with:
+          name: Test Results (py${{ matrix.python-version }})
+          path: junit.xml
+          reporter: java-junit

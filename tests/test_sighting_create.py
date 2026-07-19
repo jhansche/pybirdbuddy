@@ -1,4 +1,7 @@
-from unittest.mock import AsyncMock, ANY
+"""Tests for sighting-create, progress-check, and reanalyze flows."""
+
+from unittest.mock import ANY, AsyncMock
+
 import pytest
 
 from birdbuddy.client import BirdBuddy
@@ -7,6 +10,7 @@ from birdbuddy.sightings import SightingCreateProgress, SightingReport
 
 @pytest.mark.asyncio
 async def test_sighting_create(bbclient: BirdBuddy, graphql_mock: AsyncMock):
+    """sighting_create returns a SightingCreateProgress from the response."""
     graphql_mock.side_effect = [
         {
             "data": {
@@ -41,6 +45,7 @@ async def test_sighting_create(bbclient: BirdBuddy, graphql_mock: AsyncMock):
 async def test_sighting_create_check_progress_in_progress(
     bbclient: BirdBuddy, graphql_mock: AsyncMock
 ):
+    """An in-progress check returns a SightingCreateProgress."""
     graphql_mock.side_effect = [
         {
             "data": {
@@ -76,6 +81,7 @@ async def test_sighting_create_check_progress_in_progress(
 async def test_sighting_create_check_progress_completed(
     bbclient: BirdBuddy, graphql_mock: AsyncMock
 ):
+    """A completed check returns a SightingReport."""
     graphql_mock.side_effect = [
         {
             "data": {
@@ -121,6 +127,7 @@ async def test_sighting_create_check_progress_completed(
 
 @pytest.mark.asyncio
 async def test_reanalyze_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
+    """reanalyze_postcard returns the updated feed item payload."""
     graphql_mock.side_effect = [
         {
             "data": {
@@ -148,3 +155,9 @@ async def test_reanalyze_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
         headers=ANY,
     )
 
+
+@pytest.mark.asyncio
+async def test_reanalyze_postcard_rejects_bad_type(bbclient: BirdBuddy):
+    """A non-str/FeedNode postcard raises TypeError before any request."""
+    with pytest.raises(TypeError):
+        await bbclient.reanalyze_postcard(123)  # type: ignore[arg-type]
