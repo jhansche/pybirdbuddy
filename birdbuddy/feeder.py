@@ -199,7 +199,17 @@ class Feeder(UserDict[str, Any]):
 
     @property
     def location(self) -> tuple[str | None, str | None]:
-        """Configured location of the Feeder."""
+        """Configured location of the Feeder.
+
+        Owner feeders nest it as ``location{city,country}``; member and
+        public feeders expose flat ``locationCity``/``locationCountry``.
+
+        Returns:
+            A ``(city, country)`` tuple; either element is ``None`` when the
+            feeder does not report it.
+        """
+        if nested := self.get("location"):
+            return (nested.get("city"), nested.get("country"))
         return (self.get("locationCity"), self.get("locationCountry"))
 
     @property

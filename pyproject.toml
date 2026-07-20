@@ -23,7 +23,6 @@ dev = [
     "pytest-aiohttp~=1.1",
     "pytest-cov~=7.1",
     "coverage~=7.15",
-    "pyyaml>=6.0.3,<7",
     "python-dotenv~=1.2",
     "ruff~=0.15.20",
     "pyright~=1.1.411",

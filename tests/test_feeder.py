@@ -87,6 +87,25 @@ def test_feeder_properties():
     assert feeder.location == ("Portland", "US")
 
 
+def test_feeder_location():
+    """Owner feeders nest location{city,country}; others use flat keys."""
+    owner = Feeder(
+        {
+            "__typename": "FeederForOwner",
+            "location": {"city": "Portland", "country": "US"},
+        }
+    )
+    assert owner.location == ("Portland", "US")
+    member = Feeder(
+        {
+            "__typename": "FeederForMember",
+            "locationCity": "Austin",
+            "locationCountry": "US",
+        }
+    )
+    assert member.location == ("Austin", "US")
+
+
 def test_feeder_defaults():
     """A sparse Feeder payload falls back for name and state.
 
