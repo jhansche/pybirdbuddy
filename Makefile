@@ -46,7 +46,7 @@ check: test
 schema:
 	set -e
 	. venv/bin/activate
-	python dump_schema.py
+	python scripts/dump_schema.py
 
 # Build the sdist + wheel into dist/.
 .PHONY: build
