@@ -58,7 +58,10 @@ def is_media_expired(media_url: str) -> bool | None:
     """
     if not media_url:
         return None
-    expiry = int(parse_qs(urlparse(media_url).query)["Expires"].pop())
+    expires = parse_qs(urlparse(media_url).query).get("Expires")
+    if not expires:
+        return None
+    expiry = int(expires[-1])
     if not expiry:
         return None
     now = time.time()
