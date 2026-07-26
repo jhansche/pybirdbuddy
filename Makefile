@@ -1,39 +1,30 @@
-SHELL = /bin/bash
+SHELL = /bin/bash -xe
 
 # Create the venv with the interpreter pinned in .python-version and install
 # the dev/test/publish toolchain from the [dev] extra.
 .PHONY: deps
-.ONESHELL:
 deps:
-	set -e
 	@echo "Setting up the Python environment..."
 	python3 -m venv venv
-	. venv/bin/activate
-	pip install -U pip
-	pip install -e '.[dev]'
+	venv/bin/pip install -U pip
+	venv/bin/pip install -e '.[dev]'
 	@echo "Dependencies installed."
 
 # Auto-fix formatting and lint issues.
 .PHONY: format
-.ONESHELL:
 format:
-	set -e
-	. venv/bin/activate
-	ruff format
-	ruff check --fix
+	venv/bin/ruff format
+	venv/bin/ruff check --fix
 
 # Full gate: format check, lint, type check, and the entire test suite.
 .PHONY: test
-.ONESHELL:
 test:
 	@echo "Running format check, lint, type check, and tests..."
-	set -e
-	. venv/bin/activate
-	ruff check
-	ruff format --check --diff
+	venv/bin/ruff check
+	venv/bin/ruff format --check --diff
 	npx -y markdownlint-cli2 "*.md"
-	pyright --venvpath . --warnings
-	python -m pytest
+	venv/bin/pyright --warnings
+	venv/bin/pytest tests/
 	@echo "All checks passed."
 
 # Alias for `make test`.
@@ -42,29 +33,20 @@ check: test
 
 # Refresh the committed GraphQL schema fixture from the live API.
 .PHONY: schema
-.ONESHELL:
 schema:
-	set -e
-	. venv/bin/activate
-	python scripts/dump_schema.py
+	venv/bin/python scripts/dump_schema.py
 
 # Build the sdist + wheel into dist/.
 .PHONY: build
-.ONESHELL:
 build:
-	set -e
-	. venv/bin/activate
 	rm -rf dist
-	python -m build
+	venv/bin/python -m build
 
 # Build then upload to PyPI (requires credentials/token).
 .PHONY: publish
-.ONESHELL:
 publish: build
-	set -e
-	. venv/bin/activate
-	twine check dist/*
-	twine upload dist/*
+	venv/bin/twine check dist/*
+	venv/bin/twine upload dist/*
 
 .PHONY: clean
 clean:
