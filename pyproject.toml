@@ -47,6 +47,7 @@ birdbuddy = ["py.typed"]
 # https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#line-length
 line-length = 88
 target-version = "py310"
+include = ["birdbuddy/**/*.py", "tests/**/*.py"]
 
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
@@ -127,6 +128,7 @@ addopts = [
     "--cov-report=html",
     "--junit-xml=junit.xml",
 ]
+testpaths = ["tests"]
 
 [tool.coverage.run]
 source = ["birdbuddy"]

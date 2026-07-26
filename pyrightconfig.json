@@ -1,6 +1,9 @@
 {
   "pythonVersion": "3.10",
+  "venvPath": ".",
+  "venv": "venv",
   "exclude": ["**/__pycache__", "**/.*", "build", "dist", "venv"],
+  "include": ["birdbuddy", "tests", "scripts"],
   "reportIncompatibleVariableOverride": false,
   "executionEnvironments": [
     {
