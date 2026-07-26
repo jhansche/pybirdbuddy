@@ -12907,6 +12907,17 @@
             "deprecationReason": null
           },
           {
+            "name": "subscriptionM2",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "SubscriptionM2Scenario",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "subscriptionPremium",
             "args": [],
             "type": {
@@ -27499,6 +27510,46 @@
               "ofType": {
                 "kind": "UNION",
                 "name": "AnyHeartbeat",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SubscriptionM2Scenario",
+        "fields": [
+          {
+            "name": "affectedFeeder",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeederForOwner",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "identifier",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },

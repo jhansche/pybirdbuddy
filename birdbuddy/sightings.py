@@ -68,6 +68,14 @@ class SightingType(Enum):
 
     @classmethod
     def _missing_(cls, value: object) -> SightingType:
+        """Fall back to ``UNKNOWN`` for an unrecognized sighting type.
+
+        Args:
+            value: The raw value that matched no enum member.
+
+        Returns:
+            ``SightingType.UNKNOWN``.
+        """
         LOGGER.warning("Unexpected Sighting type: %s", value)
         return SightingType.UNKNOWN
 

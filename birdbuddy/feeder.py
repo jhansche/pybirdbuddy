@@ -20,6 +20,14 @@ class MetricState(Enum):
 
     @classmethod
     def _missing_(cls, value: object) -> MetricState:
+        """Fall back to ``UNKNOWN`` for an unrecognized metric state.
+
+        Args:
+            value: The raw value that matched no enum member.
+
+        Returns:
+            ``MetricState.UNKNOWN``.
+        """
         LOGGER.warning("Unexpected metric state: %s", value)
         return MetricState.UNKNOWN
 
@@ -35,6 +43,14 @@ class PowerProfile(Enum):
 
     @classmethod
     def _missing_(cls, value: object) -> PowerProfile:
+        """Fall back to ``UNKNOWN`` for an unrecognized power profile.
+
+        Args:
+            value: The raw value that matched no enum member.
+
+        Returns:
+            ``PowerProfile.UNKNOWN``.
+        """
         LOGGER.warning("Unexpected power profile: %s", value)
         return PowerProfile.UNKNOWN
 
@@ -59,6 +75,14 @@ class FeederState(Enum):
 
     @classmethod
     def _missing_(cls, value: object) -> FeederState:
+        """Fall back to ``UNKNOWN`` for an unrecognized feeder state.
+
+        Args:
+            value: The raw value that matched no enum member.
+
+        Returns:
+            ``FeederState.UNKNOWN``.
+        """
         LOGGER.warning("Unexpected feeder.state: %s", value)
         return FeederState.UNKNOWN
 
@@ -175,7 +199,17 @@ class Feeder(UserDict[str, Any]):
 
     @property
     def location(self) -> tuple[str | None, str | None]:
-        """Configured location of the Feeder."""
+        """Configured location of the Feeder.
+
+        Owner feeders nest it as ``location{city,country}``; member and
+        public feeders expose flat ``locationCity``/``locationCountry``.
+
+        Returns:
+            A ``(city, country)`` tuple; either element is ``None`` when the
+            feeder does not report it.
+        """
+        if nested := self.get("location"):
+            return (nested.get("city"), nested.get("country"))
         return (self.get("locationCity"), self.get("locationCountry"))
 
     @property
@@ -186,8 +220,16 @@ class Feeder(UserDict[str, Any]):
 
     @property
     def power_profile(self) -> PowerProfile:
-        """Configured power profile of the Feeder."""
-        return PowerProfile(self.get("powerProfile", "STANDARD"))
+        """Configured power profile of the Feeder.
+
+        Only owner responses carry the field; non-owner feeders omit it.
+
+        Returns:
+            The reported ``PowerProfile``, or ``PowerProfile.UNKNOWN`` when the
+            feeder does not report one.
+        """
+        value = self.get("powerProfile")
+        return PowerProfile(value) if value else PowerProfile.UNKNOWN
 
     @property
     # @incubating

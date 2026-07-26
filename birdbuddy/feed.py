@@ -39,6 +39,14 @@ class FeedNodeType(Enum):
 
     @classmethod
     def _missing_(cls, value: object) -> FeedNodeType:
+        """Fall back to ``Unknown`` for an unrecognized feed type.
+
+        Args:
+            value: The raw value that matched no enum member.
+
+        Returns:
+            ``FeedNodeType.Unknown``.
+        """
         LOGGER.warning("Unexpected Feed type: %s", value)
         return FeedNodeType.Unknown
 
