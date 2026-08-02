@@ -27,7 +27,7 @@ dev = [
     "ruff>=0.15.20,<0.17.0",
     "pyright~=1.1.411",
     "build~=1.5",
-    "twine~=6.2",
+    "twine>=6.2,<8.0",
 ]
 
 [project.urls]
