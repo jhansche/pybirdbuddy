@@ -78,3 +78,83 @@ def test_feed_newest_edge_and_filter():
     cutoff = datetime(2023, 2, 1, tzinfo=timezone.utc)
     recent = feed.filter(newer_than=cutoff)
     assert [n.node_id for n in recent] == ["n1"]
+
+
+def _postcard(**overrides: object) -> FeedNode:
+    """A NewPostcard node carrying two images and one video."""
+    node = {
+        "id": "p1",
+        "__typename": "FeedItemNewPostcard",
+        "createdAt": "2026-08-11T13:19:52.956Z",
+        "feeder": {"id": "feeder-1", "name": "Feeder", "__typename": "FeederForOwner"},
+        "medias": [
+            {
+                "id": "older-image",
+                "createdAt": "2026-08-11T12:24:19.693Z",
+                "thumbnailUrl": "https://example.test/old-thumb.jpg",
+                "contentUrl": "https://example.test/old.jpg",
+                "__typename": "MediaImage",
+            },
+            {
+                "id": "newer-image",
+                "createdAt": "2026-08-11T13:19:49.779Z",
+                "thumbnailUrl": "https://example.test/new-thumb.jpg",
+                "contentUrl": "https://example.test/new.jpg",
+                "__typename": "MediaImage",
+            },
+            {
+                "id": "video",
+                "createdAt": "2026-08-11T13:20:00.000Z",
+                "thumbnailUrl": "https://example.test/vid-thumb.jpg",
+                "__typename": "MediaVideo",
+            },
+        ],
+    }
+    node.update(overrides)
+    return FeedNode(node)
+
+
+def test_feed_node_medias_newest_first():
+    """Medias returns Media objects, newest first, video included."""
+    assert [m.id for m in _postcard().medias] == ["video", "newer-image", "older-image"]
+
+
+def test_feed_node_images_excludes_video():
+    """Images drops MediaVideo, keeping the newest-first ordering."""
+    images = _postcard().images
+    assert [m.id for m in images] == ["newer-image", "older-image"]
+    assert images[0].content_url == "https://example.test/new.jpg"
+
+
+def test_feed_node_feeder_id():
+    """feeder_id reads the embedded feeder, and tolerates its absence."""
+    assert _postcard().feeder_id == "feeder-1"
+    assert FeedNode({"id": "p2", "__typename": "FeedItemNewPostcard"}).feeder_id is None
+
+
+def test_feed_node_medias_absent_or_null():
+    """A node with no media -- or a null medias field -- yields no media."""
+    assert FeedNode({"id": "p3", "__typename": "FeedItemNewPostcard"}).medias == []
+    assert _postcard(medias=None).medias == []
+    assert _postcard(medias=[]).images == []
+
+
+def test_feed_node_medias_missing_created_at():
+    """Media with no createdAt still sorts, rather than raising."""
+    node = _postcard(
+        medias=[
+            {
+                "id": "no-date",
+                "createdAt": None,
+                "thumbnailUrl": "t",
+                "__typename": "MediaImage",
+            },
+            {
+                "id": "dated",
+                "createdAt": "2026-08-11T13:19:49.779Z",
+                "thumbnailUrl": "t",
+                "__typename": "MediaImage",
+            },
+        ]
+    )
+    assert [m.id for m in node.medias] == ["dated", "no-date"]

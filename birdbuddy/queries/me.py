@@ -375,6 +375,31 @@ fragment MysteryVisitorResolvedFields on FeedItemMysteryVisitorResolved {
 }
 fragment NewPostcardFields on FeedItemNewPostcard {
   ...FeedItemFields
+  expiresAt
+  hasVideoMedia
+  mediaImageCount
+  inferenceType
+  inferenceExecutionMode
+  inferenceConfidenceLevel
+  reanalyzeAvailability
+  mediaSpeciesNameAssignmentAvailability
+  feeder {
+    ... on FeederForOwner {
+      id
+      name
+      __typename
+    }
+    ... on FeederForMember {
+      id
+      name
+      __typename
+    }
+    __typename
+  }
+  medias {
+    ...MediaFullFields
+    __typename
+  }
   __typename
 }
 """.strip()

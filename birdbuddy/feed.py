@@ -4,11 +4,14 @@ from __future__ import annotations
 
 from collections import UserDict
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from propcache import cached_property
+
+if TYPE_CHECKING:
+    from birdbuddy.media import Media
 
 from birdbuddy import LOGGER
 
@@ -89,6 +92,34 @@ class FeedNode(UserDict[str, Any]):
     def created_at(self) -> datetime | None:
         """The `datetime` when the FeedNode item was created."""
         return FeedNode.parse_datetime(self.get("createdAt"))
+
+    @property
+    def feeder_id(self) -> str | None:
+        """The id of the feeder this item belongs to, when the item has one."""
+        return (self.get("feeder") or {}).get("id")
+
+    @property
+    def medias(self) -> list[Media]:
+        """The media attached to this feed item, newest first.
+
+        ``FeedItemNewPostcard`` and ``FeedItemCollectedPostcard`` both carry
+        their own media, so a caller does not need to convert a postcard into
+        a sighting just to get at its images.
+        """
+        # Imported here rather than at module scope: media.py imports FeedNode
+        # from this module, so a top-level import would be circular.
+        from birdbuddy.media import Media  # noqa: PLC0415
+
+        return sorted(
+            (Media(m) for m in self.get("medias") or []),
+            key=lambda m: m.created_at or datetime.min.replace(tzinfo=timezone.utc),
+            reverse=True,
+        )
+
+    @property
+    def images(self) -> list[Media]:
+        """The still images attached to this feed item, newest first."""
+        return [m for m in self.medias if not m.is_video]
 
 
 class FeedEdge(UserDict[str, Any]):
