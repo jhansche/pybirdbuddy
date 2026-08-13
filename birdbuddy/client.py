@@ -658,14 +658,18 @@ class BirdBuddy:
         Raises:
             ValueError: If ``postcard`` is a FeedNode that is not a
                 NewPostcard.
+            UnexpectedResponseError: If the response lacks the expected
+                reanalyze fields.
         """
         result = await self._make_request(
             query=queries.birds.POSTCARD_REANALYZE,
             variables={"feedItemId": self._postcard_id(postcard)},
         )
-        return PostcardAnalysis(
-            result["inferenceExternalPostcardReanalyze"]["updatedFeedItem"]
-        )
+        try:
+            updated = result["inferenceExternalPostcardReanalyze"]["updatedFeedItem"]
+        except (KeyError, TypeError) as err:
+            raise UnexpectedResponseError(result) from err
+        return PostcardAnalysis(updated)
 
     @deprecated("reanalyze_postcard is deprecated; use identify_postcard")
     async def reanalyze_postcard(
@@ -718,6 +722,8 @@ class BirdBuddy:
             ValueError: If ``postcard`` is a FeedNode that is not a
                 NewPostcard.
             TypeError: If ``postcard`` is neither a str nor a FeedNode.
+            UnexpectedResponseError: If the response lacks the expected
+                collect fields.
         """
         postcard_id = self._postcard_id(postcard)
         await self.identify_postcard(postcard_id)
@@ -728,7 +734,11 @@ class BirdBuddy:
                 "postcardCollectInput": {"share": share},
             },
         )
-        return CollectedPostcard(result["postcardCollect"]["collectedPostcard"])
+        try:
+            collected = result["postcardCollect"]["collectedPostcard"]
+        except (KeyError, TypeError) as err:
+            raise UnexpectedResponseError(result) from err
+        return CollectedPostcard(collected)
 
     async def sighting_from_postcard(
         self,

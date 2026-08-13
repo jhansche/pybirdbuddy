@@ -5,7 +5,7 @@ from unittest.mock import ANY, AsyncMock, call, patch
 import pytest
 
 from birdbuddy.client import BirdBuddy
-from birdbuddy.exceptions import NoFirmwareUpdateAvailableError
+from birdbuddy.exceptions import NoFirmwareUpdateAvailableError, UnexpectedResponseError
 from birdbuddy.feeder import Feeder
 from birdbuddy.postcards import CollectedPostcard, PostcardAnalysis
 from birdbuddy.sightings import PostcardSighting, SightingFinishStrategy
@@ -544,3 +544,23 @@ async def test_collect_postcard(
         ],
         any_order=False,
     )
+
+
+@pytest.mark.asyncio
+async def test_identify_postcard_unexpected_response(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """Missing reanalyze fields raise UnexpectedResponseError."""
+    graphql_mock.side_effect = [{"data": {}}]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.identify_postcard("postcard-id-1")
+
+
+@pytest.mark.asyncio
+async def test_collect_postcard_unexpected_response(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """Missing collect fields raise UnexpectedResponseError."""
+    graphql_mock.side_effect = [_REANALYZED, {"data": {}}]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.collect_postcard(_PID)
