@@ -5,6 +5,8 @@ from unittest.mock import ANY, AsyncMock, call, patch
 import pytest
 
 from birdbuddy.client import BirdBuddy
+from birdbuddy.exceptions import NoFirmwareUpdateAvailableError
+from birdbuddy.feeder import Feeder
 from birdbuddy.sightings import (
     PostcardSighting,
     SightingCreateProgress,
@@ -497,3 +499,34 @@ async def test_new_postcards_paginates_all_pages(
 
     assert {n.node_id for n in result} == {"p1", "p2"}
     assert graphql_mock.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_update_firmware_start_guards_when_up_to_date(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """update_firmware_start refuses to start when no update is available.
+
+    Verified live: starting an update on an up-to-date feeder errors server
+    side, so the client guards on the versions the check reported and raises
+    instead of round-tripping.
+    """
+    fid = "f1"
+    bbclient._feeders[fid] = Feeder({"id": fid, "__typename": "FeederForOwner"})  # noqa: SLF001
+    graphql_mock.side_effect = [
+        {
+            "data": {
+                "feederFirmwareUpdateCheckProgress": {
+                    "__typename": "FeederFirmwareUpdateSucceededResult",
+                    "feeder": {
+                        "availableFirmwareVersion": "1.8.1",
+                        "firmwareVersion": "1.8.1",
+                    },
+                }
+            }
+        }
+    ]
+    with pytest.raises(NoFirmwareUpdateAvailableError):
+        await bbclient.update_firmware_start(fid)
+    # Only the check ran; the start mutation was never sent.
+    assert graphql_mock.call_count == 1
