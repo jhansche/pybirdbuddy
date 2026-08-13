@@ -345,7 +345,7 @@ class BirdBuddy:
             after = cursor
 
     @property
-    def user(self) -> None | BirdBuddyUser:
+    def user(self) -> BirdBuddyUser | None:
         """The logged in user data."""
         return self._me
 

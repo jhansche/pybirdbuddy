@@ -436,7 +436,7 @@ async def test_update_firmware_start_guards_when_up_to_date(
     instead of round-tripping.
     """
     fid = "f1"
-    bbclient._feeders[fid] = Feeder({"id": fid, "__typename": "FeederForOwner"})  # noqa: SLF001
+    bbclient._feeders[fid] = Feeder({"id": fid, "__typename": "FeederForOwner"})
     graphql_mock.side_effect = [
         {
             "data": {
