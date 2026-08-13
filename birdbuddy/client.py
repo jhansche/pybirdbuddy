@@ -824,31 +824,25 @@ class BirdBuddy:
         )
         return bool(result["mediaShareToggle"]["success"])
 
+    @deprecated("sighting_create was removed from the Bird Buddy API")
     async def sighting_create(
         self,
         media_ids: list[str],
     ) -> SightingCreateProgress:
         """Identify birds in media via a background process.
 
-        Args:
-            media_ids: The media ids to analyze.
+        Deprecated since 0.0.22: the ``sightingCreate`` mutation was removed
+        from the Bird Buddy API, so this raises instead of round-tripping into
+        a server error. The postcard flow (``identify_postcard`` /
+        ``collect_postcard``) replaces media-based identification.
 
-        Returns:
-            The initial ``SightingCreateProgress``.
+        Raises:
+            NotImplementedError: Always; the mutation no longer exists.
         """
-        variables = {
-            "sightingCreateInput": {
-                "mediaIds": media_ids,
-            }
-        }
-        result = await self._make_request(
-            query=queries.birds.SIGHTING_CREATE,
-            variables=variables,
-        )
-        return SightingCreateProgress(
-            result["sightingCreate"]["sightingCreateProgress"]
-        )
+        msg = "sightingCreate was removed from the Bird Buddy API"
+        raise NotImplementedError(msg)
 
+    @deprecated("sighting_create_check_progress was removed from the Bird Buddy API")
     async def sighting_create_check_progress(
         self,
         sighting_create_id: str,
@@ -856,28 +850,15 @@ class BirdBuddy:
     ) -> SightingCreateProgress | SightingReport:
         """Check the progress of a background bird identification.
 
-        Args:
-            sighting_create_id: The id from ``sighting_create``.
-            watching_id: The watching id to poll.
+        Deprecated since 0.0.22: the ``sightingCreateCheckProgress`` query was
+        removed from the Bird Buddy API, so this raises instead of
+        round-tripping into a server error.
 
-        Returns:
-            A ``SightingCreateProgress`` while pending, or a ``SightingReport``
-            once identification completes.
+        Raises:
+            NotImplementedError: Always; the query no longer exists.
         """
-        variables = {
-            "sightingCreateCheckProgressInput": {
-                "sightingCreateId": sighting_create_id,
-                "watchingId": watching_id,
-            }
-        }
-        result = await self._make_request(
-            query=queries.birds.SIGHTING_CREATE_PROGRESS,
-            variables=variables,
-        )
-        data = result["sightingCreateCheckProgress"]
-        if data.get("__typename") == "SightingReport":
-            return SightingReport(data)
-        return SightingCreateProgress(data)
+        msg = "sightingCreateCheckProgress was removed from the Bird Buddy API"
+        raise NotImplementedError(msg)
 
     async def sighting_choose_species(
         self,

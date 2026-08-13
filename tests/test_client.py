@@ -7,12 +7,7 @@ import pytest
 from birdbuddy.client import BirdBuddy
 from birdbuddy.exceptions import NoFirmwareUpdateAvailableError
 from birdbuddy.feeder import Feeder
-from birdbuddy.sightings import (
-    PostcardSighting,
-    SightingCreateProgress,
-    SightingFinishStrategy,
-    SightingReport,
-)
+from birdbuddy.sightings import PostcardSighting, SightingFinishStrategy
 
 _POSTCARD_ID = "725af10e-8be1-5252-96fe-d49565053c44"
 _SIGHTING_ID = "64af354b-3689-5df8-afcd-78ec4f987b88"
@@ -133,93 +128,21 @@ async def test_finish_postcard_best_guess(
 
 
 @pytest.mark.asyncio
-async def test_sighting_create(bbclient: BirdBuddy, graphql_mock: AsyncMock):
-    """sighting_create returns a SightingCreateProgress from the response."""
-    graphql_mock.side_effect = [
-        {
-            "data": {
-                "sightingCreate": {
-                    "sightingCreateProgress": {
-                        "id": "test-create-id",
-                        "progress": 42.5,
-                        "__typename": "SightingCreateProgress",
-                    }
-                }
-            }
-        }
-    ]
-    result = await bbclient.sighting_create(["media-id-1", "media-id-2"])
-
-    assert isinstance(result, SightingCreateProgress)
-    assert result.id == "test-create-id"
-    assert result.progress == 42.5
-
-    graphql_mock.assert_called_once_with(
-        query=ANY,
-        variables={
-            "sightingCreateInput": {
-                "mediaIds": ["media-id-1", "media-id-2"],
-            }
-        },
-        headers=ANY,
-    )
+async def test_sighting_create_deprecated_and_removed(bbclient: BirdBuddy):
+    """sighting_create is deprecated and raises; the API removed the mutation."""
+    with pytest.deprecated_call(), pytest.raises(NotImplementedError):
+        await bbclient.sighting_create(["media-id-1", "media-id-2"])
 
 
-_IN_PROGRESS = {
-    "id": "test-create-id",
-    "progress": 75.0,
-    "__typename": "SightingCreateProgress",
-}
-_COMPLETED = {
-    "reportToken": "test-report-token",
-    "sightings": [
-        {
-            "id": "sighting-id-1",
-            "__typename": "SightingRecognizedBird",
-            "species": {
-                "id": "species-id-1",
-                "name": "Northern Cardinal",
-                "__typename": "SpeciesBird",
-            },
-        }
-    ],
-    "__typename": "SightingReport",
-}
-
-
-@pytest.mark.parametrize(
-    ("payload", "expected_type"),
-    [
-        pytest.param(_IN_PROGRESS, SightingCreateProgress, id="in_progress"),
-        pytest.param(_COMPLETED, SightingReport, id="completed"),
-    ],
-)
 @pytest.mark.asyncio
-async def test_sighting_create_check_progress(
+async def test_sighting_create_check_progress_deprecated_and_removed(
     bbclient: BirdBuddy,
-    graphql_mock: AsyncMock,
-    payload: dict,
-    expected_type: type,
 ):
-    """check_progress returns Progress while pending, Report once complete."""
-    graphql_mock.side_effect = [{"data": {"sightingCreateCheckProgress": payload}}]
-    result = await bbclient.sighting_create_check_progress(
-        sighting_create_id="test-create-id", watching_id="test-watching-id"
-    )
-    assert isinstance(result, expected_type)
-    if expected_type is SightingReport:
-        assert isinstance(result, SightingReport)
-        assert result.sightings[0].species.name == "Northern Cardinal"
-    graphql_mock.assert_called_once_with(
-        query=ANY,
-        variables={
-            "sightingCreateCheckProgressInput": {
-                "sightingCreateId": "test-create-id",
-                "watchingId": "test-watching-id",
-            }
-        },
-        headers=ANY,
-    )
+    """sighting_create_check_progress is deprecated and raises."""
+    with pytest.deprecated_call(), pytest.raises(NotImplementedError):
+        await bbclient.sighting_create_check_progress(
+            sighting_create_id="x", watching_id="y"
+        )
 
 
 @pytest.mark.asyncio
