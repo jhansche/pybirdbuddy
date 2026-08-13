@@ -2,7 +2,7 @@
 
 Reads ``BB_EMAIL`` and ``BB_PASSWORD`` (a local ``.env`` is loaded via
 python-dotenv), logs in, and captures the feeders, new postcards, and the
-postcard -> sighting flow. Each risky call is captured so a server error
+postcard collect flow. Each risky call is captured so a server error
 (e.g. the postcard ``INTERNAL_SERVER_ERROR``) lands in the dump rather than
 aborting the run. It writes two git-ignored files:
 
@@ -27,6 +27,7 @@ import uuid
 
 from dotenv import load_dotenv
 
+from birdbuddy import queries
 from birdbuddy.client import BirdBuddy
 
 _RAW = Path(__file__).resolve().parent.parent / "birdbuddy_payload.dump.json"
@@ -171,12 +172,16 @@ async def _capture(label: str, coro: Any, out: dict[str, Any]) -> Any:
 
 
 async def _collect() -> dict[str, Any]:
-    """Log in and collect the postcard/sighting payloads.
+    """Log in and capture the postcard collect flow.
+
+    Sends the library's own ``POSTCARD_REANALYZE`` and ``POSTCARD_COLLECT``
+    queries, so the fixture cannot drift from what the client actually issues.
+    Collecting is a real mutation; run against a throwaway/test account.
 
     Returns:
-        A dict mapping each captured step (feeders, new_postcards,
-        reanalyze_postcard, sighting_from_postcard, sighting_create) to its
-        payload, or an ``{"error": ...}`` entry when that step failed.
+        A dict mapping each captured step (feeders, new_postcards, reanalyze,
+        postcard_collect) to its payload, or an ``{"error": ...}`` entry when
+        that step failed.
     """
     bb = BirdBuddy(os.environ["BB_EMAIL"], os.environ["BB_PASSWORD"])
     out: dict[str, Any] = {}
@@ -188,15 +193,29 @@ async def _collect() -> dict[str, Any]:
     if not postcards:
         return out
 
-    postcard = postcards[0]
-    # Reanalyze first (PR #35), then convert; capture either path's error.
-    await _capture("reanalyze_postcard", bb.reanalyze_postcard(postcard), out)
-    sighting = await _capture(
-        "sighting_from_postcard", bb.sighting_from_postcard(postcard), out
+    feed_item_id = postcards[0].node_id
+    # Reanalyze first (idempotent), then collect; capture either path's error.
+    await _capture(
+        "reanalyze",
+        bb._make_request(
+            query=queries.birds.POSTCARD_REANALYZE,
+            variables={"feedItemId": feed_item_id},
+        ),
+        out,
     )
-    if sighting is not None and sighting.medias:
-        media_ids = [m.id for m in sighting.medias]
-        await _capture("sighting_create", bb.sighting_create(media_ids), out)
+    # Key the reanalyze capture by feed-item id, matching the fixture shape.
+    out["reanalyze"] = {feed_item_id: out["reanalyze"]}
+    await _capture(
+        "postcard_collect",
+        bb._make_request(
+            query=queries.birds.POSTCARD_COLLECT,
+            variables={
+                "feedItemId": feed_item_id,
+                "postcardCollectInput": {"share": False},
+            },
+        ),
+        out,
+    )
     return out
 
 

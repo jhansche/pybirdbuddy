@@ -7,10 +7,55 @@ mutation ReanalyzePostcard($feedItemId: ID!) {
       __typename
       ... on FeedItemNewPostcard {
         id
+        createdAt
         inferenceConfidenceLevel
         inferenceExecutionMode
         inferenceType
         reanalyzeAvailability
+        feeder {
+          __typename
+          ... on Feeder {
+            id
+            name
+          }
+        }
+        medias {
+          __typename
+          id
+          createdAt
+          thumbnailUrl
+          ... on MediaImage {
+            contentUrl(size: ORIGINAL)
+            __typename
+          }
+          ... on MediaVideo {
+            contentUrl(size: ORIGINAL)
+            __typename
+          }
+        }
+        sightingReportPreview {
+          sightings {
+            __typename
+            ... on SightingRecognizedBird {
+              species {
+                __typename
+                ... on Species {
+                  id
+                  name
+                }
+              }
+            }
+            ... on SightingRecognizedBirdUnlocked {
+              species {
+                __typename
+                ... on Species {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
