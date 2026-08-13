@@ -27,11 +27,12 @@ async def test_finish_postcard_recognized(
     graphql_mock.side_effect = [
         {"data": {"sightingReportPostcardFinish": {"success": True}}},
     ]
-    result = await bbclient.finish_postcard(
-        postcard_sighting["postcard"]["id"],
-        PostcardSighting(postcard_sighting["sighting"]),
-        strategy=SightingFinishStrategy.RECOGNIZED,
-    )
+    with pytest.deprecated_call():
+        result = await bbclient.finish_postcard(
+            postcard_sighting["postcard"]["id"],
+            PostcardSighting(postcard_sighting["sighting"]),
+            strategy=SightingFinishStrategy.RECOGNIZED,
+        )
     graphql_mock.assert_called_once_with(
         query=ANY,
         variables={
@@ -92,11 +93,12 @@ async def test_finish_postcard_best_guess(
         {"data": {"sightingChooseSpecies": modified}},
         {"data": {"sightingReportPostcardFinish": {"success": True}}},
     ]
-    result = await bbclient.finish_postcard(
-        postcard_sighting["postcard"]["id"],
-        PostcardSighting(postcard_sighting["sighting"]),
-        strategy=SightingFinishStrategy.BEST_GUESS,
-    )
+    with pytest.deprecated_call():
+        result = await bbclient.finish_postcard(
+            postcard_sighting["postcard"]["id"],
+            PostcardSighting(postcard_sighting["sighting"]),
+            strategy=SightingFinishStrategy.BEST_GUESS,
+        )
     graphql_mock.assert_has_calls(
         calls=[
             call(

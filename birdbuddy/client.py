@@ -740,6 +740,7 @@ class BirdBuddy:
             raise UnexpectedResponseError(result) from err
         return CollectedPostcard(collected)
 
+    @deprecated("sighting_from_postcard is deprecated; use identify_postcard")
     async def sighting_from_postcard(
         self,
         postcard: str | FeedNode,
@@ -783,6 +784,7 @@ class BirdBuddy:
         data = result["sightingCreateFromPostcard"]
         return PostcardSighting(data).with_postcard(postcard_id)
 
+    @deprecated("finish_postcard is deprecated; use collect_postcard")
     async def finish_postcard(
         self,
         feed_item_id: str,
@@ -839,7 +841,7 @@ class BirdBuddy:
                     match_data["confidence"],
                     match_data["speciesCode"],
                 )
-                new_report = await self.sighting_choose_species(
+                new_report = await self._choose_species(
                     sighting.id,
                     match_data["speciesCode"],
                     report,
@@ -851,7 +853,7 @@ class BirdBuddy:
                 )
                 report = new_report
             elif mod.strategy == SightingFinishStrategy.MYSTERY:
-                new_report = await self.sighting_choose_mystery(
+                new_report = await self._choose_mystery(
                     sighting.id,
                     report,
                 )
@@ -952,6 +954,7 @@ class BirdBuddy:
         msg = "sightingCreateCheckProgress was removed from the Bird Buddy API"
         raise NotImplementedError(msg)
 
+    @deprecated("sighting_choose_species is deprecated; use collect_postcard")
     async def sighting_choose_species(
         self,
         sighting_id: str,
@@ -971,6 +974,19 @@ class BirdBuddy:
         Raises:
             TypeError: If ``sighting_data`` is not a SightingReport or token.
         """
+        return await self._choose_species(sighting_id, species_id, sighting_data)
+
+    # TODO: Inline into finish_postcard and remove when the deprecated report
+    # flow (sighting_choose_species, finish_postcard) is removed. It exists
+    # only so finish_postcard can choose a species without triggering
+    # sighting_choose_species's deprecation warning.
+    async def _choose_species(
+        self,
+        sighting_id: str,
+        species_id: str,
+        sighting_data: SightingReport | str | None = None,
+    ) -> SightingReport:
+        """Assign a species to a sighting (shared by the deprecated flow)."""
         token: str | None
         if isinstance(sighting_data, SightingReport):
             token = sighting_data.token
@@ -992,6 +1008,7 @@ class BirdBuddy:
         )
         return SightingReport(data["sightingChooseSpecies"])
 
+    @deprecated("sighting_choose_mystery is deprecated; use collect_postcard")
     async def sighting_choose_mystery(
         self,
         sighting_id: str,
@@ -1009,6 +1026,17 @@ class BirdBuddy:
         Raises:
             TypeError: If ``sighting_data`` is not a SightingReport or token.
         """
+        return await self._choose_mystery(sighting_id, sighting_data)
+
+    # TODO: Remove with _choose_species when the deprecated report flow is
+    # removed; exists only to keep finish_postcard from triggering
+    # sighting_choose_mystery's deprecation warning.
+    async def _choose_mystery(
+        self,
+        sighting_id: str,
+        sighting_data: SightingReport | str | None = None,
+    ) -> SightingReport:
+        """Convert a sighting to a mystery visitor (shared by the deprecated flow)."""
         token: str | None
         if isinstance(sighting_data, SightingReport):
             token = sighting_data.token
