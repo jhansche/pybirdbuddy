@@ -9,6 +9,7 @@ from typing import Any
 
 import langcodes
 from python_graphql_client import GraphqlClient
+from typing_extensions import deprecated
 
 from birdbuddy import LOGGER, VERBOSE, queries
 from birdbuddy.const import BB_URL
@@ -1180,12 +1181,16 @@ class BirdBuddy:
                 result[node["id"]] = Media(node)
         return result
 
-    async def latest_collections(
-        self,
-    ) -> dict[str, Collection]:
-        """Return the latest collections."""
-        query = queries.me.LATEST_MEDIA  # type: ignore[attr-defined]
-        return await self._make_request(query=query)
+    @deprecated("latest_collections is deprecated; use refresh_collections()")
+    async def latest_collections(self) -> dict[str, Collection]:
+        """Return the account's bird collections.
+
+        Deprecated since 0.0.22; use :func:`refresh_collections` instead. The
+        previous implementation referenced an undefined query and raised
+        ``AttributeError`` on every call; this now delegates to
+        ``refresh_collections``, which keeps only bird collections.
+        """
+        return await self.refresh_collections()
 
     @property
     def feeders(self) -> dict[str, Feeder]:

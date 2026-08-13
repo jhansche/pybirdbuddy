@@ -1,6 +1,6 @@
 """Tests for the BirdBuddy client methods."""
 
-from unittest.mock import ANY, AsyncMock, call
+from unittest.mock import ANY, AsyncMock, call, patch
 
 import pytest
 
@@ -345,6 +345,25 @@ async def test_collection_stops_on_repeated_cursor(
 
     assert set(result) == {"m1", "m2"}
     assert graphql_mock.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_latest_collections_delegates_and_warns(bbclient: BirdBuddy):
+    """latest_collections is deprecated and forwards to refresh_collections.
+
+    The former implementation referenced an undefined query and raised
+    AttributeError; it now delegates to the working method.
+    """
+    cached = {"col-1": ANY}
+    with (
+        patch.object(
+            bbclient, "refresh_collections", AsyncMock(return_value=cached)
+        ) as refresh,
+        pytest.deprecated_call(),
+    ):
+        result = await bbclient.latest_collections()
+    refresh.assert_awaited_once_with()
+    assert result is cached
 
 
 def _fts(minute: int) -> str:
