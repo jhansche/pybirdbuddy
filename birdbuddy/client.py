@@ -24,7 +24,7 @@ from birdbuddy.exceptions import (
 from birdbuddy.feed import Feed, FeedNode, FeedNodeType
 from birdbuddy.feeder import Feeder, FeederUpdateStatus, PowerProfile
 from birdbuddy.media import Collection, Media
-from birdbuddy.postcards import CollectedPostcard
+from birdbuddy.postcards import CollectedPostcard, PostcardAnalysis
 from birdbuddy.queries.debug import DUMP_SCHEMA
 from birdbuddy.sightings import (
     PostcardSighting,
@@ -635,16 +635,48 @@ class BirdBuddy:
         msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
         raise TypeError(msg)
 
+    async def identify_postcard(
+        self,
+        postcard: str | FeedNode,
+    ) -> PostcardAnalysis:
+        """Identify a postcard's visitor (the app's "Identify this visitor").
+
+        Runs the AI inference (GraphQL ``inferenceExternalPostcardReanalyze``)
+        and returns the recognized species and media without collecting. Free
+        accounts analyze on demand (this call); premium accounts analyze
+        automatically, so this is then a no-op. Idempotent: an already-analyzed
+        postcard returns the same analysis, with reanalyzeAvailability
+        ALREADY_REANALYZED.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+
+        Returns:
+            The postcard's ``PostcardAnalysis``: recognized species and media,
+            without collecting.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
+        """
+        result = await self._make_request(
+            query=queries.birds.POSTCARD_REANALYZE,
+            variables={"feedItemId": self._postcard_id(postcard)},
+        )
+        return PostcardAnalysis(
+            result["inferenceExternalPostcardReanalyze"]["updatedFeedItem"]
+        )
+
+    @deprecated("reanalyze_postcard is deprecated; use identify_postcard")
     async def reanalyze_postcard(
         self,
         postcard: str | FeedNode,
     ) -> dict:
         """Trigger the AI identification (reanalysis) for a postcard.
 
-        Changes the inference execution mode from MANUAL_NOT_STARTED to
-        MANUAL_COMPLETED and populates the sighting report preview. It is
-        idempotent: an already-analyzed postcard returns MANUAL_COMPLETED
-        with reanalyzeAvailability ALREADY_REANALYZED.
+        Deprecated since 0.0.22: use :func:`identify_postcard`, which returns a
+        ``PostcardAnalysis``. This returns the raw
+        ``inferenceExternalPostcardReanalyze`` payload unchanged.
 
         Args:
             postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
@@ -671,7 +703,7 @@ class BirdBuddy:
     ) -> CollectedPostcard:
         """Collect a postcard into your account.
 
-        Reanalyzes the postcard first (idempotent, so it is safe whether or
+        Identifies the postcard first (idempotent, so it is safe whether or
         not inference has already run), then collects it with the species the
         backend recognized.
 
@@ -688,7 +720,7 @@ class BirdBuddy:
             TypeError: If ``postcard`` is neither a str nor a FeedNode.
         """
         postcard_id = self._postcard_id(postcard)
-        await self.reanalyze_postcard(postcard_id)
+        await self.identify_postcard(postcard_id)
         result = await self._make_request(
             query=queries.birds.POSTCARD_COLLECT,
             variables={
