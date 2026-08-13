@@ -9,6 +9,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from birdbuddy.birds import Species
+from birdbuddy.exceptions import UnexpectedResponseError
 from birdbuddy.feed import FeedNode
 
 
@@ -26,9 +27,20 @@ class Media(UserDict[str, Any]):
         return self["__typename"] == "MediaVideo"
 
     @property
-    def created_at(self) -> datetime | None:
-        """Creation timestamp."""
-        return FeedNode.parse_datetime(self["createdAt"])
+    def created_at(self) -> datetime:
+        """Creation timestamp.
+
+        Returns:
+            The creation ``datetime``. ``createdAt`` is non-null in the
+            schema, so it is always present.
+
+        Raises:
+            UnexpectedResponseError: If ``createdAt`` is missing or null,
+                which the schema does not permit.
+        """
+        if (created := FeedNode.parse_datetime(self.get("createdAt"))) is None:
+            raise UnexpectedResponseError(self.data)
+        return created
 
     @property
     def thumbnail_url(self) -> str:
@@ -94,9 +106,20 @@ class Collection(UserDict[str, Any]):
         return int(self.get("visitsAllTime", 0))
 
     @property
-    def last_visit(self) -> datetime | None:
-        """Most recent visit time."""
-        return FeedNode.parse_datetime(self["visitLastTime"])
+    def last_visit(self) -> datetime:
+        """Most recent visit time.
+
+        Returns:
+            The last-visit ``datetime``. ``visitLastTime`` is non-null in the
+            schema, so it is always present.
+
+        Raises:
+            UnexpectedResponseError: If ``visitLastTime`` is missing or null,
+                which the schema does not permit.
+        """
+        if (visited := FeedNode.parse_datetime(self.get("visitLastTime"))) is None:
+            raise UnexpectedResponseError(self.data)
+        return visited
 
     @property
     def feeder_name(self) -> str | None:

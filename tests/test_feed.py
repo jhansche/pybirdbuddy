@@ -13,7 +13,7 @@ def test_feed_node_type_known_and_unknown():
 
 
 def test_parse_datetime_none_and_formats():
-    """parse_datetime handles None, the 24-char feed format, and ISO."""
+    """parse_datetime returns None for None, and parses feed and ISO strings."""
     assert FeedNode.parse_datetime(None) is None
     feed_fmt = FeedNode.parse_datetime("2023-01-01T00:00:00.000Z")
     assert feed_fmt is not None
