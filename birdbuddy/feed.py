@@ -6,7 +6,7 @@ from collections import UserDict
 from collections.abc import Iterator
 from datetime import datetime
 from enum import Enum
-from typing import Any, cast
+from typing import Any
 
 from propcache import cached_property
 
@@ -87,7 +87,11 @@ class FeedNode(UserDict[str, Any]):
 
     @property
     def created_at(self) -> datetime | None:
-        """The `datetime` when the FeedNode item was created."""
+        """The `datetime` when the item was created, or None if absent.
+
+        Feed items are ``AnyFeedItem`` union members; a member the query does
+        not select ``createdAt`` for carries no timestamp, hence ``None``.
+        """
         return FeedNode.parse_datetime(self.get("createdAt"))
 
 
@@ -125,12 +129,13 @@ class Feed(UserDict[str, Any]):
 
     @cached_property
     def newest_edge(self) -> FeedEdge | None:
-        """Returns the newest `FeedEdge`, by `FeedNode.created_at`."""
-        return max(
-            (e for e in self.edges if e.node.created_at),
-            key=lambda edge: cast(datetime, edge.node.created_at),
-            default=None,
-        )
+        """Return the newest `FeedEdge` by time, or None when all undated."""
+        dated = [
+            (created, edge)
+            for edge in self.edges
+            if (created := edge.node.created_at) is not None
+        ]
+        return max(dated, key=lambda pair: pair[0])[1] if dated else None
 
     def filter(
         self,

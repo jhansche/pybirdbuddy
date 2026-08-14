@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 
 from birdbuddy.feed import Feed, FeedNode, FeedNodeType
+from birdbuddy.queries.me import FEED
 
 
 def test_feed_node_type_known_and_unknown():
@@ -12,7 +13,7 @@ def test_feed_node_type_known_and_unknown():
 
 
 def test_parse_datetime_none_and_formats():
-    """parse_datetime handles None, the 24-char feed format, and ISO."""
+    """parse_datetime returns None for None, and parses feed and ISO strings."""
     assert FeedNode.parse_datetime(None) is None
     feed_fmt = FeedNode.parse_datetime("2023-01-01T00:00:00.000Z")
     assert feed_fmt is not None
@@ -78,3 +79,20 @@ def test_feed_newest_edge_and_filter():
     cutoff = datetime(2023, 2, 1, tzinfo=timezone.utc)
     recent = feed.filter(newer_than=cutoff)
     assert [n.node_id for n in recent] == ["n1"]
+
+
+def test_feed_node_created_at_absent_is_none():
+    """A feed node missing createdAt reports None rather than raising."""
+    node = FeedNode({"id": "x", "__typename": "FeedItemEditorsChoice"})
+    assert node.created_at is None
+
+
+def test_feed_query_requests_created_at_for_all_union_members():
+    """The FEED query selects createdAt on the FeedItem interface (#24).
+
+    An interface fragment covers every AnyFeedItem member, including types
+    not enumerated individually.
+    """
+    assert "... on FeedItem {" in FEED
+    interface = FEED.split("... on FeedItem {", 1)[1].split("}", 1)[0]
+    assert "createdAt" in interface

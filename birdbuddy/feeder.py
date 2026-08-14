@@ -36,6 +36,7 @@ class PowerProfile(Enum):
     """Feeder power profiles."""
 
     FRENZY = "FRENZY_MODE"
+    ULTRA_FRENZY = "ULTRA_FRENZY_MODE"
     POWER_SAVE = "POWER_SAVER_MODE"
     STANDARD = "STANDARD_MODE"
 

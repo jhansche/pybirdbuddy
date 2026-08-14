@@ -92,6 +92,16 @@ async def main():
     print(birds)
 ```
 
+## Deprecations
+
+Deprecated methods keep working and emit a `DeprecationWarning`, so upgrading
+does not break existing callers. Prefer the replacement:
+
+- `latest_collections()` — deprecated in 0.0.22; use `refresh_collections()`.
+  The old method referenced an undefined query and raised `AttributeError` on
+  every call, so it never returned data. It now delegates to
+  `refresh_collections()`, which returns the account's bird collections.
+
 ## Development
 
 Install [pyenv] and the pinned interpreter, then use the Makefile — every

@@ -18,6 +18,7 @@ from birdbuddy.feeder import (
     [
         (MetricState, "HIGH", MetricState.HIGH),
         (PowerProfile, "FRENZY_MODE", PowerProfile.FRENZY),
+        (PowerProfile, "ULTRA_FRENZY_MODE", PowerProfile.ULTRA_FRENZY),
         (FeederState, "READY_TO_STREAM", FeederState.READY_TO_STREAM),
     ],
 )

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator, Callable
 from datetime import datetime
 from typing import Any
 
 import langcodes
 from python_graphql_client import GraphqlClient
+from typing_extensions import deprecated
 
 from birdbuddy import LOGGER, VERBOSE, queries
 from birdbuddy.const import BB_URL
@@ -15,6 +17,7 @@ from birdbuddy.exceptions import (
     AuthenticationFailedError,
     AuthTokenExpiredError,
     GraphqlError,
+    NoFirmwareUpdateAvailableError,
     NoResponseError,
     UnexpectedResponseError,
 )
@@ -35,10 +38,28 @@ from birdbuddy.user import BirdBuddyUser
 _NO_VALUE = object()
 """Sentinel value to allow None to override a default value."""
 
+_MAX_PAGE_SIZE = 100
+"""The largest page size the API accepts; a larger ``first`` errors server
+side (HTTP 200 with a GraphQL ``INTERNAL_SERVER_ERROR``)."""
+
 
 def _redact(data: object, redacted: bool = True) -> object:
     """Return a redacted string if necessary."""
     return "**REDACTED**" if redacted else data
+
+
+def _require_page_size(page_size: int) -> None:
+    """Validate a pagination page size.
+
+    Args:
+        page_size: The requested per-page item count.
+
+    Raises:
+        ValueError: If ``page_size`` is not between 1 and the API's limit.
+    """
+    if not 1 <= page_size <= _MAX_PAGE_SIZE:
+        msg = f"page size must be between 1 and {_MAX_PAGE_SIZE}"
+        raise ValueError(msg)
 
 
 class BirdBuddy:
@@ -269,6 +290,59 @@ class BirdBuddy:
             return result[subscript]
         return result
 
+    async def _iter_pages(
+        self,
+        query: str,
+        variables: dict[str, Any],
+        connection: Callable[[dict], dict],
+    ) -> AsyncIterator[dict]:
+        """Yield successive pages of a Relay connection, following the cursor.
+
+        Requests ``query`` repeatedly, advancing ``after`` by the previous
+        page's ``endCursor`` until ``hasNextPage`` is false. Terminates
+        defensively if the server reports another page but returns no usable
+        cursor (missing, null, or one already seen), rather than looping
+        forever on a stuck cursor.
+
+        Args:
+            query: The GraphQL query text; it must accept an ``after`` cursor
+                and select ``pageInfo { hasNextPage endCursor }``.
+            variables: Base variables sent with every page (e.g. ``first``);
+                ``after`` is injected per page.
+            connection: Extracts the connection object (the one carrying
+                ``edges`` and ``pageInfo``) from a response ``data`` dict.
+
+        Yields:
+            Each page's connection object, in natural iterating order.
+        """
+        after: str | None = None
+        seen: set[str] = set()
+        while True:
+            page_vars = dict(variables)
+            if after is not None:
+                # The API errors on an explicit ``after: null``; omit it for
+                # the first page and only send a real cursor.
+                page_vars["after"] = after
+            data = await self._make_request(query=query, variables=page_vars)
+            page = connection(data)
+            yield page
+
+            page_info = page.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+            cursor = page_info.get("endCursor")
+            if not cursor or cursor in seen:
+                # Defensive: the server claims another page but gave no new
+                # cursor to advance with. Stop instead of re-requesting.
+                LOGGER.debug(
+                    "Pagination stopped: hasNextPage but cursor did not "
+                    "advance (endCursor=%r)",
+                    cursor,
+                )
+                return
+            seen.add(cursor)
+            after = cursor
+
     @property
     def user(self) -> None | BirdBuddyUser:
         """The logged in user data."""
@@ -403,7 +477,8 @@ class BirdBuddy:
         and an ``"edges"`` key with FeedEdge nodes, newest first.
 
         Args:
-            first: Return the first N items older than ``after``.
+            first: Return the first N items older than ``after``. Must be
+                1-100; the API returns an internal error for larger values.
             after: Cursor of the oldest item previously seen (pagination).
             last: Return the last N items newer than ``before``. Currently
                 ignored; the backward-pagination request path is disabled.
@@ -412,7 +487,11 @@ class BirdBuddy:
 
         Returns:
             The Feed.
+
+        Raises:
+            ValueError: If ``first`` is not between 1 and 100.
         """
+        _require_page_size(first)
         variables: dict[str, Any] = {
             # $first: Int,
             # $after: String,
@@ -434,49 +513,94 @@ class BirdBuddy:
         data = await self._make_request(query=queries.me.FEED, variables=variables)
         return Feed(data["me"]["feed"])
 
-    async def refresh_feed(
-        self,
-        since: datetime | str = _NO_VALUE,  # type: ignore[assignment]
-    ) -> list[FeedNode]:
-        """Return only feed items new since the last refresh.
+    def _feed_pages(self) -> AsyncIterator[dict]:
+        """Iterate feed connection pages, newest first, one per request."""
+        return self._iter_pages(
+            query=queries.me.FEED,
+            variables={"first": _MAX_PAGE_SIZE},
+            connection=lambda data: data["me"]["feed"],
+        )
 
-        The most recent edge node timestamp is saved as the last-seen feed
-        item, which becomes the new default value for ``since``. Useful to,
-        for example, restore a last-seen timestamp in a new instance.
+    def _note_newest_feed_date(self, feed: Feed) -> None:
+        """Advance the saved last-seen timestamp to a page's newest item.
 
         Args:
-            since: The time after which to restrict new feed items; defaults
-                to the last-seen timestamp.
-
-        Returns:
-            The new feed nodes.
+            feed: A feed page; its newest edge sets the last-seen timestamp.
         """
-        resolved = self._last_feed_date if since is _NO_VALUE else since
-        if isinstance(resolved, str):
-            resolved = FeedNode.parse_datetime(resolved)
-        feed = await self.feed()
-        if (newest_edge := feed.newest_edge) and (
-            newest_date := newest_edge.node.created_at
-        ) != self._last_feed_date:
+        if not (newest_edge := feed.newest_edge):
+            return
+        newest_date = newest_edge.node.created_at
+        if newest_date is not None and newest_date != self._last_feed_date:
             LOGGER.debug(
                 "Updating latest seen Feed timestamp: %s -> %s",
                 self._last_feed_date,
                 newest_date,
             )
             self._last_feed_date = newest_date
-        return feed.filter(newer_than=resolved)
+
+    async def refresh_feed(
+        self,
+        since: datetime | str = _NO_VALUE,  # type: ignore[assignment]
+    ) -> list[FeedNode]:
+        """Return only feed items new since the last refresh.
+
+        Pages backward through the feed (newest first) until it reaches
+        items no newer than ``since``, so more than one page of new items is
+        returned rather than truncated at the first page. The newest item's
+        timestamp is saved as the last-seen feed item, the new default for
+        ``since``.
+
+        With no ``since`` and no prior refresh there is no lower bound to
+        page toward, so only the most recent page is returned; this avoids
+        replaying the entire history on a first refresh.
+
+        Args:
+            since: The time after which to restrict new feed items; defaults
+                to the last-seen timestamp.
+
+        Returns:
+            The new feed nodes, newest first.
+        """
+        resolved = self._last_feed_date if since is _NO_VALUE else since
+        if isinstance(resolved, str):
+            resolved = FeedNode.parse_datetime(resolved)
+
+        if resolved is None:
+            feed = await self.feed()
+            self._note_newest_feed_date(feed)
+            return feed.filter(newer_than=None)
+
+        new_nodes: list[FeedNode] = []
+        noted = False
+        async for page in self._feed_pages():
+            feed = Feed(page)
+            if not noted:
+                self._note_newest_feed_date(feed)
+                noted = True
+            new_nodes.extend(feed.filter(newer_than=resolved))
+            oldest = min(
+                (n.created_at for n in feed.nodes if n.created_at),
+                default=None,
+            )
+            if oldest is not None and oldest <= resolved:
+                # Reached items no newer than the cutoff; older pages hold
+                # nothing new.
+                break
+        return new_nodes
 
     async def feed_nodes(self, node_type: FeedNodeType) -> list[FeedNode]:
-        """Return all feed items of the given type.
+        """Return all feed items of the given type across every page.
 
         Args:
             node_type: The feed node type to filter by.
 
         Returns:
-            The matching feed nodes.
+            The matching feed nodes, newest first.
         """
-        feed = await self.feed()
-        return feed.filter(of_type=node_type)
+        nodes: list[FeedNode] = []
+        async for page in self._feed_pages():
+            nodes.extend(Feed(page).filter(of_type=node_type))
+        return nodes
 
     async def new_postcards(self) -> list[FeedNode]:
         """Return all new 'Postcard' feed items.
@@ -947,12 +1071,23 @@ class BirdBuddy:
 
         Returns:
             The firmware update status.
+
+        Raises:
+            NoFirmwareUpdateAvailableError: If the feeder already runs the
+                latest firmware (the API errors internally otherwise).
         """
         current_status = await self.update_firmware_check(feeder)
 
         if current_status.is_in_progress:
             # There's already an update in progress
             return current_status
+
+        # The API returns an internal error when asked to start an update that
+        # is not available, so guard on the versions the check reported.
+        reported = Feeder(current_status.get("feeder") or {})
+        if reported.version and reported.version == reported.version_update_available:
+            msg = f"feeder already on the latest firmware ({reported.version})"
+            raise NoFirmwareUpdateAvailableError(msg)
 
         feeder_id: str
         if isinstance(feeder, Feeder):
@@ -1025,34 +1160,49 @@ class BirdBuddy:
                 del self._collections[collection.collection_id]
         return self._collections
 
-    async def collection(self, collection_id: str) -> dict[str, Media]:
-        """Return the media in the specified collection.
+    async def collection(
+        self, collection_id: str, page_size: int = 50
+    ) -> dict[str, Media]:
+        """Return all media in the specified collection.
+
+        Follows pagination so collections larger than one page are fully
+        retrieved (not truncated to the first page).
 
         Args:
             collection_id: The collection ``UUID``.
+            page_size: How many media to request per page. Must be 1-100; the
+                API returns an internal error for larger page sizes.
 
         Returns:
             A mapping of ``media_id`` to its ``Media``.
-        """
-        variables = {
-            "collectionId": collection_id,
-            # other inputs: first, orderBy, last, after, before
-        }
-        data = await self._make_request(
-            query=queries.me.COLLECTIONS_MEDIA, variables=variables
-        )
-        # TODO: check [collection][media][pageInfo][hasNextPage]?
-        return {
-            (node := edge["node"]["media"])["id"]: Media(node)
-            for edge in data["collection"]["media"]["edges"]
-        }
 
-    async def latest_collections(
-        self,
-    ) -> dict[str, Collection]:
-        """Return the latest collections."""
-        query = queries.me.LATEST_MEDIA  # type: ignore[attr-defined]
-        return await self._make_request(query=query)
+        Raises:
+            ValueError: If ``page_size`` is not between 1 and 100.
+        """
+        _require_page_size(page_size)
+        result: dict[str, Media] = {}
+        variables = {"collectionId": collection_id, "first": page_size}
+        pages = self._iter_pages(
+            query=queries.me.COLLECTIONS_MEDIA,
+            variables=variables,
+            connection=lambda data: data["collection"]["media"],
+        )
+        async for media in pages:
+            for edge in media["edges"]:
+                node = edge["node"]["media"]
+                result[node["id"]] = Media(node)
+        return result
+
+    @deprecated("latest_collections is deprecated; use refresh_collections()")
+    async def latest_collections(self) -> dict[str, Collection]:
+        """Return the account's bird collections.
+
+        Deprecated since 0.0.22; use :func:`refresh_collections` instead. The
+        previous implementation referenced an undefined query and raised
+        ``AttributeError`` on every call; this now delegates to
+        ``refresh_collections``, which keeps only bird collections.
+        """
+        return await self.refresh_collections()
 
     @property
     def feeders(self) -> dict[str, Feeder]:
