@@ -49,7 +49,7 @@ def collect_flow_fixture() -> dict:
 
 @pytest.fixture(name="api_payloads")
 def api_payloads_fixture() -> dict:
-    """Load the sanitized real API payload fixture (2026-07 capture)."""
+    """Load the sanitized real API payload fixture."""
     return load_json_fixture("api_payloads.json")
 
 
