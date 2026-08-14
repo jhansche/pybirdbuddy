@@ -315,6 +315,10 @@ class BirdBuddy:
 
         Yields:
             Each page's connection object, in natural iterating order.
+
+        Raises:
+            UnexpectedResponseError: If a response lacks the expected
+                connection object.
         """
         after: str | None = None
         seen: set[str] = set()
@@ -325,7 +329,12 @@ class BirdBuddy:
                 # the first page and only send a real cursor.
                 page_vars["after"] = after
             data = await self._make_request(query=query, variables=page_vars)
-            page = connection(data)
+            try:
+                page = connection(data)
+            except (KeyError, TypeError) as err:
+                raise UnexpectedResponseError(data) from err
+            if not isinstance(page, dict):
+                raise UnexpectedResponseError(data)
             yield page
 
             page_info = page.get("pageInfo") or {}
@@ -1280,6 +1289,7 @@ class BirdBuddy:
 
         Raises:
             ValueError: If ``page_size`` is not between 1 and 100.
+            UnexpectedResponseError: If a page lacks the expected media edges.
         """
         _require_page_size(page_size)
         result: dict[str, Media] = {}
@@ -1290,9 +1300,12 @@ class BirdBuddy:
             connection=lambda data: data["collection"]["media"],
         )
         async for media in pages:
-            for edge in media["edges"]:
-                node = edge["node"]["media"]
-                result[node["id"]] = Media(node)
+            try:
+                for edge in media["edges"]:
+                    node = edge["node"]["media"]
+                    result[node["id"]] = Media(node)
+            except (KeyError, TypeError) as err:
+                raise UnexpectedResponseError(media) from err
         return result
 
     @deprecated("latest_collections is deprecated; use refresh_collections()")

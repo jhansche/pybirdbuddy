@@ -318,6 +318,38 @@ async def test_collection_stops_on_repeated_cursor(
 
 
 @pytest.mark.asyncio
+async def test_collection_missing_connection_raises(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """A response without the collection/media connection raises."""
+    graphql_mock.side_effect = [{"data": {}}]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.collection("col-1")
+
+
+@pytest.mark.asyncio
+async def test_collection_null_connection_raises(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """A null media connection raises instead of an AttributeError."""
+    graphql_mock.side_effect = [{"data": {"collection": {"media": None}}}]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.collection("col-1")
+
+
+@pytest.mark.asyncio
+async def test_collection_malformed_edges_raises(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """A page missing the expected media edges raises."""
+    graphql_mock.side_effect = [
+        {"data": {"collection": {"media": {"pageInfo": {"hasNextPage": False}}}}}
+    ]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.collection("col-1")
+
+
+@pytest.mark.asyncio
 async def test_latest_collections_delegates_and_warns(bbclient: BirdBuddy):
     """latest_collections is deprecated and forwards to refresh_collections.
 
