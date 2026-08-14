@@ -47,6 +47,12 @@ def collect_flow_fixture() -> dict:
     return load_json_fixture("collect_flow.json")
 
 
+@pytest.fixture(name="api_payloads")
+def api_payloads_fixture() -> dict:
+    """Load the sanitized real API payload fixture (2026-07 capture)."""
+    return load_json_fixture("api_payloads.json")
+
+
 @pytest.fixture(name="bbclient")
 def logged_in_client() -> BirdBuddy:
     """Return a BirdBuddy client pre-seeded with fake tokens."""
