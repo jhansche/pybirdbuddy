@@ -5,14 +5,10 @@ from unittest.mock import ANY, AsyncMock, call, patch
 import pytest
 
 from birdbuddy.client import BirdBuddy
-from birdbuddy.exceptions import NoFirmwareUpdateAvailableError
+from birdbuddy.exceptions import NoFirmwareUpdateAvailableError, UnexpectedResponseError
 from birdbuddy.feeder import Feeder
-from birdbuddy.sightings import (
-    PostcardSighting,
-    SightingCreateProgress,
-    SightingFinishStrategy,
-    SightingReport,
-)
+from birdbuddy.postcards import CollectedPostcard, PostcardAnalysis
+from birdbuddy.sightings import PostcardSighting, SightingFinishStrategy
 
 _POSTCARD_ID = "725af10e-8be1-5252-96fe-d49565053c44"
 _SIGHTING_ID = "64af354b-3689-5df8-afcd-78ec4f987b88"
@@ -31,11 +27,12 @@ async def test_finish_postcard_recognized(
     graphql_mock.side_effect = [
         {"data": {"sightingReportPostcardFinish": {"success": True}}},
     ]
-    result = await bbclient.finish_postcard(
-        postcard_sighting["postcard"]["id"],
-        PostcardSighting(postcard_sighting["sighting"]),
-        strategy=SightingFinishStrategy.RECOGNIZED,
-    )
+    with pytest.deprecated_call():
+        result = await bbclient.finish_postcard(
+            postcard_sighting["postcard"]["id"],
+            PostcardSighting(postcard_sighting["sighting"]),
+            strategy=SightingFinishStrategy.RECOGNIZED,
+        )
     graphql_mock.assert_called_once_with(
         query=ANY,
         variables={
@@ -96,11 +93,12 @@ async def test_finish_postcard_best_guess(
         {"data": {"sightingChooseSpecies": modified}},
         {"data": {"sightingReportPostcardFinish": {"success": True}}},
     ]
-    result = await bbclient.finish_postcard(
-        postcard_sighting["postcard"]["id"],
-        PostcardSighting(postcard_sighting["sighting"]),
-        strategy=SightingFinishStrategy.BEST_GUESS,
-    )
+    with pytest.deprecated_call():
+        result = await bbclient.finish_postcard(
+            postcard_sighting["postcard"]["id"],
+            PostcardSighting(postcard_sighting["sighting"]),
+            strategy=SightingFinishStrategy.BEST_GUESS,
+        )
     graphql_mock.assert_has_calls(
         calls=[
             call(
@@ -133,98 +131,26 @@ async def test_finish_postcard_best_guess(
 
 
 @pytest.mark.asyncio
-async def test_sighting_create(bbclient: BirdBuddy, graphql_mock: AsyncMock):
-    """sighting_create returns a SightingCreateProgress from the response."""
-    graphql_mock.side_effect = [
-        {
-            "data": {
-                "sightingCreate": {
-                    "sightingCreateProgress": {
-                        "id": "test-create-id",
-                        "progress": 42.5,
-                        "__typename": "SightingCreateProgress",
-                    }
-                }
-            }
-        }
-    ]
-    result = await bbclient.sighting_create(["media-id-1", "media-id-2"])
-
-    assert isinstance(result, SightingCreateProgress)
-    assert result.id == "test-create-id"
-    assert result.progress == 42.5
-
-    graphql_mock.assert_called_once_with(
-        query=ANY,
-        variables={
-            "sightingCreateInput": {
-                "mediaIds": ["media-id-1", "media-id-2"],
-            }
-        },
-        headers=ANY,
-    )
+async def test_sighting_create_deprecated_and_removed(bbclient: BirdBuddy):
+    """sighting_create is deprecated and raises; the API removed the mutation."""
+    with pytest.deprecated_call(), pytest.raises(NotImplementedError):
+        await bbclient.sighting_create(["media-id-1", "media-id-2"])
 
 
-_IN_PROGRESS = {
-    "id": "test-create-id",
-    "progress": 75.0,
-    "__typename": "SightingCreateProgress",
-}
-_COMPLETED = {
-    "reportToken": "test-report-token",
-    "sightings": [
-        {
-            "id": "sighting-id-1",
-            "__typename": "SightingRecognizedBird",
-            "species": {
-                "id": "species-id-1",
-                "name": "Northern Cardinal",
-                "__typename": "SpeciesBird",
-            },
-        }
-    ],
-    "__typename": "SightingReport",
-}
-
-
-@pytest.mark.parametrize(
-    ("payload", "expected_type"),
-    [
-        pytest.param(_IN_PROGRESS, SightingCreateProgress, id="in_progress"),
-        pytest.param(_COMPLETED, SightingReport, id="completed"),
-    ],
-)
 @pytest.mark.asyncio
-async def test_sighting_create_check_progress(
+async def test_sighting_create_check_progress_deprecated_and_removed(
     bbclient: BirdBuddy,
-    graphql_mock: AsyncMock,
-    payload: dict,
-    expected_type: type,
 ):
-    """check_progress returns Progress while pending, Report once complete."""
-    graphql_mock.side_effect = [{"data": {"sightingCreateCheckProgress": payload}}]
-    result = await bbclient.sighting_create_check_progress(
-        sighting_create_id="test-create-id", watching_id="test-watching-id"
-    )
-    assert isinstance(result, expected_type)
-    if expected_type is SightingReport:
-        assert isinstance(result, SightingReport)
-        assert result.sightings[0].species.name == "Northern Cardinal"
-    graphql_mock.assert_called_once_with(
-        query=ANY,
-        variables={
-            "sightingCreateCheckProgressInput": {
-                "sightingCreateId": "test-create-id",
-                "watchingId": "test-watching-id",
-            }
-        },
-        headers=ANY,
-    )
+    """sighting_create_check_progress is deprecated and raises."""
+    with pytest.deprecated_call(), pytest.raises(NotImplementedError):
+        await bbclient.sighting_create_check_progress(
+            sighting_create_id="x", watching_id="y"
+        )
 
 
 @pytest.mark.asyncio
 async def test_reanalyze_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
-    """reanalyze_postcard returns the updated feed item payload."""
+    """reanalyze_postcard is deprecated but still returns the raw payload."""
     graphql_mock.side_effect = [
         {
             "data": {
@@ -238,7 +164,8 @@ async def test_reanalyze_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
             }
         }
     ]
-    result = await bbclient.reanalyze_postcard("postcard-id-1")
+    with pytest.deprecated_call():
+        result = await bbclient.reanalyze_postcard("postcard-id-1")
 
     assert isinstance(result, dict)
     assert result["updatedFeedItem"]["id"] == "postcard-id-1"
@@ -251,10 +178,51 @@ async def test_reanalyze_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
 
 
 @pytest.mark.asyncio
-async def test_reanalyze_postcard_rejects_bad_type(bbclient: BirdBuddy):
+async def test_identify_postcard_rejects_bad_type(bbclient: BirdBuddy):
     """A non-str/FeedNode postcard raises TypeError before any request."""
     with pytest.raises(TypeError):
-        await bbclient.reanalyze_postcard(123)  # type: ignore[arg-type]
+        await bbclient.identify_postcard(123)  # type: ignore[arg-type]
+
+
+@pytest.mark.asyncio
+async def test_identify_postcard(bbclient: BirdBuddy, graphql_mock: AsyncMock):
+    """identify_postcard parses the feed item into a PostcardAnalysis."""
+    graphql_mock.side_effect = [
+        {
+            "data": {
+                "inferenceExternalPostcardReanalyze": {
+                    "updatedFeedItem": {
+                        "__typename": "FeedItemNewPostcard",
+                        "id": "postcard-id-1",
+                        "inferenceExecutionMode": "MANUAL_COMPLETED",
+                        "sightingReportPreview": {
+                            "sightings": [
+                                {
+                                    "__typename": "SightingRecognizedBird",
+                                    "species": {
+                                        "id": "s1",
+                                        "name": "American Robin",
+                                    },
+                                }
+                            ]
+                        },
+                    }
+                }
+            }
+        }
+    ]
+    result = await bbclient.identify_postcard("postcard-id-1")
+
+    assert isinstance(result, PostcardAnalysis)
+    assert result.id == "postcard-id-1"
+    assert result.inference_execution_mode == "MANUAL_COMPLETED"
+    assert [s.name for s in result.species] == ["American Robin"]
+
+    graphql_mock.assert_called_once_with(
+        query=ANY,
+        variables={"feedItemId": "postcard-id-1"},
+        headers=ANY,
+    )
 
 
 def _collection_page(media_id: str, *, has_next: bool, cursor: str | None) -> dict:
@@ -512,7 +480,7 @@ async def test_update_firmware_start_guards_when_up_to_date(
     instead of round-tripping.
     """
     fid = "f1"
-    bbclient._feeders[fid] = Feeder({"id": fid, "__typename": "FeederForOwner"})  # noqa: SLF001
+    bbclient._feeders[fid] = Feeder({"id": fid, "__typename": "FeederForOwner"})
     graphql_mock.side_effect = [
         {
             "data": {
@@ -530,3 +498,71 @@ async def test_update_firmware_start_guards_when_up_to_date(
         await bbclient.update_firmware_start(fid)
     # Only the check ran; the start mutation was never sent.
     assert graphql_mock.call_count == 1
+
+
+_PID = "postcard-1"
+_REANALYZED = {
+    "data": {
+        "inferenceExternalPostcardReanalyze": {
+            "updatedFeedItem": {
+                "__typename": "FeedItemNewPostcard",
+                "id": _PID,
+                "inferenceExecutionMode": "MANUAL_COMPLETED",
+                "reanalyzeAvailability": "ALREADY_REANALYZED",
+            }
+        }
+    }
+}
+
+
+@pytest.mark.asyncio
+async def test_collect_postcard(
+    bbclient: BirdBuddy,
+    graphql_mock: AsyncMock,
+    collect_flow: dict,
+):
+    """collect_postcard reanalyzes, then collects into a CollectedPostcard."""
+    collected = collect_flow["postcard_collect"]["postcardCollect"]
+    graphql_mock.side_effect = [
+        _REANALYZED,
+        {"data": {"postcardCollect": collected}},
+    ]
+    result = await bbclient.collect_postcard(_PID)
+    assert isinstance(result, CollectedPostcard)
+    assert result.has_mystery_visitor is False
+    assert [s.name for s in result.species] == ["California Scrub-Jay"]
+    assert result.medias
+    graphql_mock.assert_has_calls(
+        calls=[
+            call(query=ANY, variables={"feedItemId": _PID}, headers=ANY),
+            call(
+                query=ANY,
+                variables={
+                    "feedItemId": _PID,
+                    "postcardCollectInput": {"share": False},
+                },
+                headers=ANY,
+            ),
+        ],
+        any_order=False,
+    )
+
+
+@pytest.mark.asyncio
+async def test_identify_postcard_unexpected_response(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """Missing reanalyze fields raise UnexpectedResponseError."""
+    graphql_mock.side_effect = [{"data": {}}]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.identify_postcard("postcard-id-1")
+
+
+@pytest.mark.asyncio
+async def test_collect_postcard_unexpected_response(
+    bbclient: BirdBuddy, graphql_mock: AsyncMock
+):
+    """Missing collect fields raise UnexpectedResponseError."""
+    graphql_mock.side_effect = [_REANALYZED, {"data": {}}]
+    with pytest.raises(UnexpectedResponseError):
+        await bbclient.collect_postcard(_PID)

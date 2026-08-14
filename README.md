@@ -74,6 +74,29 @@ fragment ListFeederFields on FeederForPrivate {
 }
 ```
 
+New postcards arrive in the feed. Identify a postcard's visitor without
+collecting it, or collect it into your account:
+
+```python
+from birdbuddy.client import BirdBuddy
+
+
+async def main():
+    bb = BirdBuddy("user@email.com", "Pa$$w0rd")
+
+    postcards = await bb.new_postcards()
+    postcard = postcards[0]
+
+    # Preview the recognized species and media, without collecting:
+    analysis = await bb.identify_postcard(postcard)
+    print([species.name for species in analysis.species])
+
+    # Collect it into your account. collect_postcard reanalyzes internally
+    # (idempotent), so calling identify_postcard beforehand is not required.
+    collected = await bb.collect_postcard(postcard)
+    print(collected.species)
+```
+
 ## Translations
 
 API responses can return translated strings by setting the client's
@@ -101,6 +124,15 @@ does not break existing callers. Prefer the replacement:
   The old method referenced an undefined query and raised `AttributeError` on
   every call, so it never returned data. It now delegates to
   `refresh_collections()`, which returns the account's bird collections.
+- `reanalyze_postcard()` — deprecated in 0.0.22; use `identify_postcard()`,
+  which returns a `PostcardAnalysis` (recognized species and media) instead of
+  the raw payload.
+- `sighting_from_postcard()`, `finish_postcard()`, `sighting_choose_species()`,
+  and `sighting_choose_mystery()` — deprecated in 0.0.22; the report-token flow
+  is superseded by `identify_postcard()` and `collect_postcard()`.
+- `sighting_create()` and `sighting_create_check_progress()` — deprecated in
+  0.0.22; the API removed the underlying mutations, so these raise
+  `NotImplementedError`.
 
 ## Development
 

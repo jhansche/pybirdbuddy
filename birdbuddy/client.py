@@ -24,6 +24,7 @@ from birdbuddy.exceptions import (
 from birdbuddy.feed import Feed, FeedNode, FeedNodeType
 from birdbuddy.feeder import Feeder, FeederUpdateStatus, PowerProfile
 from birdbuddy.media import Collection, Media
+from birdbuddy.postcards import CollectedPostcard, PostcardAnalysis
 from birdbuddy.queries.debug import DUMP_SCHEMA
 from birdbuddy.sightings import (
     PostcardSighting,
@@ -344,7 +345,7 @@ class BirdBuddy:
             after = cursor
 
     @property
-    def user(self) -> None | BirdBuddyUser:
+    def user(self) -> BirdBuddyUser | None:
         """The logged in user data."""
         return self._me
 
@@ -610,14 +611,77 @@ class BirdBuddy:
         """
         return await self.feed_nodes(FeedNodeType.NewPostcard)
 
+    def _postcard_id(self, postcard: str | FeedNode) -> str:
+        """Resolve a postcard argument to its feed-item id.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+
+        Returns:
+            The feed-item id.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
+            TypeError: If ``postcard`` is neither a str nor a FeedNode.
+        """
+        if isinstance(postcard, str):
+            return postcard
+        if isinstance(postcard, FeedNode):
+            if postcard.node_type != FeedNodeType.NewPostcard:
+                msg = f"expected a NewPostcard, got {postcard.node_type}"
+                raise ValueError(msg)
+            return postcard.node_id
+        msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
+        raise TypeError(msg)
+
+    async def identify_postcard(
+        self,
+        postcard: str | FeedNode,
+    ) -> PostcardAnalysis:
+        """Identify a postcard's visitor (the app's "Identify this visitor").
+
+        Runs the AI inference (GraphQL ``inferenceExternalPostcardReanalyze``)
+        and returns the recognized species and media without collecting. Free
+        accounts analyze on demand (this call); premium accounts analyze
+        automatically, so this is then a no-op. Idempotent: an already-analyzed
+        postcard returns the same analysis, with reanalyzeAvailability
+        ALREADY_REANALYZED.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+
+        Returns:
+            The postcard's ``PostcardAnalysis``: recognized species and media,
+            without collecting.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
+            TypeError: If ``postcard`` is neither a str nor a FeedNode.
+            UnexpectedResponseError: If the response lacks the expected
+                reanalyze fields.
+        """
+        result = await self._make_request(
+            query=queries.birds.POSTCARD_REANALYZE,
+            variables={"feedItemId": self._postcard_id(postcard)},
+        )
+        try:
+            updated = result["inferenceExternalPostcardReanalyze"]["updatedFeedItem"]
+        except (KeyError, TypeError) as err:
+            raise UnexpectedResponseError(result) from err
+        return PostcardAnalysis(updated)
+
+    @deprecated("reanalyze_postcard is deprecated; use identify_postcard")
     async def reanalyze_postcard(
         self,
         postcard: str | FeedNode,
     ) -> dict:
         """Trigger the AI identification (reanalysis) for a postcard.
 
-        Changes the inference execution mode from MANUAL_NOT_STARTED to
-        MANUAL_COMPLETED and populates the sighting report preview.
+        Deprecated since 0.0.22: use :func:`identify_postcard`, which returns a
+        ``PostcardAnalysis``. This returns the raw
+        ``inferenceExternalPostcardReanalyze`` payload unchanged.
 
         Args:
             postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
@@ -629,25 +693,55 @@ class BirdBuddy:
             ValueError: If ``postcard`` is a FeedNode that is not a
                 NewPostcard.
         """
-        postcard_id: str
-        if isinstance(postcard, str):
-            postcard_id = postcard
-        elif isinstance(postcard, FeedNode):
-            if postcard.node_type != FeedNodeType.NewPostcard:
-                msg = f"expected a NewPostcard, got {postcard.node_type}"
-                raise ValueError(msg)
-            postcard_id = postcard.node_id
-        else:
-            msg = f"postcard must be a str or FeedNode, got {type(postcard)}"
-            raise TypeError(msg)
-
-        variables = {"feedItemId": postcard_id}
+        variables = {"feedItemId": self._postcard_id(postcard)}
         result = await self._make_request(
             query=queries.birds.POSTCARD_REANALYZE,
             variables=variables,
         )
         return result["inferenceExternalPostcardReanalyze"]
 
+    async def collect_postcard(
+        self,
+        postcard: str | FeedNode,
+        *,
+        share: bool = False,
+    ) -> CollectedPostcard:
+        """Collect a postcard into your account.
+
+        Identifies the postcard first (idempotent, so it is safe whether or
+        not inference has already run), then collects it with the species the
+        backend recognized.
+
+        Args:
+            postcard: A postcard feed-item id, or a ``NewPostcard`` FeedNode.
+            share: Whether to share the collected media.
+
+        Returns:
+            The collected postcard.
+
+        Raises:
+            ValueError: If ``postcard`` is a FeedNode that is not a
+                NewPostcard.
+            TypeError: If ``postcard`` is neither a str nor a FeedNode.
+            UnexpectedResponseError: If the response lacks the expected
+                collect fields.
+        """
+        postcard_id = self._postcard_id(postcard)
+        await self.identify_postcard(postcard_id)
+        result = await self._make_request(
+            query=queries.birds.POSTCARD_COLLECT,
+            variables={
+                "feedItemId": postcard_id,
+                "postcardCollectInput": {"share": share},
+            },
+        )
+        try:
+            collected = result["postcardCollect"]["collectedPostcard"]
+        except (KeyError, TypeError) as err:
+            raise UnexpectedResponseError(result) from err
+        return CollectedPostcard(collected)
+
+    @deprecated("sighting_from_postcard is deprecated; use identify_postcard")
     async def sighting_from_postcard(
         self,
         postcard: str | FeedNode,
@@ -691,6 +785,7 @@ class BirdBuddy:
         data = result["sightingCreateFromPostcard"]
         return PostcardSighting(data).with_postcard(postcard_id)
 
+    @deprecated("finish_postcard is deprecated; use collect_postcard")
     async def finish_postcard(
         self,
         feed_item_id: str,
@@ -747,7 +842,7 @@ class BirdBuddy:
                     match_data["confidence"],
                     match_data["speciesCode"],
                 )
-                new_report = await self.sighting_choose_species(
+                new_report = await self._choose_species(
                     sighting.id,
                     match_data["speciesCode"],
                     report,
@@ -759,7 +854,7 @@ class BirdBuddy:
                 )
                 report = new_report
             elif mod.strategy == SightingFinishStrategy.MYSTERY:
-                new_report = await self.sighting_choose_mystery(
+                new_report = await self._choose_mystery(
                     sighting.id,
                     report,
                 )
@@ -824,31 +919,25 @@ class BirdBuddy:
         )
         return bool(result["mediaShareToggle"]["success"])
 
+    @deprecated("sighting_create was removed from the Bird Buddy API")
     async def sighting_create(
         self,
         media_ids: list[str],
     ) -> SightingCreateProgress:
         """Identify birds in media via a background process.
 
-        Args:
-            media_ids: The media ids to analyze.
+        Deprecated since 0.0.22: the ``sightingCreate`` mutation was removed
+        from the Bird Buddy API, so this raises instead of round-tripping into
+        a server error. The postcard flow (``identify_postcard`` /
+        ``collect_postcard``) replaces media-based identification.
 
-        Returns:
-            The initial ``SightingCreateProgress``.
+        Raises:
+            NotImplementedError: Always; the mutation no longer exists.
         """
-        variables = {
-            "sightingCreateInput": {
-                "mediaIds": media_ids,
-            }
-        }
-        result = await self._make_request(
-            query=queries.birds.SIGHTING_CREATE,
-            variables=variables,
-        )
-        return SightingCreateProgress(
-            result["sightingCreate"]["sightingCreateProgress"]
-        )
+        msg = "sightingCreate was removed from the Bird Buddy API"
+        raise NotImplementedError(msg)
 
+    @deprecated("sighting_create_check_progress was removed from the Bird Buddy API")
     async def sighting_create_check_progress(
         self,
         sighting_create_id: str,
@@ -856,29 +945,17 @@ class BirdBuddy:
     ) -> SightingCreateProgress | SightingReport:
         """Check the progress of a background bird identification.
 
-        Args:
-            sighting_create_id: The id from ``sighting_create``.
-            watching_id: The watching id to poll.
+        Deprecated since 0.0.22: the ``sightingCreateCheckProgress`` query was
+        removed from the Bird Buddy API, so this raises instead of
+        round-tripping into a server error.
 
-        Returns:
-            A ``SightingCreateProgress`` while pending, or a ``SightingReport``
-            once identification completes.
+        Raises:
+            NotImplementedError: Always; the query no longer exists.
         """
-        variables = {
-            "sightingCreateCheckProgressInput": {
-                "sightingCreateId": sighting_create_id,
-                "watchingId": watching_id,
-            }
-        }
-        result = await self._make_request(
-            query=queries.birds.SIGHTING_CREATE_PROGRESS,
-            variables=variables,
-        )
-        data = result["sightingCreateCheckProgress"]
-        if data.get("__typename") == "SightingReport":
-            return SightingReport(data)
-        return SightingCreateProgress(data)
+        msg = "sightingCreateCheckProgress was removed from the Bird Buddy API"
+        raise NotImplementedError(msg)
 
+    @deprecated("sighting_choose_species is deprecated; use collect_postcard")
     async def sighting_choose_species(
         self,
         sighting_id: str,
@@ -898,6 +975,19 @@ class BirdBuddy:
         Raises:
             TypeError: If ``sighting_data`` is not a SightingReport or token.
         """
+        return await self._choose_species(sighting_id, species_id, sighting_data)
+
+    # TODO: Inline into finish_postcard and remove when the deprecated report
+    # flow (sighting_choose_species, finish_postcard) is removed. It exists
+    # only so finish_postcard can choose a species without triggering
+    # sighting_choose_species's deprecation warning.
+    async def _choose_species(
+        self,
+        sighting_id: str,
+        species_id: str,
+        sighting_data: SightingReport | str | None = None,
+    ) -> SightingReport:
+        """Assign a species to a sighting (shared by the deprecated flow)."""
         token: str | None
         if isinstance(sighting_data, SightingReport):
             token = sighting_data.token
@@ -919,6 +1009,7 @@ class BirdBuddy:
         )
         return SightingReport(data["sightingChooseSpecies"])
 
+    @deprecated("sighting_choose_mystery is deprecated; use collect_postcard")
     async def sighting_choose_mystery(
         self,
         sighting_id: str,
@@ -936,6 +1027,17 @@ class BirdBuddy:
         Raises:
             TypeError: If ``sighting_data`` is not a SightingReport or token.
         """
+        return await self._choose_mystery(sighting_id, sighting_data)
+
+    # TODO: Remove with _choose_species when the deprecated report flow is
+    # removed; exists only to keep finish_postcard from triggering
+    # sighting_choose_mystery's deprecation warning.
+    async def _choose_mystery(
+        self,
+        sighting_id: str,
+        sighting_data: SightingReport | str | None = None,
+    ) -> SightingReport:
+        """Convert a sighting to a mystery visitor (shared by the deprecated flow)."""
         token: str | None
         if isinstance(sighting_data, SightingReport):
             token = sighting_data.token
