@@ -658,6 +658,7 @@ class BirdBuddy:
         Raises:
             ValueError: If ``postcard`` is a FeedNode that is not a
                 NewPostcard.
+            TypeError: If ``postcard`` is neither a str nor a FeedNode.
             UnexpectedResponseError: If the response lacks the expected
                 reanalyze fields.
         """
