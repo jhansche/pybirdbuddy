@@ -313,7 +313,7 @@ class BirdBuddy:
                 ``edges`` and ``pageInfo``) from a response ``data`` dict.
 
         Yields:
-            Each page's connection object, oldest cursor first.
+            Each page's connection object, in natural iterating order.
         """
         after: str | None = None
         seen: set[str] = set()
