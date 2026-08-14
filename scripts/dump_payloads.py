@@ -51,7 +51,14 @@ _TOKEN_KEYS = {"accessToken", "refreshToken", "token"}
 _EMAIL_KEYS = {"email", "memberEmail"}
 _NAME_KEYS = {"name", "feederName", "memberName", "ownerName"}
 _SERIAL_KEYS = {"serialNumber"}
-_URL_KEYS = {"avatarUrl", "contentUrl", "thumbnailUrl", "iconUrl", "mediaUrl"}
+_URL_KEYS = {
+    "avatarUrl",
+    "contentUrl",
+    "thumbnailUrl",
+    "iconUrl",
+    "mediaUrl",
+    "mapUrl",
+}
 _CITY_KEYS = {"city", "locationCity"}
 _COUNTRY_KEYS = {"country", "locationCountry"}
 
@@ -194,18 +201,29 @@ async def _collect() -> dict[str, Any]:
     await bb.refresh()
     out["feeders"] = {k: v.data for k, v in bb.feeders.items()}
 
-    # Read-only profile and collections, straight from the library's queries.
-    profile = await bb._make_request(query=queries.me.ME)
-    out["me"] = profile["me"]
-    collections = await bb._make_request(query=queries.me.COLLECTIONS)
-    out["collections"] = collections["me"]["collections"]
+    # Capture profile and collections via _capture so a server error lands in
+    # the dump instead of aborting before the postcard steps run.
+    profile = await _capture("me", bb._make_request(query=queries.me.ME), out)
+    if profile:
+        out["me"] = profile["me"]
+    collections = await _capture(
+        "collections", bb._make_request(query=queries.me.COLLECTIONS), out
+    )
+    if collections:
+        out["collections"] = collections["me"]["collections"]
 
     postcards = await bb.new_postcards()
     out["new_postcards"] = [p.data for p in postcards]
     if not postcards:
         return out
 
-    feed_item_id = postcards[0].node_id
+    # Collecting is an irreversible mutation, so it is opt-in: set
+    # BB_COLLECT_POSTCARD_ID to the feed-item id to collect. Unset (the
+    # default) keeps the run read-only. Reanalyze and collect target the same
+    # item, so opting in reanalyzes the postcard being collected.
+    collect_id = os.environ.get("BB_COLLECT_POSTCARD_ID")
+    feed_item_id = collect_id or postcards[0].node_id
+
     # Reanalyze is idempotent (the app's identify button); safe to always run.
     await _capture(
         "reanalyze",
@@ -218,10 +236,6 @@ async def _collect() -> dict[str, Any]:
     # Key the reanalyze capture by feed-item id, matching the fixture shape.
     out["reanalyze"] = {feed_item_id: out["reanalyze"]}
 
-    # Collecting is an irreversible mutation, so it is opt-in: set
-    # BB_COLLECT_POSTCARD_ID to the feed-item id to collect. Unset (the
-    # default) keeps the run read-only.
-    collect_id = os.environ.get("BB_COLLECT_POSTCARD_ID")
     if not collect_id:
         return out
     await _capture(
@@ -229,7 +243,7 @@ async def _collect() -> dict[str, Any]:
         bb._make_request(
             query=queries.birds.POSTCARD_COLLECT,
             variables={
-                "feedItemId": collect_id,
+                "feedItemId": feed_item_id,
                 "postcardCollectInput": {"share": False},
             },
         ),

@@ -97,7 +97,7 @@
         "name": "Black-Capped Chickadee",
         "__typename": "SpeciesBird",
         "isUnofficialName": false,
-        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/6bc27d4e-9f1a-41dc-8316-2086a9f79022_Black-capped%20Chickadee%20%281%29.svg"
+        "mapUrl": "https://example.invalid/asset"
       }
     },
     {
@@ -141,7 +141,7 @@
         "name": "Pine Siskin",
         "__typename": "SpeciesBird",
         "isUnofficialName": false,
-        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/a34bcd83-2d18-4d2a-8b97-2f591ff79985_Pine%20Siskin.svg"
+        "mapUrl": "https://example.invalid/asset"
       }
     },
     {
@@ -185,7 +185,7 @@
         "name": "House Finch",
         "__typename": "SpeciesBird",
         "isUnofficialName": false,
-        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/d8c20684-d366-4933-8ceb-4955ec9459a1_House%20Finch.svg"
+        "mapUrl": "https://example.invalid/asset"
       }
     },
     {
@@ -229,7 +229,7 @@
         "name": "Red-Breasted Nuthatch",
         "__typename": "SpeciesBird",
         "isUnofficialName": false,
-        "mapUrl": "https://assets.cms-api-graphql.cms-api.prod.aws.mybirdbuddy.com/asset/map/bird/bd6ef12e-955d-488c-af4e-c5462d6979aa_Red-Breasted%20Nuthatch.svg"
+        "mapUrl": "https://example.invalid/asset"
       }
     },
     {
