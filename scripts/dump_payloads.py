@@ -1,14 +1,19 @@
 """Dump real Bird Buddy payloads for building test fixtures (needs creds).
 
 Reads ``BB_EMAIL`` and ``BB_PASSWORD`` (a local ``.env`` is loaded via
-python-dotenv), logs in, and captures the feeders, new postcards, and the
-postcard collect flow. Each risky call is captured so a server error
-(e.g. the postcard ``INTERNAL_SERVER_ERROR``) lands in the dump rather than
-aborting the run. It writes two git-ignored files:
+python-dotenv), logs in, and captures the profile, collections, feeders, new
+postcards, and the postcard collect flow. Each risky call is captured so a
+server error (e.g. the postcard ``INTERNAL_SERVER_ERROR``) lands in the dump
+rather than aborting the run. It writes two git-ignored files:
 
 * ``birdbuddy_payload.dump.json`` -- the raw capture (real account data).
 * ``birdbuddy_payload.sanitized.json`` -- the same data with identifying
   values scrubbed, suitable for copying into ``tests/fixtures`` after review.
+
+By default the run is read-only: it reads the profile, collections and feed,
+and reanalyzes a postcard (running AI inference, exactly what the app's
+identify button does). It only collects a postcard, an irreversible change to
+your account, when ``BB_COLLECT_POSTCARD_ID`` names the feed-item to collect.
 
 Usage:
     Copy ``.env.example`` to ``.env`` and fill in your credentials (or export
@@ -46,7 +51,14 @@ _TOKEN_KEYS = {"accessToken", "refreshToken", "token"}
 _EMAIL_KEYS = {"email", "memberEmail"}
 _NAME_KEYS = {"name", "feederName", "memberName", "ownerName"}
 _SERIAL_KEYS = {"serialNumber"}
-_URL_KEYS = {"avatarUrl", "contentUrl", "thumbnailUrl", "iconUrl", "mediaUrl"}
+_URL_KEYS = {
+    "avatarUrl",
+    "contentUrl",
+    "thumbnailUrl",
+    "iconUrl",
+    "mediaUrl",
+    "mapUrl",
+}
 _CITY_KEYS = {"city", "locationCity"}
 _COUNTRY_KEYS = {"country", "locationCountry"}
 
@@ -172,29 +184,47 @@ async def _capture(label: str, coro: Any, out: dict[str, Any]) -> Any:
 
 
 async def _collect() -> dict[str, Any]:
-    """Log in and capture the postcard collect flow.
+    """Log in and capture the read-only profile plus the postcard collect flow.
 
-    Sends the library's own ``POSTCARD_REANALYZE`` and ``POSTCARD_COLLECT``
-    queries, so the fixture cannot drift from what the client actually issues.
-    Collecting is a real mutation; run against a throwaway/test account.
+    Reads the ME profile and collections, then sends the library's own
+    ``POSTCARD_REANALYZE`` query (and ``POSTCARD_COLLECT`` only when opted in
+    via ``BB_COLLECT_POSTCARD_ID``), so the fixtures cannot drift from what the
+    client actually issues.
 
     Returns:
-        A dict mapping each captured step (feeders, new_postcards, reanalyze,
-        postcard_collect) to its payload, or an ``{"error": ...}`` entry when
-        that step failed.
+        A dict mapping each captured step (feeders, me, collections,
+        new_postcards, reanalyze, and postcard_collect when opted in) to its
+        payload, or an ``{"error": ...}`` entry when that step failed.
     """
     bb = BirdBuddy(os.environ["BB_EMAIL"], os.environ["BB_PASSWORD"])
     out: dict[str, Any] = {}
     await bb.refresh()
     out["feeders"] = {k: v.data for k, v in bb.feeders.items()}
 
+    # Capture profile and collections via _capture so a server error lands in
+    # the dump instead of aborting before the postcard steps run.
+    profile = await _capture("me", bb._make_request(query=queries.me.ME), out)
+    if profile:
+        out["me"] = profile["me"]
+    collections = await _capture(
+        "collections", bb._make_request(query=queries.me.COLLECTIONS), out
+    )
+    if collections:
+        out["collections"] = collections["me"]["collections"]
+
     postcards = await bb.new_postcards()
     out["new_postcards"] = [p.data for p in postcards]
     if not postcards:
         return out
 
-    feed_item_id = postcards[0].node_id
-    # Reanalyze first (idempotent), then collect; capture either path's error.
+    # Collecting is an irreversible mutation, so it is opt-in: set
+    # BB_COLLECT_POSTCARD_ID to the feed-item id to collect. Unset (the
+    # default) keeps the run read-only. Reanalyze and collect target the same
+    # item, so opting in reanalyzes the postcard being collected.
+    collect_id = os.environ.get("BB_COLLECT_POSTCARD_ID")
+    feed_item_id = collect_id or postcards[0].node_id
+
+    # Reanalyze is idempotent (the app's identify button); safe to always run.
     await _capture(
         "reanalyze",
         bb._make_request(
@@ -205,6 +235,9 @@ async def _collect() -> dict[str, Any]:
     )
     # Key the reanalyze capture by feed-item id, matching the fixture shape.
     out["reanalyze"] = {feed_item_id: out["reanalyze"]}
+
+    if not collect_id:
+        return out
     await _capture(
         "postcard_collect",
         bb._make_request(
